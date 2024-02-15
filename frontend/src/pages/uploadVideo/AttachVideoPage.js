@@ -3,10 +3,11 @@ import { Link } from "react-router-dom";
 import Sidebar from "../../components/sidebar/Sidebar";
 import styled from "styled-components";
 import Navbar from "../../components/header/Navbar";
+import { GoArrowRight } from "react-icons/go";
 
 const Container = styled.div`
   display: flex;
-  margin-top: 4rem;
+  margin-top: 50px;
 `;
 
 const SidebarContainer = styled.nav`
@@ -62,6 +63,19 @@ const InfoContainer = styled.div`
   display: flex;
   justify-content: center;
   font-size: 1em;
+`;
+
+const ButtonContainer = styled.div`
+  display: flex;
+  justify-content: end;
+`;
+
+const NextButton = styled(Link)`
+  text-decoration: none;
+  font-family: "Inter";
+  font-size: 18px;
+  color: black;
+  margin-top: 5px;
 `;
 
 const Attach = () => {
@@ -208,8 +222,8 @@ const Attach = () => {
 
   return (
     <Container>
-      <Navbar/>
-      <Sidebar />
+      <Navbar />
+      <Sidebar step={1} />
       <SidebarContainer></SidebarContainer>
       <AttachContainer>
         <SubTitle>동영상 업로드</SubTitle>
@@ -236,6 +250,11 @@ const Attach = () => {
         </InputPointContainer>
 
         <InfoContainer>{infoText}</InfoContainer>
+        <ButtonContainer>
+          <NextButton to="/modify">
+            다음 <GoArrowRight />
+          </NextButton>
+        </ButtonContainer>
       </AttachContainer>
     </Container>
   );

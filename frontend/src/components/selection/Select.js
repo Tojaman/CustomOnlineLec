@@ -118,6 +118,9 @@ const avatars = [
 ];
 
 const Select = () => {
+  const goToCameraPage = () => {
+    window.location.href = "/camera.html";
+  };
   return (
     <SelectContainer>
       <Navbar />
@@ -147,7 +150,7 @@ const Select = () => {
           </CustomSlider>
         </Selection>
 
-        <NextButton to="/video/:id">
+        <NextButton onClick={goToCameraPage}>
           다음 <GoArrowRight />
         </NextButton>
       </ContentContainer>

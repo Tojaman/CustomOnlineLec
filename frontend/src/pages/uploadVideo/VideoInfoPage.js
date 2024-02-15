@@ -5,7 +5,7 @@ import styled from "styled-components";
 import Navbar from "../../components/header/Navbar";
 const Container = styled.div`
   display: flex;
-  margin-top: 4rem;
+  margin-top: 50px;
 `;
 
 const SidebarContainer = styled.nav`
@@ -114,8 +114,8 @@ const VideoInfo = () => {
 
   return (
     <Container>
-      <Navbar/>
-      <Sidebar />
+      <Navbar />
+      <Sidebar step={3} />
       <SidebarContainer></SidebarContainer>
       <InfoContainer>
         <SubTitle>강의 정보</SubTitle>
@@ -149,7 +149,9 @@ const VideoInfo = () => {
 
             <Image src={formData.imageFile && URL.createObjectURL(formData.imageFile)} alt="Thumbnail Preview" />
           </SelectContainer>
-          <SubmitButton>제출</SubmitButton>
+          <Link to="/">
+            <SubmitButton>제출</SubmitButton>
+          </Link>
         </FormContainer>
       </InfoContainer>
     </Container>
