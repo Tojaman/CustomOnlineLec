@@ -4,6 +4,8 @@ import com.example.CustomLecture.dto.Request.VideoConvertRequestDTO;
 import com.example.CustomLecture.dto.Request.VideoSaveRequestDTO;
 import com.example.CustomLecture.service.VideoService;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.*;
 import org.springframework.web.bind.annotation.*;
@@ -28,6 +30,10 @@ public class VideoController {
      */
     @PostMapping("/uploadInfo")
     @Operation(summary = "강의 영상 정보 업로드", description = "강의 영상 정보를 DB에 저장합니다.")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "OK"),
+            @ApiResponse(responseCode = "500", description = "Server Error")
+    })
     public ResponseEntity<String> uploadVideoInfo(@RequestBody VideoSaveRequestDTO videoSaveRequestDTO) {
 
         try {
@@ -45,6 +51,10 @@ public class VideoController {
 
     @PostMapping("/uploadVideo")
     @Operation(summary = "강의 영상 업로드", description = "강의 영상을 보내주세요.")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "OK"),
+            @ApiResponse(responseCode = "500", description = "Server Error")
+    })
     public ResponseEntity<String> convertVideo(@RequestBody VideoConvertRequestDTO videoConvertRequestDTO) {
 
         try {

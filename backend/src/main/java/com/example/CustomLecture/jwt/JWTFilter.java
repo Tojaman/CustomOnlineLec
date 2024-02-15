@@ -18,6 +18,7 @@ public class JWTFilter extends OncePerRequestFilter {
 
     private final JWTUtil jwtUtil;
 
+    // JWTUtil 주입
     public JWTFilter(JWTUtil jwtUtil){
         this.jwtUtil = jwtUtil;
     }
@@ -39,8 +40,10 @@ public class JWTFilter extends OncePerRequestFilter {
         }
 
         System.out.println("authorization now");
+
         //Bearer 부분 제거 후 순수 토큰만 획득
         String token = authorization.split(" ")[1];
+
         //토큰 소멸 시간 검증
         if (jwtUtil.isExpired(token)) {
 
@@ -58,7 +61,7 @@ public class JWTFilter extends OncePerRequestFilter {
         //userEntity를 생성하여 값 set
         UserEntity userEntity = new UserEntity();
         userEntity.setUsername(username);
-        userEntity.setPassword("temppassword");
+        userEntity.setPassword("temppassword"); // JWT 토큰에 비밀번호는 담기지 않지만 Entity에는 필요하기 때문에 아무거나 임시로 넣어둠
         userEntity.setRole(role);
 
         //UserDetails에 회원 정보 객체 담기
@@ -66,7 +69,8 @@ public class JWTFilter extends OncePerRequestFilter {
 
         //스프링 시큐리티 인증 토큰 생성
         Authentication authToken = new UsernamePasswordAuthenticationToken(customUserDetails, null, customUserDetails.getAuthorities());
-        //세션에 사용자 등록
+
+        //세션에 사용자 등록(임시 세션을 만들어서 임시 저장)
         SecurityContextHolder.getContext().setAuthentication(authToken);
 
         filterChain.doFilter(request, response);

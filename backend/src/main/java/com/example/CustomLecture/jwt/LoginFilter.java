@@ -20,6 +20,10 @@ import java.nio.charset.StandardCharsets;
 import java.util.Collection;
 import java.util.Iterator;
 
+
+/**
+ * 서블릿 필터 체인의 DelegatingFilter에 있는 요청을 가로채서 Security 필터 체인(LoginFilter, JWTFilter)에서 검증
+ */
 public class LoginFilter extends UsernamePasswordAuthenticationFilter {
     private final AuthenticationManager authenticationManager;
     private final JWTUtil jwtUtil;
@@ -55,7 +59,10 @@ public class LoginFilter extends UsernamePasswordAuthenticationFilter {
         //스프링 시큐리티에서 username과 password를 검증하기 위해서는 token에 담아야 함
         UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(username, password, null);
 
-        //token에 담은 검증을 위한 AuthenticationManager로 전달
+        /**
+         * token에 담은 검증을 위한 AuthenticationManager로 전달
+         * DB에서 user 정보를 가져와서 검증을 진행
+         */
         return authenticationManager.authenticate(authToken);
     }
 
@@ -70,6 +77,7 @@ public class LoginFilter extends UsernamePasswordAuthenticationFilter {
         //getUsername()으로 username 뽑아내기
         String username = customUserDetails.getUsername();
 
+        //user의 role 뽑아내기
         Collection<? extends GrantedAuthority> authorities = authentication.getAuthorities();
         Iterator<? extends GrantedAuthority> iterator = authorities.iterator();
         GrantedAuthority auth = iterator.next();
@@ -78,7 +86,7 @@ public class LoginFilter extends UsernamePasswordAuthenticationFilter {
 
 
 
-        String token = jwtUtil.createJwt(username, role,60*60*10L);
+        String token = jwtUtil.createJwt(username, role,60*60*1000*10L);
         //header에 담음.
         response.addHeader("Authorization", "Bearer " + token);
     }
