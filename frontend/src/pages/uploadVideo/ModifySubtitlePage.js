@@ -3,10 +3,11 @@ import { Link } from "react-router-dom";
 import Sidebar from "../../components/sidebar/Sidebar";
 import styled from "styled-components";
 import Navbar from "../../components/header/Navbar";
+import { GoArrowRight } from "react-icons/go";
 
 const Container = styled.div`
   display: flex;
-  margin-top: 4rem;
+  margin-top: 50px;
 `;
 
 const SidebarContainer = styled.nav`
@@ -41,6 +42,19 @@ const ModifySubtitle = styled.div`
   button {
     align-self: flex-start;
   }
+`;
+
+const ButtonContainer = styled.div`
+  display: flex;
+  justify-content: end;
+`;
+
+const NextButton = styled(Link)`
+  text-decoration: none;
+  font-family: "Inter";
+  font-size: 18px;
+  color: black;
+  margin-top: 5px;
 `;
 
 const Modify = () => {
@@ -97,8 +111,8 @@ const Modify = () => {
 
   return (
     <Container>
-      <Navbar/>
-      <Sidebar />
+      <Navbar />
+      <Sidebar step={2} />
       <SidebarContainer></SidebarContainer>
       <ModifyContainer>
         <SubTitle>자막 수정</SubTitle>
@@ -121,6 +135,11 @@ const Modify = () => {
           ))}
           <button onClick={handleSaveAllClick}>저장</button>
         </SubtitleContainer>
+        <ButtonContainer>
+          <NextButton to="/inform">
+            다음 <GoArrowRight />
+          </NextButton>
+        </ButtonContainer>
       </ModifyContainer>
     </Container>
   );

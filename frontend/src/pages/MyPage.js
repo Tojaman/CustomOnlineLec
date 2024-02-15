@@ -35,7 +35,7 @@ const Image = styled.img`
   height: 100px;
 `;
 
-const EditIcon = styled.div`
+const EditIcon = styled.label`
   position: absolute;
   bottom: -10px;
   right: -10px;
@@ -50,7 +50,7 @@ const EditIcon = styled.div`
   border: 1px solid #000;
 `;
 
-const InfoText = styled.text`
+const InfoText = styled.span`
   margin-top: 15px;
 `;
 
@@ -114,7 +114,7 @@ const Thumbnail = styled.img`
   max-height: 125px;
 `;
 
-const Text = styled.text`
+const Text = styled.span`
   max-width: 100%;
   max-height: 50px;
   margin-top: 10px;
@@ -159,54 +159,54 @@ const MyPage = () => {
   };
 
   return (
-  <div>
-  <Navbar/>
-    <Container>
-      
-      <SubTitle>User Profile</SubTitle>
-      <ProfileContainer>
-        <ProfileImageContainer>
-          <Image src={userProfileImageUrl} alt="프로필" />
-          <EditIcon>
-            <FaPencilAlt />
-          </EditIcon>
-          <InputFile type="file" accept="image/*" onChange={handleImageChange} />
-        </ProfileImageContainer>
-        <InfoText>User Name</InfoText>
-        {isEditing ? (
-          <Input value={editedUserName} onChange={(e) => setEditedUserName(e.target.value)} />
-        ) : (
-          <Input value={userName} readOnly />
-        )}
-        <InfoText>Email Address</InfoText>
-        {isEditing ? (
-          <Input value={editedEmailAddress} onChange={(e) => setEditedEmailAddress(e.target.value)} />
-        ) : (
-          <Input value={emailAddress} readOnly />
-        )}
-        {isEditing && (
-          <ButtonContent>
-            <ChangeButton onClick={handleSaveClick}>저장</ChangeButton>
-            <ChangeButton onClick={handleCancelClick}>취소</ChangeButton>
-          </ButtonContent>
-        )}
-        {!isEditing && <ChangeButton onClick={handleEditClick}>수정</ChangeButton>}
-      </ProfileContainer>
-      <SubTitle>업로드 영상 목록</SubTitle>
-      <UploadListContainer>
-        <VideoContainer>
-          <Thumbnail src="/favicon.ico" alt="썸네일" />
-          <Text>간지나게 사는 방법</Text>
-          <Text>Tony</Text>
-        </VideoContainer>
-        <MoreButton>
-          <ListLink to="/uploadList">
-            더보기
-            <IoIosArrowForward />
-          </ListLink>
-        </MoreButton>
-      </UploadListContainer>
-    </Container></div>
+    <div>
+      <Navbar />
+      <Container>
+        <SubTitle>User Profile</SubTitle>
+        <ProfileContainer>
+          <ProfileImageContainer>
+            <Image src={userProfileImageUrl} alt="프로필" />
+            <EditIcon htmlFor="fileInput">
+              <FaPencilAlt />
+              <InputFile id="fileInput" type="file" accept="image/*" onChange={handleImageChange} />
+            </EditIcon>
+          </ProfileImageContainer>
+          <InfoText>User Name</InfoText>
+          {isEditing ? (
+            <Input value={editedUserName} onChange={(e) => setEditedUserName(e.target.value)} />
+          ) : (
+            <Input value={userName} readOnly />
+          )}
+          <InfoText>Email Address</InfoText>
+          {isEditing ? (
+            <Input value={editedEmailAddress} onChange={(e) => setEditedEmailAddress(e.target.value)} />
+          ) : (
+            <Input value={emailAddress} readOnly />
+          )}
+          {isEditing && (
+            <ButtonContent>
+              <ChangeButton onClick={handleSaveClick}>저장</ChangeButton>
+              <ChangeButton onClick={handleCancelClick}>취소</ChangeButton>
+            </ButtonContent>
+          )}
+          {!isEditing && <ChangeButton onClick={handleEditClick}>수정</ChangeButton>}
+        </ProfileContainer>
+        <SubTitle>업로드 영상 목록</SubTitle>
+        <UploadListContainer>
+          <VideoContainer>
+            <Thumbnail src="/favicon.ico" alt="썸네일" />
+            <Text>간지나게 사는 방법</Text>
+            <Text>Tony</Text>
+          </VideoContainer>
+          <MoreButton>
+            <ListLink to="/uploadList">
+              더보기
+              <IoIosArrowForward />
+            </ListLink>
+          </MoreButton>
+        </UploadListContainer>
+      </Container>
+    </div>
   );
 };
 

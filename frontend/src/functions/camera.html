@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Rigging Function</title>
+    
+    <style>
+      @-webkit-keyframes sk-pulseScaleOut {
+        0% {
+          -webkit-transform: scale(0);
+          transform: scale(0);
+        }
+
+        100% {
+          -webkit-transform: scale(1);
+          transform: scale(1);
+          opacity: 0;
+        }
+      }
+      @keyframes sk-pulseScaleOut {
+        0% {
+          -webkit-transform: scale(0);
+          transform: scale(0);
+        }
+
+        100% {
+          -webkit-transform: scale(1);
+          transform: scale(1);
+          opacity: 0;
+        }
+      }
+      .spinner-text {
+        float: left;
+      }
+      .sk-spinner-pulse {
+        width: 20px;
+        height: 20px;
+        margin: auto 10px;
+        float: left;
+        background-color: #333;
+        border-radius: 100%;
+        -webkit-animation: sk-pulseScaleOut 1s infinite ease-in-out;
+        animation: sk-pulseScaleOut 1s infinite ease-in-out;
+      }
+      #loading {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+      }
+
+      #progressBarFull {
+        height: 5px;
+        width: 100%;
+        background-color: #ccc;
+        cursor: pointer;
+      }
+      #progressBar {
+        height: 5px;
+        background-color: #4caf50;
+        width: 0;
+      }
+      #control {
+        display: flex;
+        padding: 2px;
+        justify-content: space-between;
+        background-color: #333;
+        color: #fff;
+      }
+      #subControl {
+        display: flex;
+        margin-right: 10px;
+      }
+      #playPauseButton {
+        font-size: 15px;
+      }
+      #time {
+        font-size: 15px;
+        margin-left: 10px;
+      }
+      #volumeSlider {
+        margin-top: 7.5px;
+        height: 5px;
+        width: 75px;
+      }
+
+      #resultVideo {
+        width: 100%;
+        margin-bottom: -4px;
+      }
+      #player {
+        width: 100%;
+      }
+      #videoPlayer {
+        display: flex;
+        flex-direction: column;
+      }
+
+      .container {
+        padding-left: 80px;
+        padding-right: 80px;
+      }
+
+      #videoInfo {
+        display: flex;
+        flex-direction: column;
+      }
+      #first {
+        display: flex;
+        justify-content: space-between;
+      }
+      #title {
+        font-size: 24px;
+        font-weight: bold;
+        margin-bottom: 10px;
+      }
+      #downloadButton {
+        height: 25px;
+      }
+      #profile {
+        height: 50px;
+        width: 50px;
+      }
+      #second {
+        display: flex;
+        align-items: flex-end;
+      }
+      #instructor,
+      #date {
+        margin-left: 10px;
+      }
+      #third {
+        display: flex;
+        width: 100%;
+        height: 150px;
+        background-color: #ccc;
+        border-radius: 15px;
+        margin-top: 8px;
+      }
+      #description {
+        padding: 10px;
+      }
+    </style>
+  </head>
+
+  <body>
+    <div id="loading">
+      <span class="spinner-text" id="status"> Loading PoseNet model... </span>
+      <div class="sk-spinner sk-spinner-pulse"></div>
+    </div>
+
+    <div class="container">
+      <div id="content" hidden>
+        <div>
+          <video id="originVideo" src="test8.mp4" type="video/mp4" controls></video>
+        </div>
+
+        <div id="canvasCollection">
+          <canvas id="copyCanvas"></canvas>
+          <canvas id="camCanvas"></canvas>
+          <canvas id="camFlipCanvas"></canvas>
+          <canvas class="illustrationCanvas"></canvas>
+          <canvas id="mergedCanvas"></canvas>
+        </div>
+      </div>
+
+      <div id="videoPlayer">
+        <div>
+          <video id="resultVideo"></video>
+        </div>
+
+        <div id="player">
+          <div id="progressBarFull">
+            <div id="progressBar"></div>
+          </div>
+          <div id="control">
+            <div id="subControl">
+              <div id="playPauseButton">▶</div>
+              <div id="time">0:00 / 0:00</div>
+            </div>
+            <div id="subControl">
+              <div id="volume">🔊</div>
+              <input type="range" id="volumeSlider" min="0" max="1" step="0.01" value="1" />
+            </div>
+          </div>
+        </div>
+
+        <hr />
+
+        <div id="videoInfo">
+          <div id="first">
+            <div id="title">제목</div>
+            <button id="downloadButton">PDF 다운로드</button>
+          </div>
+          <div id="second">
+            <img id="profile" src="test.png" alt="프로필 이미지" />
+            <div id="instructor">강사명</div>
+            <div id="date">날짜</div>
+          </div>
+          <div id="third">
+            <div id="description">강의 설명</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script src="camera.js"></script>
+    <script src="progressBar.js"></script>
+  </body>
+</html>
