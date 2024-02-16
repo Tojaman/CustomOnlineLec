@@ -1,8 +1,9 @@
 import React from "react";
 import logo from "../../assets/img/UUJJ.png";
-import { Link, NavLink } from "react-router-dom";
+import { Link, NavLink, useNavigate } from "react-router-dom";
 import styled from "styled-components";
 import { TfiMenu } from "react-icons/tfi";
+import Swal from "sweetalert2";
 
 const NavContainer = styled.div`
   width: 100%;
@@ -88,6 +89,20 @@ const RegisterButton = styled.button`
 
 const Navbar = () => {
   const token = sessionStorage.getItem("token");
+  const navigate= useNavigate();
+
+  const handleUploadClick = () => {
+    if (!token) {
+      Swal.fire({
+        icon: "warning",
+        title: "로그인 필요",
+        text: "강의 업로드를 하시려면 로그인이 필요합니다.",
+        toast: true,
+      }).then(() => {
+        navigate("/");
+      });
+    }
+  };
 
   return (
     <NavContainer>
@@ -97,7 +112,7 @@ const Navbar = () => {
       <NavElement>
         <TfiMenuStyled />
         <NavItem to="/">Home</NavItem>
-        <NavItem to="/attach">강의 업로드</NavItem>
+        <NavItem to="/attach" onClick={handleUploadClick} >강의 업로드</NavItem>
         <NavItem to="/videoList">강의 목록</NavItem>
         {token ? <NavItem to="/mypage">마이페이지</NavItem> : null}
       </NavElement>

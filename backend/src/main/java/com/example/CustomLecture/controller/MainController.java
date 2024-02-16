@@ -1,15 +1,8 @@
 package com.example.CustomLecture.controller;
 
-import com.example.CustomLecture.dto.JoinDTO;
-import com.example.CustomLecture.entity.UserEntity;
-import com.example.CustomLecture.repository.UserRepository;
-import com.example.CustomLecture.service.JoinService;
-import org.apache.catalina.User;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Collection;

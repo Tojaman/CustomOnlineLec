@@ -3,10 +3,13 @@ import { Link, useNavigate } from "react-router-dom";
 import styled from "styled-components";
 import { GoArrowRight } from "react-icons/go";
 import axios from "axios";
+
+import {jwtDecode} from "jwt-decode";
+
 import Swal from "sweetalert2";
 import logo from "../assets/img/UUJJ.png";
 import Background from "../assets/img/Group.png";
-import GoogleLogin from "../assets/img/GoogleLogin.png";
+import GoogleLogin from "../assets/img/Googlelogin.png";
 import OR from "../assets/img/Or.png";
 
 const LoginContainer = styled.div`
@@ -44,7 +47,9 @@ const LoginText = styled.p`
 `;
 
 const RegisterButton = styled(Link)`
-  text-decoration: none;
+  text-decoration: underline;
+  text-decoration-color: #499be9;
+  text-underline-offset: 3px;
   font-family: "Inter";
   font-size: 16px;
   line-height: 22px;
@@ -120,7 +125,7 @@ const GradientButton = styled.button`
   width: 400px;
 `;
 
-export default function Login() {
+const LoginPage = () => {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const navigate = useNavigate();
@@ -131,18 +136,34 @@ export default function Login() {
         username,
         password,
       });
-      const { token, user_name, pass_word } = response.data;
-      sessionStorage.setItem("token", token);
-      sessionStorage.setItem("username", user_name);
-      sessionStorage.setItem("password", pass_word);
-      showToast();
       
+      // JWT 토큰을 'Bearer ' 부분을 제외한 부분만 추출하여 sessionStorage에 저장
+      const token = response.headers['authorization'].split(' ')[1];
+      sessionStorage.setItem("token", token);
+
+      // JWT 토큰을 디코딩하여 사용자 이름 추출
+      const decodedToken = jwtDecode(token);
+      const { username: decodedUsername, role } = decodedToken;
+
+      // 추출된 정보를 sessionStorage에 저장
+      sessionStorage.setItem("username", decodedUsername);
+      sessionStorage.setItem("role", role);
+  
+      // 세션에 저장된 정보를 콘솔에 출력
+      console.log("Username:", decodedUsername);
+      console.log("Role:", role);
+  
+  
+      // 세션에 저장된 정보를 콘솔에 출력
+      console.log("Token:", sessionStorage.getItem("token"));
+
+      showToast();
     } catch (error) {
-      console.error("로그인 요청 실패:", error.response.data); // 서버에서 전달한 에러 메시지 출력
+      console.error("로그인 요청 실패:", error.response.status);
       if (error.response.status === 401) {
         showToastError("입력값이 올바르지 않습니다.");
+        showToastError("존재하지 않는 아이디 또는 비밀번호입니다.");
       } else {
-        // 기타 예외 처리
         showToastError("로그인 중 오류가 발생했습니다.");
       }
     }
@@ -153,7 +174,6 @@ export default function Login() {
       icon: "success",
       title: "로그인 성공",
       toast: true,
-      position: "center",
       showConfirmButton: false,
       timer: 1000,
     }).then(() => {
@@ -167,7 +187,6 @@ export default function Login() {
       title: "로그인 실패",
       text: message,
       toast: true,
-      position: "center",
       showConfirmButton: false,
       timer: 2000,
     });
@@ -203,3 +222,5 @@ export default function Login() {
     </LoginContainer>
   );
 }
+
+export default LoginPage;

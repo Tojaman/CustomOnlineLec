@@ -1,10 +1,11 @@
 import React from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import styled from "styled-components";
 import { FaRegCirclePlay } from "react-icons/fa6";
 import { GoArrowRight } from "react-icons/go";
 import Navbar from "../components/header/Navbar";
 
+import Swal from "sweetalert2";
 import Background from "../assets/img/background.png";
 import Mainimg from "../assets/img/MainImg.png";
 
@@ -114,6 +115,22 @@ const MainImg = styled.img.attrs({
 `;
 
 export default function MainPage() {
+  const token = sessionStorage.getItem("token");
+  const navigate= useNavigate();
+
+  const handleUploadClick = () => {
+    if (!token) {
+      Swal.fire({
+        icon: "warning",
+        title: "로그인 필요",
+        text: "강의 업로드를 하시려면 로그인이 필요합니다.",
+        toast: true,
+      }).then(() => {
+        navigate("/");
+      });
+    }
+  };
+
   return (
     <MainContainer>
       <Navbar />
@@ -126,13 +143,13 @@ export default function MainPage() {
             <Explain3>강의를 업로드하고 원하는 음성과 캐릭터를 선택해 강의를 시청해보세요!</Explain3>
           </TextContainer>
           <LinkContainer>
-            <GradientButton to="/attach">
+            <GradientButton to="/attach" onClick={handleUploadClick}>
               강의 업로드 하러가기
               <GoArrowRight />
             </GradientButton>
             <LectureLink to="/videoList">
               강의 시청하기
-              <FaRegCirclePlay />
+              <FaRegCirclePlay/>
             </LectureLink>
           </LinkContainer>
         </LeftContainer>
