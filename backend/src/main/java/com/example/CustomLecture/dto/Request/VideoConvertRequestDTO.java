@@ -8,7 +8,7 @@ import lombok.*;
 @AllArgsConstructor
 @ToString
 public class VideoConvertRequestDTO {
-    private Integer userId;
+//    private Integer userId;
     private String url;
-    private String rvcModel;
+//    private String rvcModel;
 }

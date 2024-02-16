@@ -1,10 +1,12 @@
 package com.example.CustomLecture.service;
 
 import com.example.CustomLecture.dto.Request.VideoSaveRequestDTO;
-import com.example.CustomLecture.dto.Response.VideoSaveResponseDTO;
 import com.example.CustomLecture.entity.UserEntity;
 import com.example.CustomLecture.entity.Video;
+import com.example.CustomLecture.entity.VideoData;
+import com.example.CustomLecture.jwt.JWTUtil;
 import com.example.CustomLecture.repository.UserRepository;
+import com.example.CustomLecture.repository.VideoDataRepository;
 import com.example.CustomLecture.repository.VideoRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpEntity;
@@ -22,31 +24,36 @@ import org.springframework.web.client.RestTemplate;
 @RequiredArgsConstructor
 @RestController
 public class VideoService {
-    private final VideoRepository videoRepository;
+
     private final UserRepository userRepository;
+    private final VideoRepository videoRepository;
+    private final VideoDataRepository videoDataRepository;
     private final RestTemplate restTemplate;
+    private final JWTUtil jwtUtil;
+
 
     /**
      * 강의 영상 업로드 및 음성 변환
      */
-    public void uploadVideo(VideoSaveRequestDTO videoSaveRequestDTO) {
+    public String  convertVideo(String requestBody, String jwtToken){
 
-        // userId로 부터 UserEntity 객체 추출
+        String token = jwtToken.replace("Bearer ", "");
+
+        // JWTUtil을 사용하여 사용자 이름 추출
+        String username = jwtUtil.getUsername(token);
+
+
         UserEntity userEntity = userRepository
-                .findById(videoSaveRequestDTO.getUserId())
+                .findByUsername(username)
                 .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 ID 입니다."));
 
-        VideoSaveResponseDTO videoSaveResponseDTO = new VideoSaveResponseDTO(videoSaveRequestDTO.getBoardId(), userEntity, videoSaveRequestDTO.getTitle(), videoSaveRequestDTO.getContent(), videoSaveRequestDTO.getSubject(), videoSaveRequestDTO.getThumbnailS3Path(), videoSaveRequestDTO.getLectureMaterialsS3Path());
-
-        // DTO 객체를 domain 객체로 변환
-        Video video = videoSaveResponseDTO.toVideo(videoSaveResponseDTO);
+        Long userId = userEntity.getId();
 
 
-        // DB에 강의 영상 정보 저장
-        videoRepository.save(video);
-    }
+        // requestBody에 userId 추가
+        String updatedRequestBody = requestBody.substring(0, requestBody.length() - 1) + ", \"userId\":" + userId + "}";
+        System.out.println(updatedRequestBody);
 
-    public String  convertVideo(String requestBody){
         // 플라스크 서버 URL
         String flaskUrl = "http://localhost:5000/convert";
 
@@ -55,10 +62,7 @@ public class VideoService {
         headers.setContentType(MediaType.APPLICATION_JSON);
 
         // HTTP 요청 객체 생성
-        HttpEntity<String> requestEntity = new HttpEntity<>(requestBody, headers);
-
-        System.out.println(requestEntity);
-
+        HttpEntity<String> requestEntity = new HttpEntity<>(updatedRequestBody, headers);
 
         // 플라스크 서버로 요청 전송 및 응답 받기
         ResponseEntity<String> response = restTemplate.postForEntity(flaskUrl, requestEntity, String.class);
@@ -66,4 +70,29 @@ public class VideoService {
         return response.getBody();
     }
 
+
+    /**
+     * 강의 영상 정보 업로드
+     */
+    public void uploadVideo(VideoSaveRequestDTO videoSaveRequestDTO, String jwtToken) {
+
+        String token = jwtToken.replace("Bearer ", "");
+
+        // JWTUtil을 사용하여 사용자 이름 추출
+        String username = jwtUtil.getUsername(token);
+        System.out.println(username);
+
+        // userId로 부터 UserEntity 객체 추출
+        UserEntity userEntity = userRepository
+                .findByUsername(username)
+                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 userId 입니다."));
+
+        // DTO 객체를 domain 객체로 변환
+        Video video =videoSaveRequestDTO.toVideo(userEntity);
+        VideoData videoData = videoSaveRequestDTO.toVideoData(video);
+
+        // DB에 강의 영상 정보 저장
+        videoRepository.save(video);
+        videoDataRepository.save(videoData);
+    }
 }

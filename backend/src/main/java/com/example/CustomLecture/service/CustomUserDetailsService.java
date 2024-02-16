@@ -22,7 +22,8 @@ public class CustomUserDetailsService implements UserDetailsService {
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
 
         //DB에서 조회
-        UserEntity userData = userRepository.findByUsername(username);
+        UserEntity userData = userRepository.findByUsername(username)
+                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 ID 입니다."));;
 
         if (userData != null) {
 
