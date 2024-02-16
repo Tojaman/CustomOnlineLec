@@ -5,6 +5,9 @@ import styled from "styled-components";
 import Navbar from "../../components/header/Navbar";
 import { GoArrowRight } from "react-icons/go";
 
+import { useDispatch } from "react-redux";
+import { subtitle } from "../../redux/subtitle";
+
 const Container = styled.div`
   display: flex;
   margin-top: 50px;
@@ -58,6 +61,8 @@ const NextButton = styled(Link)`
 `;
 
 const Modify = () => {
+  const dispatch = useDispatch();
+
   const lines = [
     "동해물과 백두산이 마르고 닳도록.",
     "하느님이 보우하사 우리나라만세.",
@@ -87,7 +92,7 @@ const Modify = () => {
 
   const [editStates, setEditStates] = useState(Array(lines.length).fill(false));
   const [modifiedContents, setModifiedContents] = useState([...lines]);
-  const setResult = useState([]);
+  const [result, setResult] = useState([]);
 
   const handleSaveClick = (index) => {
     const newEditStates = [...editStates];
@@ -102,11 +107,10 @@ const Modify = () => {
   };
 
   const handleSaveAllClick = () => {
-    const updatedResult = modifiedContents.map((content, index) => ({
-      original: lines[index],
-      modified: content,
-    }));
-    setResult(updatedResult);
+    const saves = modifiedContents.map((content, index) => content);
+    setResult(saves);
+    dispatch(subtitle(saves));
+    console.log(saves);
   };
 
   return (
@@ -119,7 +123,7 @@ const Modify = () => {
         <SubtitleContainer>
           {lines.map((line, index) => (
             <ModifySubtitle key={index}>
-              <text>{line}</text>
+              <span>{line}</span>
               <textarea
                 type="text"
                 value={modifiedContents[index]}

@@ -6,7 +6,7 @@ import axios from "axios";
 import Swal from "sweetalert2";
 import logo from "../assets/img/UUJJ.png";
 import Background from "../assets/img/Group.png";
-import GoogleLogin from "../assets/img/Google login.png";
+import GoogleLogin from "../assets/img/GoogleLogin.png";
 import OR from "../assets/img/Or.png";
 
 const LoginContainer = styled.div`
