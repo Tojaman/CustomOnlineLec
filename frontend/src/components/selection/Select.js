@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import { Link } from "react-router-dom";
 import styled from "styled-components";
 import { GoArrowRight } from "react-icons/go";
@@ -37,8 +37,8 @@ const ContentContainer = styled.div`
 `;
 
 const Selection = styled.div`
-  diplay: flex;
-  margin-top: 60px;
+  display: flex;
+  margin-top: 30px;
 `;
 
 const SelectText = styled.p`
@@ -46,6 +46,7 @@ const SelectText = styled.p`
   font-size: 20px;
   line-height: 15px;
   margin-left: 12px;
+  margin-top:60px
 `;
 
 const CustomSlider = styled(Slider)`
@@ -59,12 +60,20 @@ const CustomSlider = styled(Slider)`
   .slick-slide {
     height: 150px;
     margin: 0 10px;
-    border: 1px solid #1b78da;
+    border: 1px solid #e1dddd;
     padding: 1px;
+
+    &:hover {
+      border: 1px solid #499be9;
+    }
+    
   }
   .slick-track {
     display: flex;
   }
+  .selected { 
+  border: 1px solid #499be9;
+}
 `;
 
 const Img = styled.img`
@@ -74,7 +83,6 @@ const Img = styled.img`
 `;
 
 const Name = styled.div`
-  diplay: flex;
   font-family: "Inter";
   font-style: normal;
   font-weight: 600;
@@ -83,13 +91,16 @@ const Name = styled.div`
 `;
 
 const NextButton = styled(Link)`
-  text-decoration: none;
+  text-decoration: underline;
+  text-decoration-color: #499be9;
+  text-underline-offset: 3px;
   font-family: "Inter";
   font-size: 16px;
   line-height: 22px;
   color: black;
   align-self: flex-end;
   margin-top: 30px;
+  margin-left: 5px;
 `;
 
 const settings = {
@@ -121,28 +132,54 @@ const Select = () => {
   const goToCameraPage = () => {
     window.location.href = "/camera.html";
   };
+
+  const [selectedVoiceIndex, setSelectedVoiceIndex] = useState(null);
+  const [selectedAvatarIndex, setSelectedAvatarIndex] = useState(null);
+
+  const handleVoiceSelection = (index) => {
+    setSelectedVoiceIndex(index);
+    const selectedVoice = voices[index];
+    sessionStorage.setItem("selectedVoice", selectedVoice.name);
+    console.log("Selected Voice:", sessionStorage.getItem("selectedVoice"));
+  };
+
+  const handleAvatarSelection = (index) => {
+    setSelectedAvatarIndex(index);
+    const selectedAvatar = avatars[index];
+    sessionStorage.setItem("selectedAvatar", selectedAvatar.name);
+    console.log("Selected Avatar:", sessionStorage.getItem("selectedAvatar"));
+  };
+
   return (
     <SelectContainer>
       <Navbar />
       <PageBackGround />
       <ContentContainer>
-        <Selection>
-          <SelectText>음성 선택</SelectText>
+      <SelectText>음성 선택</SelectText>
+      <Selection>
           <CustomSlider {...settings}>
-            {voices.map((voice) => (
-              <div key={voice.name}>
+            {voices.map((voice, index) => (
+              <div
+                key={voice.name}
+                className={selectedVoiceIndex === index ? "selected" : ""}
+                onClick={() => handleVoiceSelection(index)}
+              >
                 <Img src={voice.img} />
                 <Name>{voice.name}</Name>
               </div>
             ))}
           </CustomSlider>
         </Selection>
-
+<SelectText>아바타 선택</SelectText>
         <Selection>
-          <SelectText>아바타 선택</SelectText>
+          
           <CustomSlider {...settings}>
-            {avatars.map((avatar) => (
-              <div key={avatar.index}>
+            {avatars.map((avatar, index) => (
+              <div
+                key={avatar.name}
+                className={selectedAvatarIndex === index ? "selected" : ""}
+                onClick={() => handleAvatarSelection(index)}
+              >
                 <Img src={avatar.img} />
                 <Name>{avatar.name}</Name>
               </div>

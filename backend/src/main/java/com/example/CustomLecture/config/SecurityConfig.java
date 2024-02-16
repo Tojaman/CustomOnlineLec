@@ -4,7 +4,6 @@ import com.example.CustomLecture.jwt.JWTFilter;
 import com.example.CustomLecture.jwt.JWTUtil;
 import com.example.CustomLecture.jwt.LoginFilter;
 import jakarta.servlet.http.HttpServletRequest;
-import org.springframework.boot.autoconfigure.security.servlet.PathRequest;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -15,13 +14,10 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
-import org.springframework.security.web.header.writers.frameoptions.XFrameOptionsHeaderWriter;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 
 import java.util.Collections;
-
-import static org.springframework.web.servlet.function.RequestPredicates.headers;
 
 @Configuration // 스프링 컨테이너에 Configuration Bean으로 등록
 @EnableWebSecurity // security 활성화(WebSecurityConfiguration.class, SpringWebMvcImportSelector.class, OAuth2ImportSelector.class, HttpSecurityConfiguration.class들을 import해서 활성화해줌)

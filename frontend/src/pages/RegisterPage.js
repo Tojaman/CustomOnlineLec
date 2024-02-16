@@ -6,7 +6,7 @@ import Swal from "sweetalert2";
 
 import logo from "../assets/img/UUJJ.png";
 import Background from "../assets/img/Group.png";
-import GoogleRegister from "../assets/img/GoogleRegister.png";
+import GoogleLogin from "../assets/img/Googlelogin.png";
 import OR from "../assets/img/Or.png";
 
 const RegistContainer = styled.div`
@@ -63,7 +63,7 @@ const ContentContainer = styled.div`
 const Google = styled.button`
   width: 400px;
   height: 57.55px;
-  background: url(${GoogleRegister});
+  background: url(${GoogleLogin});
   border: none;
   cursor: pointer;
   background-size: contain;
@@ -120,19 +120,18 @@ export default function RegisterPage() {
   const handleRegister = async () => {
     try {
       const response = await axios.post("/join", {
-        nickname,
         username,
         password,
+        nickname,
       });
   
       console.log("회원가입 요청 성공");
       showToast();
     } catch (error) {
-      console.error("회원가입 요청 실패:", error.response.data); // 서버에서 전달한 에러 메시지 출력
+      console.error("회원가입 요청 실패", error.response.status); // 서버에서 전달한 에러 메시지 출력
       if (error.response.status === 500) {
         showToastError("입력값이 올바르지 않습니다.");
       } else if (error.response.status === 409) {
-        // 중복된 사용자 이름 예외 처리
         showToastError("이미 존재하는 사용자 이름 또는 닉네임입니다.");
       } else {
         // 기타 예외 처리
@@ -165,8 +164,6 @@ export default function RegisterPage() {
       navigate("/login");
     });
   };
-
-
 
   return (
     <RegistContainer>
