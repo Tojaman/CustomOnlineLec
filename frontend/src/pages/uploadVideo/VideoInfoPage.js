@@ -3,6 +3,9 @@ import { Link } from "react-router-dom";
 import Sidebar from "../../components/sidebar/Sidebar";
 import styled from "styled-components";
 import Navbar from "../../components/header/Navbar";
+
+import { useSelector } from "react-redux";
+
 const Container = styled.div`
   display: flex;
   margin-top: 50px;
@@ -98,18 +101,53 @@ const Image = styled.img`
   margin-top: 10px;
 `;
 
+const ResultContainer = styled.div`
+  display: flex;
+`;
+
 const VideoInfo = () => {
+  const videoData = useSelector((state) => state.videoData.value);
+
+  const subtitle = useSelector((state) => state.subtitle.value);
+  const video = videoData ? videoData.videoURL : "N/A";
+  const x = videoData ? videoData.x : "N/A";
+  const y = videoData ? videoData.x : "N/A";
+  const width = videoData ? videoData.width : "N/A";
+  const height = videoData ? videoData.height : "N/A";
+  const videoWidth = videoData ? videoData.videoWidth : "N/A";
+  const videoHeight = videoData ? videoData.videoHeight : "N/A";
+
   const [formData, setFormData] = useState({
     title: "",
     description: "",
     category: "",
     pdfFile: null,
     imageFile: null,
+    imageFileURL: null,
   });
 
   const handleFileChange = (e, fileType) => {
     const file = e.target.files[0];
-    setFormData({ ...formData, [fileType]: file });
+    const fileURL = URL.createObjectURL(file);
+    setFormData({ ...formData, [fileType]: file, imageFileURL: fileURL });
+  };
+
+  const handleSubmit = () => {
+    console.log("제목:", formData.title);
+    console.log("강의 설명:", formData.description);
+    console.log("카테고리:", formData.category);
+    console.log("강의자료:", formData.pdfFile);
+    console.log("썸네일 URL:", formData.imageFileURL);
+
+    console.log("redux");
+    console.log("자막:", subtitle);
+    console.log("비디오:", video);
+    console.log("x:", x);
+    console.log("y:", y);
+    console.log("너비:", width);
+    console.log("높이:", height);
+    console.log("영상 너비:", videoWidth);
+    console.log("영상 높이:", videoHeight);
   };
 
   return (
@@ -145,12 +183,11 @@ const VideoInfo = () => {
             <FileInput type="file" accept=".pdf" onChange={(e) => handleFileChange(e, "pdfFile")} />
 
             <Label2>썸네일</Label2>
-            <FileInput type="file" accept=".jpg" onChange={(e) => handleFileChange(e, "imageFile")} />
-
+            <FileInput type="file" accept="image/*" onChange={(e) => handleFileChange(e, "imageFile")} />
             <Image src={formData.imageFile && URL.createObjectURL(formData.imageFile)} alt="Thumbnail Preview" />
           </SelectContainer>
           <Link to="/">
-            <SubmitButton>제출</SubmitButton>
+            <SubmitButton onClick={handleSubmit}>제출</SubmitButton>
           </Link>
         </FormContainer>
       </InfoContainer>

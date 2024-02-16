@@ -1,8 +1,13 @@
 import { configureStore } from "@reduxjs/toolkit";
-import userReducer from "./user";
+import { combineReducers } from "redux";
+import videoReducer from "./videoData";
+import subtitleReducer from "./subtitle";
+
+const rootReducer = combineReducers({
+  videoData: videoReducer,
+  subtitle: subtitleReducer,
+});
 
 export default configureStore({
-  reducer: {
-    user: userReducer,
-  },
+  reducer: rootReducer,
 });

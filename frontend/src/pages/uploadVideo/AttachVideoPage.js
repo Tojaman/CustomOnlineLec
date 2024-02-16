@@ -5,6 +5,9 @@ import styled from "styled-components";
 import Navbar from "../../components/header/Navbar";
 import { GoArrowRight } from "react-icons/go";
 
+import { useDispatch } from "react-redux";
+import { videoData } from "../../redux/videoData";
+
 const Container = styled.div`
   display: flex;
   margin-top: 50px;
@@ -79,6 +82,7 @@ const NextButton = styled(Link)`
 `;
 
 const Attach = () => {
+  const dispatch = useDispatch();
   const [videoURL, setVideoURL] = useState("");
   const videoRef = useRef(null);
   const canvasRef = useRef(null);
@@ -92,6 +96,8 @@ const Attach = () => {
   const widthInputRef = useRef(null);
   const heightInputRef = useRef(null);
   const [infoText, setInfoText] = useState("");
+  const [videoWidth, setVideoWidth] = useState(0);
+  const [videoHeight, setVideoHeight] = useState(0);
 
   const updateVideo = async (event) => {
     URL.revokeObjectURL(videoRef.current.src);
@@ -102,6 +108,8 @@ const Attach = () => {
     await new Promise((resolve) => {
       videoRef.current.onloadeddata = () => {
         resolve(videoRef.current);
+        setVideoWidth(videoRef.current.videoWidth);
+        setVideoHeight(videoRef.current.videoHeight);
       };
     });
 
@@ -109,6 +117,29 @@ const Attach = () => {
     const canvas = canvasRef.current;
     canvas.width = video.getAttribute("width");
     canvas.height = video.offsetHeight;
+  };
+
+  const handleSubmit = () => {
+    const rect = rectRef.current;
+
+    const videoInfo = {
+      videoURL,
+      x: rect.x,
+      y: rect.y,
+      width: rect.width,
+      height: rect.height,
+      videoWidth,
+      videoHeight,
+    };
+
+    console.log("동영상 파일:", videoURL);
+    console.log("x:", rect.x);
+    console.log("y:", rect.y);
+    console.log("width:", rect.width);
+    console.log("height:", rect.height);
+    console.log("영상 파일의 가로 크기:", videoWidth);
+    console.log("영상 파일의 세로 크기:", videoHeight);
+    dispatch(videoData(videoInfo));
   };
 
   useEffect(() => {
@@ -255,6 +286,7 @@ const Attach = () => {
             다음 <GoArrowRight />
           </NextButton>
         </ButtonContainer>
+        <button onClick={handleSubmit}>제출</button>
       </AttachContainer>
     </Container>
   );

@@ -6,7 +6,7 @@ import Swal from "sweetalert2";
 
 import logo from "../assets/img/UUJJ.png";
 import Background from "../assets/img/Group.png";
-import GoogleLogin from "../assets/img/Google login.png";
+import GoogleRegister from "../assets/img/GoogleRegister.png";
 import OR from "../assets/img/Or.png";
 
 const RegistContainer = styled.div`
@@ -63,7 +63,7 @@ const ContentContainer = styled.div`
 const Google = styled.button`
   width: 400px;
   height: 57.55px;
-  background: url(${GoogleLogin});
+  background: url(${GoogleRegister});
   border: none;
   cursor: pointer;
   background-size: contain;
