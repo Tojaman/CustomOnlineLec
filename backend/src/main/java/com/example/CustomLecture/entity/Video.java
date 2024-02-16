@@ -42,16 +42,16 @@ public class Video {
     private String subtitleS3Path;
 
     private String thumbnailS3Path;
-    private String lectureMaterialsS3Path;
+    private String lectureNoteS3Path;
 
-    public Video(final Long id, final UserEntity member, final String title, final String content, final String subject, final String thumbnailS3Path, final String lectureMaterialsS3Path) {
+    public Video(final Long id, final UserEntity member, final String title, final String content, final String subject, final String thumbnailS3Path, final String lectureNoteS3Path) {
         this.id = id;
         this.member = member;
         this.title = title;
         this.content = content;
         this.subject = subject;
         this.thumbnailS3Path = thumbnailS3Path;
-        this.lectureMaterialsS3Path = lectureMaterialsS3Path;
+        this.lectureNoteS3Path = lectureNoteS3Path;
     }
 
 }
