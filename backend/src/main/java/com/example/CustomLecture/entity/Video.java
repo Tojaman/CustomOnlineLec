@@ -28,6 +28,14 @@ public class Video {
     @JoinColumn(name = "userId")
     private UserEntity member;
 
+    @OneToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "videoDataId")
+    private VideoData videoData;
+
+    @OneToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "convertVideosId")
+    private ConvertVideos convertVideos;
+
     private String title;
 
     private String content;
@@ -71,4 +79,14 @@ public class Video {
         this.setDate(new Timestamp(System.currentTimeMillis()));
 
     }
+
+
+    public String toString() {
+        return "title : " + this.title + "," +
+                "content : " + this.content + "," +
+                "subject : " + this.subject + "," +
+                "lectureNoteS3Path : " + this.lectureNoteS3Path + "," +
+                "date : " + this.date + ",";
+    }
+
 }

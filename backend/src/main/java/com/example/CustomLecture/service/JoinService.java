@@ -31,7 +31,6 @@ public class JoinService {
             throw new DataIntegrityViolationException("중복된 사용자 이름이 이미 존재합니다.");
         }
 
-
         if (userRepository.existsByNickname(nickname)) {
             throw new DataIntegrityViolationException("중복된 별명이 이미 존재합니다.");
         }

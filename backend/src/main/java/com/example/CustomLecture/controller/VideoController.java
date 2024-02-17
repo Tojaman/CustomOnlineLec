@@ -67,7 +67,6 @@ public class VideoController {
      */
 
 
-
     /**
      * 강의 영상 정보 업로드
      */
@@ -118,4 +117,30 @@ public class VideoController {
         return new ResponseEntity<>(result, HttpStatus.OK);
     }
 
+
+    @PostMapping("/info")
+    @Operation(summary = "강의 영상 정보 반환", description = "반환하다 친구들아!")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "OK"),
+            @ApiResponse(responseCode = "500", description = "Server Error")
+    })
+    public ResponseEntity<String> returnVideoInfo(@RequestBody Map<String, Long> requestBody) {
+        Long id = requestBody.get("id");
+
+        try {
+            // 메소드 내부에 예외 발생 가능한 부분을 try 블록 안에 위치시킵니다.
+            String videoInfo = videoService.returnVideo(id);
+
+            // 정상적인 경우에는 OK 상태코드와 함께 반환합니다.
+            return ResponseEntity.status(HttpStatus.OK).body(videoInfo);
+
+        } catch (IllegalArgumentException e) {
+            // 유효성 검사 실패 등 예외 발생 시 클라이언트에게 BadRequest 반환
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("요청이 잘못되었습니다: " + e.getMessage());
+
+        } catch (Exception e) {
+            // 그 외 예상치 못한 예외 발생 시 클라이언트에게 InternalServerError 반환
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("서버 오류가 발생했습니다: " + e.getMessage());
+        }
+    }
 }

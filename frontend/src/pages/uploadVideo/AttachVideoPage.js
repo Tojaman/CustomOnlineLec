@@ -146,7 +146,7 @@ const Attach = () => {
         },
         {
           headers: {
-            Authorization: token,
+            Authorization: `Bearer ${token}`,
           },
         }
       );
