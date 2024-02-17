@@ -123,6 +123,13 @@ const Text = styled.span`
   text-overflow: ellipsis;
 `;
 
+const WithdrawalButton = styled.span`
+  cursor: pointer;
+  font-size: 15px;
+  display: block;
+  margin-top: 40px;
+`;
+
 const MyPage = () => {
   const [userProfileImageUrl, setUserProfileImageUrl] = useState("/favicon.ico");
   const [userName, setUserName] = useState("John Doe");
@@ -205,6 +212,10 @@ const MyPage = () => {
             </ListLink>
           </MoreButton>
         </UploadListContainer>
+        <WithdrawalButton>
+          탈퇴하기
+          <IoIosArrowForward />
+        </WithdrawalButton>
       </Container>
     </div>
   );
