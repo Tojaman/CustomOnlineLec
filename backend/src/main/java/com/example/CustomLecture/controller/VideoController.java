@@ -13,13 +13,18 @@ import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.*;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
 // swagger
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.IntStream;
 
 @Tag(name="강의 정보 업로드 API", description = "자막 및 강의 정보를 업로드하는 API 입니다.")
 @RestController
@@ -92,8 +97,25 @@ public class VideoController {
     }
 
     @GetMapping("/list")
-    public List<Video> getList() {
-        return videoService.getList();
+    public ResponseEntity<List<Map<String, Object>>> getAllVideoDetails() {
+        List<Map<String, Object>> result = new ArrayList<>();
+
+        List<Long> videoIds = videoService.getAllVideoIds();
+        List<String> videoTitles = videoService.getAllVideoTitles();
+        List<String> videoThumbnails = videoService.getAllVideoThumbnails();
+        List<String> nicknames = videoService.getAllNicknames(); // Change to nicknames
+
+        IntStream.range(0, Math.min(Math.min(videoIds.size(), videoTitles.size()), Math.min(videoThumbnails.size(), nicknames.size())))
+                .forEach(i -> {
+                    Map<String, Object> map = new HashMap<>();
+                    map.put("id", videoIds.get(i));
+                    map.put("title", videoTitles.get(i));
+                    map.put("thumbnail", videoThumbnails.get(i));
+                    map.put("nickname", nicknames.get(i)); // Change to nickname
+                    result.add(map);
+                });
+
+        return new ResponseEntity<>(result, HttpStatus.OK);
     }
 
 }

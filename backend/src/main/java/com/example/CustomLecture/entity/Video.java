@@ -1,7 +1,9 @@
 package com.example.CustomLecture.entity;
 
 import com.example.CustomLecture.dto.Request.VideoSaveRequestDTO;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -21,6 +23,7 @@ public class Video {
 //    @Column(name = "video_id")
     private Long id;
 
+    @JsonIgnore
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "userId")
     private UserEntity member;
@@ -46,6 +49,7 @@ public class Video {
     private String thumbnailS3Path;
     private String lectureNoteS3Path;
 
+
     public Video(final Long id, final UserEntity member, final String title, final String content, final String subject, final String thumbnailS3Path, final String lectureMaterialsS3Path) {
         this.id = id;
         this.member = member;
@@ -54,6 +58,7 @@ public class Video {
         this.subject = subject;
         this.thumbnailS3Path = thumbnailS3Path;
         this.lectureNoteS3Path = lectureMaterialsS3Path;
+
     }
 
     public void setVideo(VideoSaveRequestDTO videoSaveRequestDTO, UserEntity user) {
@@ -63,9 +68,7 @@ public class Video {
         this.setSubject(videoSaveRequestDTO.getSubject());
         this.setThumbnailS3Path(videoSaveRequestDTO.getThumbnailS3Path());
         this.setLectureNoteS3Path(videoSaveRequestDTO.getLectureNoteS3Path());
-        this.setDate(new Timestamp(System.currentTimeMillis())); // 현재 시간을 설정
+        this.setDate(new Timestamp(System.currentTimeMillis()));
 
     }
-
-
 }

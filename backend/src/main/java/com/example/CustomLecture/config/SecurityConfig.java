@@ -97,7 +97,7 @@ public class SecurityConfig {
 
             .authorizeHttpRequests((auth) -> auth
                     // 아래 경로에 대해서 모든 권한 허용 -> 이걸 밑밑으로 옮기면 로그인 한 사용자만 접근할 수 있도록 변경
-                    .requestMatchers("/login", "/", "/join","/videos/list", "/v3/**", "/swagger-ui/**").permitAll()
+                    .requestMatchers("/login", "/", "/join", "/v3/**", "/swagger-ui/**").permitAll()
                     // admin 경로는 admin이라는 권한 가진 사용자만 접근
                     .requestMatchers("/admin").hasRole("ADMIN")
                     // 그 외 다른 요청은 로그인한 사용자만 접근가능
