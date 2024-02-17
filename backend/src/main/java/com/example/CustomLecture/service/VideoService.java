@@ -83,7 +83,6 @@ public class VideoService {
 
         // JWTUtil을 사용하여 사용자 이름 추출
         String username = jwtUtil.getUsername(token);
-        System.out.println(username);
 
         // userId로 부터 UserEntity 객체 추출
         UserEntity userEntity = userRepository
@@ -96,7 +95,6 @@ public class VideoService {
 
         // Video 레코드 생성
         video.setVideo(videoSaveRequestDTO, userEntity);
-        videoRepository.save(video);
 
 
         // VideoData 레코드 생성
@@ -112,6 +110,23 @@ public class VideoService {
             VideoData videoData = new VideoData();
             videoData.setVideoData(videoSaveRequestDTO, video);
             videoDataRepository.save(videoData);
+            video.setVideoData(videoData);
         }
+
+        videoRepository.save(video);
+    }
+
+    public String returnVideo(Long id) {
+        Video video = videoRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 userId 입니다."));
+
+        // title, content, category, lecturenote, date
+        // 프로필 사진, 닉네임
+        // 영상 정보
+        // 변환 영상 경로
+        String videoInfo = video.toString() + "\n" + video.getMember().getNickname() + "\n" +
+                        video.getVideoData().toString() + "\n" + video.getConvertVideos().toString();
+
+        return videoInfo;
     }
 }

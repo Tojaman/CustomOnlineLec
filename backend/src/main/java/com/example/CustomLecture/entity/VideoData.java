@@ -45,4 +45,13 @@ public class VideoData {
 //        this.videoWidth = videoWidth;
 //        this.videoHeight = videoHeight;
 //    }
+
+    public String toString() {
+        return "x : " + this.x + "," +
+                "y : " + this.y + "," +
+                "width : " + this.width + "," +
+                "height : " + this.height + "," +
+                "videoWidth : " + this.videoWidth + "," +
+                "videoHeight : " + this.videoHeight + ",";
+    }
 }
