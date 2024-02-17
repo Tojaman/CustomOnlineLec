@@ -133,7 +133,7 @@ const VideoInfo = () => {
   const handleSubmit = async () => {
     const token = sessionStorage.getItem("token");
     
-    const id = 100;
+    const id = 0;
 
     const title = formData.title;
     const content = formData.description;
@@ -143,7 +143,7 @@ const VideoInfo = () => {
 
     try {
       const response = await axios.post(
-        "http://localhost:8080//videos/uploadInfo",
+        "http://localhost:8080/videos/uploadInfo",
         {
           id,
           title,
@@ -160,7 +160,7 @@ const VideoInfo = () => {
         },
         {
           headers: {
-            Authorization: token,
+            Authorization: `Bearer ${token}`,
           },
         }
       );
