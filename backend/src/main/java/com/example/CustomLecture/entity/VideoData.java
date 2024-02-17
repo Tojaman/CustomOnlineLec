@@ -1,5 +1,6 @@
 package com.example.CustomLecture.entity;
 
+import com.example.CustomLecture.dto.Request.VideoSaveRequestDTO;
 import jakarta.persistence.*;
 import jakarta.persistence.criteria.CriteriaBuilder;
 import lombok.NoArgsConstructor;
@@ -24,14 +25,24 @@ public class VideoData {
     private Integer videoWidth;
     private Integer videoHeight;
 
-    public VideoData(Long id, Video video, Integer x, Integer y, Integer width, Integer height, Integer videoWidth, Integer videoHeight) {
-        this.id = id;
+    public void setVideoData(VideoSaveRequestDTO videoSaveRequestDTO, Video video) {
         this.video = video;
-        this.x = x;
-        this.y = y;
-        this.width = width;
-        this.height = height;
-        this.videoWidth = videoWidth;
-        this.videoHeight = videoHeight;
+        this.x = videoSaveRequestDTO.getX();
+        this.y = videoSaveRequestDTO.getY();
+        this.width = videoSaveRequestDTO.getWidth();
+        this.height = videoSaveRequestDTO.getHeight();
+        this.videoWidth = videoSaveRequestDTO.getVideoWidth();
+        this.videoHeight = videoSaveRequestDTO.getVideoHeight();
     }
+
+//    public VideoData(Long id, Video video, Integer x, Integer y, Integer width, Integer height, Integer videoWidth, Integer videoHeight) {
+//        this.id = id;
+//        this.video = video;
+//        this.x = x;
+//        this.y = y;
+//        this.width = width;
+//        this.height = height;
+//        this.videoWidth = videoWidth;
+//        this.videoHeight = videoHeight;
+//    }
 }

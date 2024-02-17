@@ -1,10 +1,12 @@
 package com.example.CustomLecture.entity;
 
+import com.example.CustomLecture.dto.Request.VideoSaveRequestDTO;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.sql.Timestamp;
 import java.util.Date;
 
 @Entity
@@ -44,14 +46,26 @@ public class Video {
     private String thumbnailS3Path;
     private String lectureNoteS3Path;
 
-    public Video(final Long id, final UserEntity member, final String title, final String content, final String subject, final String thumbnailS3Path, final String lectureNoteS3Path) {
+    public Video(final Long id, final UserEntity member, final String title, final String content, final String subject, final String thumbnailS3Path, final String lectureMaterialsS3Path) {
         this.id = id;
         this.member = member;
         this.title = title;
         this.content = content;
         this.subject = subject;
         this.thumbnailS3Path = thumbnailS3Path;
-        this.lectureNoteS3Path = lectureNoteS3Path;
+        this.lectureNoteS3Path = lectureMaterialsS3Path;
     }
+
+    public void setVideo(VideoSaveRequestDTO videoSaveRequestDTO, UserEntity user) {
+        this.setMember(user);
+        this.setTitle(videoSaveRequestDTO.getTitle());
+        this.setContent(videoSaveRequestDTO.getContent());
+        this.setSubject(videoSaveRequestDTO.getSubject());
+        this.setThumbnailS3Path(videoSaveRequestDTO.getThumbnailS3Path());
+        this.setLectureNoteS3Path(videoSaveRequestDTO.getLectureNoteS3Path());
+        this.setDate(new Timestamp(System.currentTimeMillis())); // 현재 시간을 설정
+
+    }
+
 
 }
