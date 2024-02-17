@@ -18,6 +18,9 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.client.RestTemplate;
 
+import java.sql.Timestamp;
+import java.util.Optional;
+
 
 @Service
 @Transactional
@@ -88,11 +91,27 @@ public class VideoService {
                 .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 userId 입니다."));
 
         // DTO 객체를 domain 객체로 변환
-        Video video =videoSaveRequestDTO.toVideo(userEntity);
-        VideoData videoData = videoSaveRequestDTO.toVideoData(video);
+        Video video = videoRepository.findById(videoSaveRequestDTO.getId())
+                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 boardId 입니다."));
 
-        // DB에 강의 영상 정보 저장
+        // Video 레코드 생성
+        video.setVideo(videoSaveRequestDTO, userEntity);
         videoRepository.save(video);
-        videoDataRepository.save(videoData);
+
+
+        // VideoData 레코드 생성
+        Optional<VideoData> existingVideoDataOptional = videoDataRepository.findByVideo(video);
+
+        if (existingVideoDataOptional.isPresent()) {
+            // 기존 레코드가 존재할 경우 업데이트
+            VideoData existingVideoData = existingVideoDataOptional.get();
+            existingVideoData.setVideoData(videoSaveRequestDTO, video);
+            videoDataRepository.save(existingVideoData);
+        } else {
+            // 기존 레코드가 없을 경우 새로운 레코드 생성
+            VideoData videoData = new VideoData();
+            videoData.setVideoData(videoSaveRequestDTO, video);
+            videoDataRepository.save(videoData);
+        }
     }
 }
