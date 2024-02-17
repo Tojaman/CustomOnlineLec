@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import Sidebar from "../../components/sidebar/Sidebar";
 import styled from "styled-components";
@@ -63,32 +63,40 @@ const NextButton = styled(Link)`
 const Modify = () => {
   const dispatch = useDispatch();
 
-  const lines = [
-    "동해물과 백두산이 마르고 닳도록.",
-    "하느님이 보우하사 우리나라만세.",
-    "무궁화 삼천리 화려강산 대한사람 대한으로 길이 보전하세.",
-    "남산위에 저 소나무 철갑을 두른듯.",
-    "바람서리 불변함은 우리기상 일세.",
-    "무궁화 삼천리 화려강산 대한사람 대한으로 길이보전하세.",
-    "가을하늘 공활한데 높고 구름없이 .",
-    "밝은달은 우리가슴 일편단심일세.",
-    "무궁화 삼천리 화려강산 대한사람 대한으로 길이보전하세.",
-    "이 기상과 이 맘으로 충성을 다하여.",
-    "괴로우나 즐거우나 나라사랑하세.",
-    "무궁화 삼천리 화려강산 대한사람 대한으로 길이보전하세.",
-    "동해물과 백두산이 마르고 닳도록.",
-    "하느님이 보우하사 우리나라만세.",
-    "무궁화 삼천리 화려강산 대한사람 대한으로 길이 보전하세.",
-    "남산위에 저 소나무 철갑을 두른듯.",
-    "바람서리 불변함은 우리기상 일세.",
-    "무궁화 삼천리 화려강산 대한사람 대한으로 길이보전하세.",
-    "가을하늘 공활한데 높고 구름없이 .",
-    "밝은달은 우리가슴 일편단심일세.",
-    "무궁화 삼천리 화려강산 대한사람 대한으로 길이보전하세.",
-    "이 기상과 이 맘으로 충성을 다하여.",
-    "괴로우나 즐거우나 나라사랑하세.",
-    "무궁화 삼천리 화려강산 대한사람 대한으로 길이보전하세.",
-  ];
+  const [data, setData] = useState([]);
+  const [lines, setTexts] = useState([]);
+  const [timeRanges, setTimeRanges] = useState([]);
+
+  useEffect(() => {
+    const jsonData = [
+      { text: " GDB를 결국에 D-Bug잖아요.", start: 15.8, end: 18.28 },
+      { text: " 제가 솔직하게 얘기하면 GDB 저도 써봤는데", start: 18.5, end: 22.0 },
+      { text: " Inverted 개발할 때 GDB 못 쓰는 경우가 오히려 더 태반이에요.", start: 22.0, end: 26.84 },
+      { text: " 진짜 웃긴 얘기지만 프린트 F로 D-Bug 하는 경우도 굉장히 많습니다.", start: 26.84, end: 31.72 },
+      { text: " 제가 Kernel 강의하잖아요.", start: 32.12, end: 33.2 },
+      { text: " 그러면 F-Trace나 이런 것들 쓴단 말이에요.", start: 33.6, end: 36.02 },
+      { text: " 근데 F-Trace도 결국에 근본으로 가보면 프린트 F랑 방법이 좀 비슷해요.", start: 36.52, end: 41.1 },
+      {
+        text: " 기본적으로 내가 원하는 로그를 찍어서 추적하는 과정 이런 게 프린트 F랑 좀 비슷한 면이 있습니다.",
+        start: 41.38,
+        end: 47.12,
+      },
+      { text: " 근데 D-Bug를 사용하면 좋은 게 뭐냐면", start: 47.38, end: 49.42 },
+      { text: " 내가 원하는 지점에 멈출 수 있고 변수도 볼 수 있고", start: 49.42, end: 52.84 },
+      { text: " 뭐 Assembler로 어떻게 되었나 이런 것도 추적하기 되게 용이한 거죠.", start: 52.84, end: 56.22 },
+    ];
+
+    const textsArray = jsonData.map((item) => item.text.trim());
+    const timeRangesArray = jsonData.map((item) => ({ start: item.start, end: item.end }));
+
+    setData(jsonData);
+    setTexts(textsArray);
+    setTimeRanges(timeRangesArray);
+  }, []);
+
+  useEffect(() => {
+    setModifiedContents([...lines]);
+  }, [lines]);
 
   const [editStates, setEditStates] = useState(Array(lines.length).fill(false));
   const [modifiedContents, setModifiedContents] = useState([...lines]);
@@ -109,8 +117,15 @@ const Modify = () => {
   const handleSaveAllClick = () => {
     const saves = modifiedContents.map((content, index) => content);
     setResult(saves);
-    dispatch(subtitle(saves));
-    console.log(saves);
+
+    const newData = modifiedContents.map((content, index) => ({
+      text: content,
+      start: timeRanges[index].start,
+      end: timeRanges[index].end,
+    }));
+
+    dispatch(subtitle(newData));
+    console.log(newData);
   };
 
   return (

@@ -1,5 +1,6 @@
 import React, { useState, useRef, useEffect } from "react";
 import { Link } from "react-router-dom";
+import axios from "axios";
 import Sidebar from "../../components/sidebar/Sidebar";
 import styled from "styled-components";
 import Navbar from "../../components/header/Navbar";
@@ -102,6 +103,9 @@ const Attach = () => {
   const updateVideo = async (event) => {
     URL.revokeObjectURL(videoRef.current.src);
     const file = event.target.files[0];
+
+    console.log("동영상 파일:", file);
+
     setVideoURL(URL.createObjectURL(file));
 
     videoRef.current.load();
@@ -119,11 +123,11 @@ const Attach = () => {
     canvas.height = video.offsetHeight;
   };
 
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
+    const token = sessionStorage.getItem("token");
     const rect = rectRef.current;
 
     const videoInfo = {
-      videoURL,
       x: rect.x,
       y: rect.y,
       width: rect.width,
@@ -131,15 +135,30 @@ const Attach = () => {
       videoWidth,
       videoHeight,
     };
-
-    console.log("동영상 파일:", videoURL);
-    console.log("x:", rect.x);
-    console.log("y:", rect.y);
-    console.log("width:", rect.width);
-    console.log("height:", rect.height);
-    console.log("영상 파일의 가로 크기:", videoWidth);
-    console.log("영상 파일의 세로 크기:", videoHeight);
     dispatch(videoData(videoInfo));
+
+    const url = "original_video/oj.mp4";
+    try {
+      const response = await axios.post(
+        "http://localhost:8080/videos/uploadVideo",
+        {
+          url,
+        },
+        {
+          headers: {
+            Authorization: token,
+          },
+        }
+      );
+      console.log("API 응답:", response.data);
+      console.log("요청 성공");
+    } catch (error) {
+      if (error.response) {
+        console.error("요청 실패1", error.response.status);
+      } else {
+        console.error("요청 실패2", error.message);
+      }
+    }
   };
 
   useEffect(() => {
@@ -282,11 +301,10 @@ const Attach = () => {
 
         <InfoContainer>{infoText}</InfoContainer>
         <ButtonContainer>
-          <NextButton to="/modify">
+          <NextButton to="/modify" onClick={handleSubmit}>
             다음 <GoArrowRight />
           </NextButton>
         </ButtonContainer>
-        <button onClick={handleSubmit}>제출</button>
       </AttachContainer>
     </Container>
   );

@@ -26,8 +26,7 @@ const ImageContainer = styled.img`
   height: 100px;
 `;
 
-const TextContainer = styled.div`
-`;
+const TextContainer = styled.div``;
 
 const Text = styled.div`
   max-width: 100%;
@@ -54,17 +53,15 @@ const UploadList = () => {
 
   return (
     <Container>
-      <Navbar/>
+      <Navbar />
       {videos.map((video) => (
-        <Link to={`/video/${video.id}`} key={video.id}>
-          <VideoContainer onClick={() => handleVideoClick(video.id, video.title, video.person)}>
-            <ImageContainer src="/favicon.ico" alt="썸네일" />
-            <TextContainer>
-              <Text>{video.title}</Text>
-              <Text>{video.person}</Text>
-            </TextContainer>
-          </VideoContainer>
-        </Link>
+        <VideoContainer onClick={() => handleVideoClick(video.id, video.title, video.person)}>
+          <ImageContainer src="/favicon.ico" alt="썸네일" />
+          <TextContainer>
+            <Text>{video.title}</Text>
+            <Text>{video.person}</Text>
+          </TextContainer>
+        </VideoContainer>
       ))}
     </Container>
   );

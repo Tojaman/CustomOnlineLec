@@ -89,7 +89,7 @@ const RegisterButton = styled.button`
 
 const Navbar = () => {
   const token = sessionStorage.getItem("token");
-  const navigate= useNavigate();
+  const navigate = useNavigate();
 
   const handleUploadClick = () => {
     if (!token) {
@@ -104,6 +104,15 @@ const Navbar = () => {
     }
   };
 
+  const handleLogout = () => {
+    sessionStorage.clear();
+    if (history.location.pathname === "/") {
+      history.go(0);
+    } else {
+      history.push("/");
+    }
+  };
+
   return (
     <NavContainer>
       <Link to="/">
@@ -112,7 +121,9 @@ const Navbar = () => {
       <NavElement>
         <TfiMenuStyled />
         <NavItem to="/">Home</NavItem>
-        <NavItem to="/attach" onClick={handleUploadClick} >강의 업로드</NavItem>
+        <NavItem to="/attach" onClick={handleUploadClick}>
+          강의 업로드
+        </NavItem>
         <NavItem to="/videoList">강의 목록</NavItem>
         {token ? <NavItem to="/mypage">마이페이지</NavItem> : null}
       </NavElement>
@@ -126,6 +137,13 @@ const Navbar = () => {
           </Link>
         </BeforeLogin>
       )}
+      {token ? (
+        <BeforeLogin>
+          <Link to="/">
+            <RegisterButton onClick={handleLogout}>로그아웃</RegisterButton>
+          </Link>
+        </BeforeLogin>
+      ) : null}
     </NavContainer>
   );
 };

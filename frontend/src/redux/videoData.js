@@ -4,13 +4,12 @@ export const videoSlice = createSlice({
   name: "videoData",
   initialState: {
     value: {
-      videoURL: "",
       x: 0,
       y: 0,
-      width: 0,
-      height: 0,
-      videoWidth: 0,
-      videoHeight: 0,
+      width: 100,
+      height: 100,
+      videoWidth: 100,
+      videoHeight: 100,
     },
   },
   reducers: {

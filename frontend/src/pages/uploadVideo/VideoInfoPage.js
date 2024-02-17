@@ -1,7 +1,8 @@
 import React, { useState } from "react";
 import { Link } from "react-router-dom";
-import Sidebar from "../../components/sidebar/Sidebar";
 import styled from "styled-components";
+import axios from "axios";
+import Sidebar from "../../components/sidebar/Sidebar";
 import Navbar from "../../components/header/Navbar";
 
 import { useSelector } from "react-redux";
@@ -109,7 +110,6 @@ const VideoInfo = () => {
   const videoData = useSelector((state) => state.videoData.value);
 
   const subtitle = useSelector((state) => state.subtitle.value);
-  const video = videoData ? videoData.videoURL : "N/A";
   const x = videoData ? videoData.x : "N/A";
   const y = videoData ? videoData.x : "N/A";
   const width = videoData ? videoData.width : "N/A";
@@ -123,25 +123,61 @@ const VideoInfo = () => {
     category: "",
     pdfFile: null,
     imageFile: null,
-    imageFileURL: null,
   });
 
   const handleFileChange = (e, fileType) => {
     const file = e.target.files[0];
-    const fileURL = URL.createObjectURL(file);
-    setFormData({ ...formData, [fileType]: file, imageFileURL: fileURL });
+    setFormData({ ...formData, [fileType]: file });
   };
 
-  const handleSubmit = () => {
-    console.log("제목:", formData.title);
-    console.log("강의 설명:", formData.description);
-    console.log("카테고리:", formData.category);
-    console.log("강의자료:", formData.pdfFile);
-    console.log("썸네일 URL:", formData.imageFileURL);
+  const handleSubmit = async () => {
+    const token = sessionStorage.getItem("token");
+    
+    const id = 100;
 
-    console.log("redux");
+    const title = formData.title;
+    const content = formData.description;
+    const subject = formData.category;
+    const thumbnailS3Path = "formData.pdfFile";
+    const lectureNoteS3Path = "formData.imageFile";
+
+    try {
+      const response = await axios.post(
+        "http://localhost:8080//videos/uploadInfo",
+        {
+          id,
+          title,
+          content,
+          subject,
+          thumbnailS3Path,
+          lectureNoteS3Path,
+          x,
+          y,
+          width,
+          height,
+          videoWidth,
+          videoHeight,
+        },
+        {
+          headers: {
+            Authorization: token,
+          },
+        }
+      );
+
+      console.log("요청 성공");
+    } catch (error) {
+      console.error("요청 실패", error.response.status);
+    }
+
+    console.log("제목:", title);
+    console.log("강의 설명:", content);
+    console.log("카테고리:", subject);
+
+    console.log("강의자료:", formData.pdfFile);
+    console.log("썸네일:", formData.imageFile);
+
     console.log("자막:", subtitle);
-    console.log("비디오:", video);
     console.log("x:", x);
     console.log("y:", y);
     console.log("너비:", width);
