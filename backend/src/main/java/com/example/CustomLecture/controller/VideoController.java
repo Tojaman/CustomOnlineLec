@@ -2,13 +2,16 @@ package com.example.CustomLecture.controller;
 
 import com.example.CustomLecture.dto.Request.VideoConvertRequestDTO;
 import com.example.CustomLecture.dto.Request.VideoSaveRequestDTO;
+import com.example.CustomLecture.entity.Video;
 import com.example.CustomLecture.jwt.JWTUtil;
+import com.example.CustomLecture.repository.VideoRepository;
 import com.example.CustomLecture.service.VideoService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.*;
 import org.springframework.web.bind.annotation.*;
 
@@ -16,13 +19,15 @@ import org.springframework.web.bind.annotation.*;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 
+import java.util.List;
+
 @Tag(name="강의 정보 업로드 API", description = "자막 및 강의 정보를 업로드하는 API 입니다.")
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/videos")
 public class VideoController {
 
-    // 생성자 주입
+    @Autowired // 생성자 주입
     private final VideoService videoService;
 
 
@@ -85,4 +90,10 @@ public class VideoController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("서버 오류가 발생했습니다: " + e.getMessage());
         }
     }
+
+    @GetMapping("/list")
+    public List<Video> getList() {
+        return videoService.getList();
+    }
+
 }

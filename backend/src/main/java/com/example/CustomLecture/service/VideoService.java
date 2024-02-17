@@ -1,5 +1,6 @@
 package com.example.CustomLecture.service;
 
+import com.example.CustomLecture.dto.JoinDTO;
 import com.example.CustomLecture.dto.Request.VideoSaveRequestDTO;
 import com.example.CustomLecture.entity.UserEntity;
 import com.example.CustomLecture.entity.Video;
@@ -19,6 +20,9 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.client.RestTemplate;
 
 import java.sql.Timestamp;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 
@@ -113,5 +117,14 @@ public class VideoService {
             videoData.setVideoData(videoSaveRequestDTO, video);
             videoDataRepository.save(videoData);
         }
+
+
+
+
+    }
+
+
+    public List<Video> getList() {
+        return this.videoRepository.findAll();
     }
 }
