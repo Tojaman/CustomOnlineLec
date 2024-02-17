@@ -2,29 +2,37 @@ package com.example.CustomLecture.controller;
 
 import com.example.CustomLecture.dto.Request.VideoConvertRequestDTO;
 import com.example.CustomLecture.dto.Request.VideoSaveRequestDTO;
+import com.example.CustomLecture.entity.Video;
 import com.example.CustomLecture.jwt.JWTUtil;
+import com.example.CustomLecture.repository.VideoRepository;
 import com.example.CustomLecture.service.VideoService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.*;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
 // swagger
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.stream.IntStream;
 
-@Tag(name = "강의 정보 업로드 API", description = "자막 및 강의 정보를 업로드하는 API 입니다.")
+@Tag(name="강의 정보 업로드 API", description = "자막 및 강의 정보를 업로드하는 API 입니다.")
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/videos")
 public class VideoController {
 
-    // 생성자 주입
+    @Autowired // 생성자 주입
     private final VideoService videoService;
 
 
@@ -86,6 +94,29 @@ public class VideoController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("서버 오류가 발생했습니다: " + e.getMessage());
         }
     }
+
+    @GetMapping("/list")
+    public ResponseEntity<List<Map<String, Object>>> getAllVideoDetails() {
+        List<Map<String, Object>> result = new ArrayList<>();
+
+        List<Long> videoIds = videoService.getAllVideoIds();
+        List<String> videoTitles = videoService.getAllVideoTitles();
+        List<String> videoThumbnails = videoService.getAllVideoThumbnails();
+        List<String> nicknames = videoService.getAllNicknames(); // Change to nicknames
+
+        IntStream.range(0, Math.min(Math.min(videoIds.size(), videoTitles.size()), Math.min(videoThumbnails.size(), nicknames.size())))
+                .forEach(i -> {
+                    Map<String, Object> map = new HashMap<>();
+                    map.put("id", videoIds.get(i));
+                    map.put("title", videoTitles.get(i));
+                    map.put("thumbnail", videoThumbnails.get(i));
+                    map.put("nickname", nicknames.get(i)); // Change to nickname
+                    result.add(map);
+                });
+
+        return new ResponseEntity<>(result, HttpStatus.OK);
+    }
+
 
     @PostMapping("/info")
     @Operation(summary = "강의 영상 정보 반환", description = "반환하다 친구들아!")

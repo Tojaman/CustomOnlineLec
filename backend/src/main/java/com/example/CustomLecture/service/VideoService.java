@@ -1,5 +1,6 @@
 package com.example.CustomLecture.service;
 
+import com.example.CustomLecture.dto.JoinDTO;
 import com.example.CustomLecture.dto.Request.VideoSaveRequestDTO;
 import com.example.CustomLecture.entity.UserEntity;
 import com.example.CustomLecture.entity.Video;
@@ -9,6 +10,7 @@ import com.example.CustomLecture.repository.UserRepository;
 import com.example.CustomLecture.repository.VideoDataRepository;
 import com.example.CustomLecture.repository.VideoRepository;
 import lombok.RequiredArgsConstructor;
+import org.apache.catalina.User;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
@@ -19,7 +21,8 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.client.RestTemplate;
 
 import java.sql.Timestamp;
-import java.util.Optional;
+import java.util.*;
+import java.util.stream.Collectors;
 
 
 @Service
@@ -35,10 +38,11 @@ public class VideoService {
     private final JWTUtil jwtUtil;
 
 
+
     /**
      * 강의 영상 업로드 및 음성 변환
      */
-    public String  convertVideo(String requestBody, String jwtToken){
+    public String convertVideo(String requestBody, String jwtToken) {
 
         String token = jwtToken.replace("Bearer ", "");
 
@@ -112,8 +116,39 @@ public class VideoService {
             videoDataRepository.save(videoData);
             video.setVideoData(videoData);
         }
-
         videoRepository.save(video);
+
+    }
+
+    public List<Long> getAllVideoIds() {
+        List<Video> videoIds = videoRepository.findAll();
+        return videoIds.stream()
+                .map(Video::getId)
+                .collect(Collectors.toList());
+    }
+
+    public List<String> getAllVideoTitles() {
+        List<Video> videoTitles = videoRepository.findAll();
+        return videoTitles.stream()
+                .map(Video::getTitle)
+                .collect(Collectors.toList());
+    }
+
+    public List<String> getAllVideoThumbnails(){
+        List<Video> videoThumbnails = videoRepository.findAll();
+        return videoThumbnails.stream()
+                .map(Video::getThumbnailS3Path)
+                .collect(Collectors.toList());
+    }
+
+    public List<String> getAllNicknames() {
+        List<Video> videos = videoRepository.findAll();
+        return videos.stream()
+                .map(video -> {
+                    Optional<UserEntity> userOptional = userRepository.findById(video.getMember().getId());
+                    return userOptional.map(UserEntity::getNickname).orElse(null);
+                })
+                .collect(Collectors.toList());
     }
 
     public String returnVideo(Long id) {
@@ -130,3 +165,4 @@ public class VideoService {
         return videoInfo;
     }
 }
+
