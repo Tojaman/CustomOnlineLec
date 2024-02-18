@@ -132,13 +132,9 @@ const VideoInfo = () => {
 
   const handleSubmit = async () => {
     const token = sessionStorage.getItem("token");
-<<<<<<< HEAD
+
     console.log("현재 토큰 값:", token);
-    const id = 31;
-=======
-    
-    const id = 0;
->>>>>>> main
+    const id = 33;
 
     const title = formData.title;
     const content = formData.description;

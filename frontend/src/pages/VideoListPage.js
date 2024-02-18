@@ -1,8 +1,9 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import styled from "styled-components";
 import Navbar from "../components/header/Navbar";
 import Background from "../assets/img/Group.png";
+import axios from "axios";
 
 const ListContainer = styled.div`
   display: flex;
@@ -64,18 +65,28 @@ const VideoItems = styled.div`
   margin-top: 50px;
 `;
 
-const videos = [
-  { id: 1, title: "간지나게 사는 방법", person: "Tony" },
-  { id: 2, title: "리액트 컴포넌트 디자인", person: "Alice" },
-  { id: 3, title: "웹 개발 기초", person: "Bob" },
-];
-
 const VideoList = () => {
-  const [selectedVideo, setSelectedVideo] = useState(null);
+  const [videos, setVideos] = useState([]);
+  const token = sessionStorage.getItem("token");
 
-  const handleVideoClick = (title, person) => {
-    setSelectedVideo({ title, person });
-  };
+  useEffect(() => {
+    axios.get("http://localhost:8080/videos/list", {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      }
+    })
+      .then(response => {
+        const videoData = response.data.map(video => ({
+          id: video.id,
+          title: video.title,
+          thumbnail: video.thumbnail,
+          nickname: video.nickname
+        }));
+        setVideos(videoData);
+      })
+      .catch(error => console.error("Error fetching videos:", error));
+  }, [token]);
+
 
   return (
     <ListContainer>
@@ -89,10 +100,10 @@ const VideoList = () => {
         <VideoItems>
           {videos.map((video) => (
             <Link to="/select" key={video.id}>
-              <VideoContainer onClick={() => handleVideoClick(video.id, video.title, video.person)}>
-                <Thumbnail src="/favicon.ico" alt="썸네일" />
+              <VideoContainer>
+                <Thumbnail src={video.thumbnail} alt="썸네일" />
                 <Text>{video.title}</Text>
-                <Text>{video.person}</Text>
+                <Text>{video.nickname}</Text>
               </VideoContainer>
             </Link>
           ))}
