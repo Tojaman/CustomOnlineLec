@@ -26,7 +26,7 @@ celery = Celery('FlaskAiModelServing', broker='redis://127.0.0.1:6379/0', backen
 
 
 @celery.task
-def process_uploaded_file(convert_video_dir, local_video_path, local_audio_path, RVC_model, video_id):
+def process_uploaded_file(merge_video_path, local_video_path, local_audio_path, RVC_model, video_id):
 
     result = []
 
@@ -34,10 +34,12 @@ def process_uploaded_file(convert_video_dir, local_video_path, local_audio_path,
     s3 = s3_connection()
 
     # RVC 변환(return 변환 음성 저장 경로)
-    convert_voice_path = execute_voice_conversion(RVC_model, local_audio_path)
+    # convert_voice_path = execute_voice_conversion(RVC_model, local_audio_path)
+    convert_voice_path = local_audio_path
 
     # 원본 영상 + 변환 음성
-    convert_video_path = merge_video_audio(convert_video_dir, local_video_path, convert_voice_path)
+    convert_video_path = merge_video_audio(merge_video_path, local_video_path, convert_voice_path)
+    # convert_video_path = local_video_path
 
     # 최종 변환 파일 이름 추출
     convert_video_name = os.path.basename(convert_video_path)
@@ -56,7 +58,7 @@ def process_uploaded_file(convert_video_dir, local_video_path, local_audio_path,
     connection = get_connection(DB)
 
     # DB에 convert_file_path_s3 저장
-    video_dao.add_convert_s3_path(connection, video_id, convert_video_path_s3, RVC_model)
+    video_dao.add_convert_s3_path(connection, video_id, convert_video_path_s3 )
 
     # DB와 연결 해제
     connection.close()
@@ -64,7 +66,7 @@ def process_uploaded_file(convert_video_dir, local_video_path, local_audio_path,
 
 # 원본 영상 + 변환 음성
 @celery.task
-def merge_video_audio(convert_voice_path, video_path, audio_path):
+def merge_video_audio(merge_video_path, video_path, audio_path):
     video_clip = VideoFileClip(video_path)
     audio_clip = AudioFileClip(audio_path)
 
@@ -75,7 +77,7 @@ def merge_video_audio(convert_voice_path, video_path, audio_path):
     file_name = os.path.splitext(os.path.basename(video_path))[0]  # splitext : 파일의 확장자를 분리해서 저장하기 위함
 
     # 최종 영상 저장 경로 설정
-    output_path = os.path.join(convert_voice_path, f'{file_name}_video.mp4')
+    output_path = os.path.join(merge_video_path, f'{file_name}_video.mp4')
 
     # 새로운 파일로 저장(.mp4)
     video_clip.write_videofile(output_path, codec="libx264", audio_codec="aac", ffmpeg_params=["-preset", "ultrafast"])
@@ -123,21 +125,13 @@ def execute_voice_conversion(model_name, local_file_dir):
         "-i", local_file_dir,
         "-dir", model_name,
         "-p", "0",
-        "-pall", "0",
         "-ir", "0.75",
         "-fr", "3",
         "-rms", "0.25",
         "-palgo", "rmvpe",
         "-hop", "64",
         "-pro", "0.33",
-        "-mv", "0",
-        "-bv", "0",
-        "-iv", "0",
-        "-rsize", "0.15",
-        "-rwet", "0.2",
-        "-rdry", "0.8",
-        "-rdamp", "0.7",
-        "-oformat", "wav"
+        "-pall", "0"
     ]
     # 명령어 실행
     process = subprocess.Popen(command, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, universal_newlines=True)

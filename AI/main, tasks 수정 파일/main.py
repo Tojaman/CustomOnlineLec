@@ -5,9 +5,8 @@ from DB.connection import get_connection
 from dao.dao import VideoDao
 import os, tempfile, boto3, shutil
 from datetime import datetime
-from celery import group
 
-import whisper
+# import whisper
 
 # swagger
 from flask_restx import Api, Resource, fields
@@ -47,16 +46,14 @@ class ConvertVoice(Resource):
         body 메시지 예시
         {
             "url": "original_video/ojtube.wav",
-            "RVC_model": "Elonmusk"
+            # "RVC_model": "Elonmusk"
+        }
         }
         """
         try:
-            json_data = request.json
-            print(json_data)
             user_id = request.json['userId']
             original_video_s3_path = request.json['url']
-            # RVC_model = "te"
-            RVC_model = request.json['rvcModel']
+            # RVC_model = request.json['rvcModel']
 
 
             # s3 연결 및 객체 생성
@@ -64,8 +61,8 @@ class ConvertVoice(Resource):
 
             original_video_path = "./original_video/"
             extract_voice_path = "./extract_voice/"
-            convert_voice_path = "./convert_voice/"
-            convert_video_dir = "./convert_video/"
+            # convert_voice_path = "./convert_voice/"
+            merge_video_path = "./merge_video/"
 
             # 원본 영상 파일명 추출
             original_filename = os.path.basename(original_video_s3_path)
@@ -83,10 +80,10 @@ class ConvertVoice(Resource):
             # 음성 추출
             local_audio_path = extract_audio(extract_voice_path, local_video_path)
 
+
             # 자막 추출(Flask 동기)
             # Whisper STT로 문장 단위 JSON 형식 자막
             subtitle = stt(local_audio_path)
-
 
             # DB와 연결
             connection = get_connection(DB)
@@ -98,26 +95,19 @@ class ConvertVoice(Resource):
             date = current_time.strftime('%Y-%m-%d')
 
             # DB에 convert_file_path_s3 저장
-            video_id = video_dao.update_video_s3_path(connection, date, user_id, original_video_s3_path)
+            videoId = video_dao.update_video_s3_path(connection, date, user_id)
 
-            # RVC 음성 변환(celery 비동기)
-            # process_uploaded_file.delay(convert_video_dir, local_video_path, local_audio_path, RVC_model, video_id)
-
-            # 모델 목록
-            model_list = ["jimin700", "timcook", "Elonmusk", "윤석열"]
-
-            # 모든 모델을 동시에 처리
-            tasks = group(
-                process_uploaded_file.s(convert_video_dir, local_video_path, local_audio_path, model, video_id) for model in model_list)
-            tasks.delay()
+            # RVC 음성 변환 및 병합(celery 비동기)
+            # convert_file_path_s3 = process_uploaded_file.delay(convert_voice_path, local_video_path, local_audio_path, RVC_model, video_id)
+            process_uploaded_file.delay(merge_video_path, local_video_path, local_audio_path, videoId)
 
             # DB와 연결 해제
             connection.close()
 
             # JSON 형식 자막, s3 경로 저장한 테이블 기본키 HTTP body에 넣어서 프론트에 return
             response_data = {
-                'video_id': video_id,
-                'subtitle': subtitle
+                "videoId": videoId,
+                "subtitle": subtitle
             }
 
             # HTTP 응답 생성
