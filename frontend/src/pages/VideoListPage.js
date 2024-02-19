@@ -67,6 +67,7 @@ const VideoItems = styled.div`
 
 const VideoList = () => {
   const [videos, setVideos] = useState([]);
+  const [setSelectedVideoId] = useState(null);
   const token = sessionStorage.getItem("token");
 
   useEffect(() => {
@@ -87,6 +88,11 @@ const VideoList = () => {
       .catch(error => console.error("Error fetching videos:", error));
   }, [token]);
 
+  // 비디오를 클릭할 때 선택된 비디오 ID를 세션 스토리지에 저장하는 함수
+  const handleVideoClick = (videoId) => {
+    setSelectedVideoId(videoId);
+    sessionStorage.setItem('selectedVideoId', videoId);
+  };
 
   return (
     <ListContainer>
@@ -99,7 +105,7 @@ const VideoList = () => {
         </SearchContent>
         <VideoItems>
           {videos.map((video) => (
-            <Link to="/select" key={video.id}>
+            <Link to="/select" key={video.id} onClick={() => handleVideoClick(video.id)}>
               <VideoContainer>
                 <Thumbnail src={video.thumbnail} alt="썸네일" />
                 <Text>{video.title}</Text>

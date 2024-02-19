@@ -140,6 +140,39 @@
       #description {
         padding: 10px;
       }
+      
+      #avatarSelection {
+        position: fixed;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        background-color: white;
+        padding: 20px;
+        border: 1px solid #ccc;
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+      }
+  
+      #avatarSelection p {
+        margin-bottom: 10px;
+      }
+  
+      #avatarSelection button {
+        margin-right: 10px;
+      }
+  
+      #avatarSelection button:last-child {
+        margin-right: 0;
+      }
+       
+    #toggleAvatarButton {
+      background-color: #5d5e60;
+      color: white;
+      border: none;
+      padding: 8px 16px;
+      cursor: pointer;
+      border-radius: 5px;
+      font-size: 14px;
+    }
     </style>
   </head>
 
@@ -200,10 +233,22 @@
           <div id="third">
             <div id="description">강의 설명</div>
           </div>
+
+          <div>  
+          <button id="toggleAvatarButton">아바타 선택</button>
+          <div id="avatarSelection" hidden>
+            <p>아바타를 선택하세요:</p>
+            <button id="avatar1">아바타 1</button>
+            <button id="avatar2">아바타 2</button>
+            <button id="avatar3">아바타 3</button>
+            <button id="avatar4">아바타 4</button>
+            <button id="avatar5">아바타 5</button>
+            <button id="avatar6">아바타 6</button>
+          </div>
+          </div>
         </div>
       </div>
     </div>
-
     <script src="camera.js"></script>
     <script src="progressBar.js"></script>
   </body>
