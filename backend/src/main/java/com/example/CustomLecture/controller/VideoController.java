@@ -2,10 +2,6 @@ package com.example.CustomLecture.controller;
 
 import com.example.CustomLecture.dto.Request.VideoConvertRequestDTO;
 import com.example.CustomLecture.dto.Request.VideoSaveRequestDTO;
-import com.example.CustomLecture.dto.Response.VideoInfoResponseDTO;
-import com.example.CustomLecture.entity.Video;
-import com.example.CustomLecture.jwt.JWTUtil;
-import com.example.CustomLecture.repository.VideoRepository;
 import com.example.CustomLecture.service.VideoService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -14,7 +10,6 @@ import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.*;
-import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
 // swagger

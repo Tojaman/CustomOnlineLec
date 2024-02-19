@@ -36,24 +36,4 @@ public class VideoData {
         this.videoWidth = videoSaveRequestDTO.getVideoWidth();
         this.videoHeight = videoSaveRequestDTO.getVideoHeight();
     }
-
-//    public VideoData(Long id, Video video, Integer x, Integer y, Integer width, Integer height, Integer videoWidth, Integer videoHeight) {
-//        this.id = id;
-//        this.video = video;
-//        this.x = x;
-//        this.y = y;
-//        this.width = width;
-//        this.height = height;
-//        this.videoWidth = videoWidth;
-//        this.videoHeight = videoHeight;
-//    }
-
-    public String toString() {
-        return "x : " + this.x + "," +
-                "y : " + this.y + "," +
-                "width : " + this.width + "," +
-                "height : " + this.height + "," +
-                "videoWidth : " + this.videoWidth + "," +
-                "videoHeight : " + this.videoHeight + ",";
-    }
 }

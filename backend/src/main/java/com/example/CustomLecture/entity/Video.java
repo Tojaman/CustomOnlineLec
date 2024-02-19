@@ -4,7 +4,6 @@ import com.example.CustomLecture.dto.Request.VideoSaveRequestDTO;
 import com.example.CustomLecture.dto.Response.VideoInfoResponseDTO;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
-import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -101,16 +100,6 @@ public class Video {
                 videoData.getVideoHeight(),
                 videoData.getVideoHeight()
         );
-    }
-
-
-
-    public String toString() {
-        return "title : " + this.title + "," +
-                "content : " + this.content + "," +
-                "subject : " + this.subject + "," +
-                "lectureNoteS3Path : " + this.lectureNoteS3Path + "," +
-                "date : " + this.date + ",";
     }
 
 }
