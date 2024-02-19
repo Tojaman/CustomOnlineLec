@@ -46,7 +46,7 @@ const SelectText = styled.p`
   font-size: 20px;
   line-height: 15px;
   margin-left: 12px;
-  margin-top:60px
+  margin-top: 60px;
 `;
 
 const CustomSlider = styled(Slider)`
@@ -66,14 +66,13 @@ const CustomSlider = styled(Slider)`
     &:hover {
       border: 1px solid #499be9;
     }
-    
   }
   .slick-track {
     display: flex;
   }
-  .selected { 
-  border: 1px solid #499be9;
-}
+  .selected {
+    border: 1px solid #499be9;
+  }
 `;
 
 const Img = styled.img`
@@ -155,24 +154,19 @@ const Select = () => {
       <Navbar />
       <PageBackGround />
       <ContentContainer>
-      <SelectText>음성 선택</SelectText>
-      <Selection>
+        <SelectText>음성 선택</SelectText>
+        <Selection>
           <CustomSlider {...settings}>
             {voices.map((voice, index) => (
-              <div
-                key={voice.name}
-                className={selectedVoiceIndex === index ? "selected" : ""}
-                onClick={() => handleVoiceSelection(index)}
-              >
+              <div key={voice.name} className={selectedVoiceIndex === index ? "selected" : ""} onClick={() => handleVoiceSelection(index)}>
                 <Img src={voice.img} />
                 <Name>{voice.name}</Name>
               </div>
             ))}
           </CustomSlider>
         </Selection>
-<SelectText>아바타 선택</SelectText>
+        <SelectText>아바타 선택</SelectText>
         <Selection>
-          
           <CustomSlider {...settings}>
             {avatars.map((avatar, index) => (
               <div

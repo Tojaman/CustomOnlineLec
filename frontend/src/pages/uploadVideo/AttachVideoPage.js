@@ -150,7 +150,8 @@ const Attach = () => {
           },
         }
       );
-      console.log("API 응답:", response.data);
+      console.log("API 응답:", response.data.video_id);
+      sessionStorage.setItem("videoID", response.data.video_id);
       console.log("요청 성공");
     } catch (error) {
       if (error.response) {

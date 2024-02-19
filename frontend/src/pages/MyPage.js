@@ -76,6 +76,8 @@ const ButtonContent = styled.div`
 `;
 
 const UploadListContainer = styled.div`
+  display: flex;
+  flex-wrap: wrap;
   background-color: lightgrey;
   padding: 20px;
   border-radius: 10px;
@@ -106,7 +108,7 @@ const VideoContainer = styled.div`
   border: 1px solid #000;
   border-radius: 10px;
   overflow: hidden;
-  cursor: pointer;
+  margin-right: 50px;
 `;
 
 const Thumbnail = styled.img`
@@ -129,6 +131,12 @@ const WithdrawalButton = styled.span`
   display: block;
   margin-top: 40px;
 `;
+
+const videos = [
+  { id: 1, title: "간지나게 사는 방법", person: "Tony" },
+  { id: 2, title: "리액트 컴포넌트 디자인", person: "Alice" },
+  { id: 3, title: "웹 개발 기초", person: "Bob" },
+];
 
 const MyPage = () => {
   const [userProfileImageUrl, setUserProfileImageUrl] = useState("/favicon.ico");
@@ -200,11 +208,13 @@ const MyPage = () => {
         </ProfileContainer>
         <SubTitle>업로드 영상 목록</SubTitle>
         <UploadListContainer>
-          <VideoContainer>
-            <Thumbnail src="/favicon.ico" alt="썸네일" />
-            <Text>간지나게 사는 방법</Text>
-            <Text>Tony</Text>
-          </VideoContainer>
+          {videos.map((video) => (
+            <VideoContainer>
+              <Thumbnail src="/favicon.ico" alt="썸네일" />
+              <Text>{video.title}</Text>
+              <Text>{video.person}</Text>
+            </VideoContainer>
+          ))}
           <MoreButton>
             <ListLink to="/uploadList">
               더보기
