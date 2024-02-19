@@ -1,6 +1,7 @@
 package com.example.CustomLecture.entity;
 
 import com.example.CustomLecture.dto.Request.VideoSaveRequestDTO;
+import com.example.CustomLecture.dto.Response.VideoInfoResponseDTO;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.Builder;
@@ -79,6 +80,29 @@ public class Video {
         this.setDate(new Timestamp(System.currentTimeMillis()));
 
     }
+
+    public VideoInfoResponseDTO toVideoInfoResponseDTO(UserEntity user, VideoData videoData) {
+        return new VideoInfoResponseDTO(
+                // 영상 정보
+                this.getTitle(),
+                this.getContent(),
+                this.getSubject(),
+                this.getLectureNoteS3Path(),
+                this.getDate(),
+
+                // 강사 정보
+                user.getNickname(),
+
+                // 영상 상세 정보
+                videoData.getY(),
+                videoData.getX(),
+                videoData.getWidth(),
+                videoData.getHeight(),
+                videoData.getVideoHeight(),
+                videoData.getVideoHeight()
+        );
+    }
+
 
 
     public String toString() {

@@ -3,11 +3,13 @@ package com.example.CustomLecture.entity;
 import com.example.CustomLecture.dto.Request.VideoSaveRequestDTO;
 import jakarta.persistence.*;
 import jakarta.persistence.criteria.CriteriaBuilder;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 @Entity
 @Table(name = "videoData")
 @NoArgsConstructor
+@Getter
 public class VideoData {
 
     @Id
