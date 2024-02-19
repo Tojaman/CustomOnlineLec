@@ -5,6 +5,7 @@ from DB.connection import get_connection
 from dao.dao import VideoDao
 import os, tempfile, boto3, shutil
 from datetime import datetime
+from celery import group
 
 # import whisper
 
@@ -54,7 +55,8 @@ class ConvertVoice(Resource):
             print(json_data)
             user_id = request.json['userId']
             original_video_s3_path = request.json['url']
-            RVC_model = request.json['rvcModel']
+            # RVC_model = "te"
+            #RVC_model = request.json['rvcModel']
 
 
             # s3 연결 및 객체 생성
@@ -62,16 +64,13 @@ class ConvertVoice(Resource):
 
             original_video_path = "./original_video/"
             extract_voice_path = "./extract_voice/"
-            convert_voice_path = "./convert_voice/"
+            convert_video_dir = "./convert_video/"
 
-            # 임시 디렉토리에 파일 저장
-            # with tempfile.TemporaryDirectory() as temp_dir:
             # 원본 영상 파일명 추출
             original_filename = os.path.basename(original_video_s3_path)
 
             # 원본 영상을 저장할 경로 설정
             local_video_path = os.path.join(original_video_path, original_filename)
-            # local_video_path = os.path.join(temp_dir, original_filename)
 
 
             # 원본 영상 다운로드
@@ -82,24 +81,11 @@ class ConvertVoice(Resource):
 
             # 음성 추출
             local_audio_path = extract_audio(extract_voice_path, local_video_path)
-            # local_audio_path = extract_audio(temp_dir, local_video_path)
-
-
-
 
             # 자막 추출(Flask 동기)
             # Whisper STT로 문장 단위 JSON 형식 자막
-            # subtitle = stt(local_audio_path, temp_dir)
-            # print("자막 추출")
+            # subtitle = stt(local_audio_path)
 
-            # 임시 디렉토리 삭제(원본 동영상 및 추출 음성 삭제)
-            # shutil.rmtree(temp_dir)
-
-            # 임시 디렉토리 삭제 되었는지 확인
-            # if os.path.exists(local_video_path) and os.path.exists(local_audio_path):
-            #     print("임시 디렉토리에 파일이 여전히 존재합니다")
-            # else:
-            #     print("임시 디렉토리의 파일이 삭제되었습니다.")
 
             # DB와 연결
             connection = get_connection(DB)
@@ -111,20 +97,28 @@ class ConvertVoice(Resource):
             date = current_time.strftime('%Y-%m-%d')
 
             # DB에 convert_file_path_s3 저장
-            video_id = video_dao.update_video_s3_path(connection, date, user_id)
+            video_id = video_dao.update_video_s3_path(connection, date, user_id, original_video_s3_path)
 
             # RVC 음성 변환(celery 비동기)
-            # convert_file_path_s3 = process_uploaded_file.delay(temp_dir, local_video_path, local_audio_path, RVC_model).get()
-            convert_file_path_s3 = process_uploaded_file.delay(convert_voice_path
-                                                               , local_video_path, local_audio_path, RVC_model, video_id)
+            # process_uploaded_file.delay(convert_video_dir, local_video_path, local_audio_path, RVC_model, video_id)
+
+            # 모델 목록
+            # model_list = ["jimin700", "timcook", "Elonmusk", "윤석열"]
+            model_list = ["jimin700"]
+
+
+            # 모든 모델을 동시에 처리
+            tasks = group(
+                process_uploaded_file.s(convert_video_dir, local_video_path, local_audio_path, model, video_id) for model in model_list)
+            tasks.delay()
 
             # DB와 연결 해제
             connection.close()
 
             # JSON 형식 자막, s3 경로 저장한 테이블 기본키 HTTP body에 넣어서 프론트에 return
             response_data = {
-                # 'subtitle': subtitle,
-                'video_id': video_id
+                'video_id': video_id,
+                # 'subtitle': subtitle
             }
 
             # HTTP 응답 생성
@@ -194,7 +188,7 @@ def extract_audio(temp_dir, file_path):
     return output_audio_path
 
 
-def stt(local_audio_path, tmp_path):
+def stt(local_audio_path):
     model = whisper.load_model("medium")
     sentence_result = model.transcribe(local_audio_path)
     sentencelevel_info = []
