@@ -27,11 +27,4 @@ public class ConvertVideos {
 
     @Column(unique = true)
     private String DconvertS3Path;
-
-    public String toString() {
-        return "AconvertS3Path : " + this.AconvertS3Path + "," +
-                "BconvertS3Path : " + this.BconvertS3Path + "," +
-                "CconvertS3Path : " + this.CconvertS3Path + "," +
-                "DconvertS3Path : " + this.DconvertS3Path + ",";
-    }
 }

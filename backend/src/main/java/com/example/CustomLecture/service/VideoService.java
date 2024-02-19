@@ -2,6 +2,7 @@ package com.example.CustomLecture.service;
 
 import com.example.CustomLecture.dto.JoinDTO;
 import com.example.CustomLecture.dto.Request.VideoSaveRequestDTO;
+import com.example.CustomLecture.dto.Response.VideoInfoResponseDTO;
 import com.example.CustomLecture.entity.UserEntity;
 import com.example.CustomLecture.entity.Video;
 import com.example.CustomLecture.entity.VideoData;
@@ -9,8 +10,8 @@ import com.example.CustomLecture.jwt.JWTUtil;
 import com.example.CustomLecture.repository.UserRepository;
 import com.example.CustomLecture.repository.VideoDataRepository;
 import com.example.CustomLecture.repository.VideoRepository;
+import com.google.gson.Gson;
 import lombok.RequiredArgsConstructor;
-import org.apache.catalina.User;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
@@ -19,6 +20,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.client.RestTemplate;
+
 
 import java.sql.Timestamp;
 import java.util.*;
@@ -155,14 +157,16 @@ public class VideoService {
         Video video = videoRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 userId 입니다."));
 
-        // title, content, category, lecturenote, date
-        // 프로필 사진, 닉네임
-        // 영상 정보
-        // 변환 영상 경로
-        String videoInfo = video.toString() + "\n" + video.getMember().getNickname() + "\n" +
-                        video.getVideoData().toString() + "\n" + video.getConvertVideos().toString();
+        // 객체를 json으로 만들기 위해서 jackson, gson,  두 가지 라이브러리가 있다.(JSON-SIMPLE도 있는데 일단 제외)
+        // 빅데이터 같이 큰 데이터는 jackson 우위, 작은 데이터는 gson 우위 -> 여기선 gson 사용
+        VideoInfoResponseDTO videoInfoResponseDTO = video.toVideoInfoResponseDTO(video.getMember(), video.getVideoData());
 
-        return videoInfo;
+        // Gson 객체 생성
+        Gson gson = new Gson();
+
+        // VideoInfoResponseDTO 객체를 JSON 문자열로 변환
+        return gson.toJson(videoInfoResponseDTO);
+
     }
 }
 

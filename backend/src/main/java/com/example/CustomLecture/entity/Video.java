@@ -1,9 +1,9 @@
 package com.example.CustomLecture.entity;
 
 import com.example.CustomLecture.dto.Request.VideoSaveRequestDTO;
+import com.example.CustomLecture.dto.Response.VideoInfoResponseDTO;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
-import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -80,13 +80,26 @@ public class Video {
 
     }
 
+    public VideoInfoResponseDTO toVideoInfoResponseDTO(UserEntity user, VideoData videoData) {
+        return new VideoInfoResponseDTO(
+                // 영상 정보
+                this.getTitle(),
+                this.getContent(),
+                this.getSubject(),
+                this.getLectureNoteS3Path(),
+                this.getDate(),
 
-    public String toString() {
-        return "title : " + this.title + "," +
-                "content : " + this.content + "," +
-                "subject : " + this.subject + "," +
-                "lectureNoteS3Path : " + this.lectureNoteS3Path + "," +
-                "date : " + this.date + ",";
+                // 강사 정보
+                user.getNickname(),
+
+                // 영상 상세 정보
+                videoData.getY(),
+                videoData.getX(),
+                videoData.getWidth(),
+                videoData.getHeight(),
+                videoData.getVideoHeight(),
+                videoData.getVideoHeight()
+        );
     }
 
 }

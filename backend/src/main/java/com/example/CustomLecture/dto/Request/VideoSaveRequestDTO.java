@@ -29,19 +29,4 @@ public class VideoSaveRequestDTO {
     private Integer height;
     private Integer videoWidth;
     private Integer videoHeight;
-
-
-    // 영상 데이터 테이블 저장을 위한 함수
-//    public VideoData toVideoData(Video video) {
-//        return new VideoData(
-//            this.id,
-//            video,
-//            this.x,
-//            this.y,
-//            this.width,
-//            this.height,
-//            this.videoWidth,
-//            this.videoHeight
-//        );
-//    }
 }
