@@ -5,7 +5,6 @@ from moviepy.editor import VideoFileClip, AudioFileClip
 from DB.connection import get_connection
 from dao.dao import VideoDao
 
-
 load_dotenv()
 
 AWS_DEFAULT_REGION = os.environ.get('AWS_DEFAULT_REGION')
@@ -27,23 +26,30 @@ celery = Celery('FlaskAiModelServing', broker='redis://127.0.0.1:6379/0', backen
 
 @celery.task
 def process_uploaded_file(convert_video_dir, local_video_path, local_audio_path, RVC_model, video_id):
-
     result = []
 
     # s3 연결 및 객체 생성
     s3 = s3_connection()
 
     # RVC 변환(return 변환 음성 저장 경로)
-    convert_voice_path = execute_voice_conversion(RVC_model, local_audio_path)
+    # convert_voice_path = execute_voice_conversion(RVC_model, local_audio_path)
+    # print("경로당~~" + convert_voice_path)
+    convert_voice_path = local_audio_path
+
 
     # 원본 영상 + 변환 음성
     convert_video_path = merge_video_audio(convert_video_dir, local_video_path, convert_voice_path)
+    print("변환 비디오 경로" + convert_video_path)
 
     # 최종 변환 파일 이름 추출
-    convert_video_name = os.path.basename(convert_video_path)
+    convert_video_name_mp4 = os.path.basename(convert_video_path)
+    convert_video_name, convert_video_mp4 = os.path.splitext(convert_video_name_mp4)
+    convert_video_name = convert_video_name + "_" + RVC_model + convert_video_mp4
+    print("변환 비디오 이름" + convert_video_name)
+
 
     # s3 업로드
-    convert_video_path_s3 = "convert_voice/" + convert_video_name # 저장할 S3 경로
+    convert_video_path_s3 = "convert_video/" + convert_video_name  # 저장할 S3 경로
     if s3_put_object(s3, S3_BUCKET, convert_video_path, convert_video_path_s3):
         result.append("파일 업로드 성공")
     else:
@@ -86,7 +92,6 @@ def merge_video_audio(convert_voice_path, video_path, audio_path):
 # S3 연결 및 S3 객체 반환
 @celery.task
 def s3_connection():
-
     try:
         s3 = boto3.client(
             service_name='s3',
@@ -104,7 +109,6 @@ def s3_connection():
 # S3에 파일 업로드
 @celery.task
 def s3_put_object(s3, bucket, local_filepath, s3_filepath):
-
     try:
         s3.upload_file(local_filepath, bucket, s3_filepath)
         print("s3 file upload")
@@ -123,32 +127,27 @@ def execute_voice_conversion(model_name, local_file_dir):
         "-i", local_file_dir,
         "-dir", model_name,
         "-p", "0",
-        "-pall", "0",
         "-ir", "0.75",
         "-fr", "3",
         "-rms", "0.25",
         "-palgo", "rmvpe",
         "-hop", "64",
         "-pro", "0.33",
-        "-mv", "0",
-        "-bv", "0",
-        "-iv", "0",
-        "-rsize", "0.15",
-        "-rwet", "0.2",
-        "-rdry", "0.8",
-        "-rdamp", "0.7",
-        "-oformat", "wav"
+        "-pall", "0",
     ]
     # 명령어 실행
     process = subprocess.Popen(command, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, universal_newlines=True)
     # 명령어 실행 결과 반환
-    # output = ""
+    output = ""
     cover_path = ""
     for line in process.stdout:
         # 정규식을 사용하여 파일 경로 추출
         match = re.search(r'Cover generated at (.+)', line)
         if match:
             cover_path = match.group(1).strip()
+            # print(cover_path)  # 파일 경로 출력
+        output += line
+        print(line, end='')
 
     process.wait()
 

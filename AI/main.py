@@ -7,7 +7,7 @@ import os, tempfile, boto3, shutil
 from datetime import datetime
 from celery import group
 
-import whisper
+# import whisper
 
 # swagger
 from flask_restx import Api, Resource, fields
@@ -56,7 +56,7 @@ class ConvertVoice(Resource):
             user_id = request.json['userId']
             original_video_s3_path = request.json['url']
             # RVC_model = "te"
-            RVC_model = request.json['rvcModel']
+            #RVC_model = request.json['rvcModel']
 
 
             # s3 연결 및 객체 생성
@@ -64,7 +64,6 @@ class ConvertVoice(Resource):
 
             original_video_path = "./original_video/"
             extract_voice_path = "./extract_voice/"
-            convert_voice_path = "./convert_voice/"
             convert_video_dir = "./convert_video/"
 
             # 원본 영상 파일명 추출
@@ -85,7 +84,7 @@ class ConvertVoice(Resource):
 
             # 자막 추출(Flask 동기)
             # Whisper STT로 문장 단위 JSON 형식 자막
-            subtitle = stt(local_audio_path)
+            # subtitle = stt(local_audio_path)
 
 
             # DB와 연결
@@ -104,7 +103,9 @@ class ConvertVoice(Resource):
             # process_uploaded_file.delay(convert_video_dir, local_video_path, local_audio_path, RVC_model, video_id)
 
             # 모델 목록
-            model_list = ["jimin700", "timcook", "Elonmusk", "윤석열"]
+            # model_list = ["jimin700", "timcook", "Elonmusk", "윤석열"]
+            model_list = ["jimin700"]
+
 
             # 모든 모델을 동시에 처리
             tasks = group(
@@ -117,7 +118,7 @@ class ConvertVoice(Resource):
             # JSON 형식 자막, s3 경로 저장한 테이블 기본키 HTTP body에 넣어서 프론트에 return
             response_data = {
                 'video_id': video_id,
-                'subtitle': subtitle
+                # 'subtitle': subtitle
             }
 
             # HTTP 응답 생성
