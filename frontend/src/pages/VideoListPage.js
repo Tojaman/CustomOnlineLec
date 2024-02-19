@@ -10,6 +10,7 @@ const ListContainer = styled.div`
 `;
 
 const PageBackGround = styled.div`
+  position: fixed;
   position: absolute;
   width: 100vw;
   height: 100vh;
@@ -27,6 +28,7 @@ const ContentContainer = styled.div`
 `;
 
 const VideoContainer = styled.div`
+  background-color: #fff;
   height: 200px;
   width: 200px;
   display: flex;
@@ -71,27 +73,28 @@ const VideoList = () => {
   const token = sessionStorage.getItem("token");
 
   useEffect(() => {
-    axios.get("http://localhost:8080/videos/list", {
-      headers: {
-        Authorization: `Bearer ${token}`,
-      }
-    })
-      .then(response => {
-        const videoData = response.data.map(video => ({
+    axios
+      .get("http://localhost:8080/videos/list", {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      })
+      .then((response) => {
+        const videoData = response.data.map((video) => ({
           id: video.id,
           title: video.title,
           thumbnail: video.thumbnail,
-          nickname: video.nickname
+          nickname: video.nickname,
         }));
         setVideos(videoData);
       })
-      .catch(error => console.error("Error fetching videos:", error));
+      .catch((error) => console.error("Error fetching videos:", error));
   }, [token]);
 
   // 비디오를 클릭할 때 선택된 비디오 ID를 세션 스토리지에 저장하는 함수
   const handleVideoClick = (videoId) => {
     setSelectedVideoId(videoId);
-    sessionStorage.setItem('selectedVideoId', videoId);
+    sessionStorage.setItem("selectedVideoId", videoId);
   };
 
   return (

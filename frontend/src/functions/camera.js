@@ -226,15 +226,7 @@ async function parseSVG(target, blinking) {
   illustration.bindSkeleton(skeleton, svgScope, blinking);
 }
 
-export async function run() {
-  camera = new Context();
-
-  setting();
-
-  setupCanvas();
-
-  toggleLoadingUI(true);
-
+async function loadModels() {
   setStatusText("Loading PoseNet model...");
   posenet = await posenet_module.load({
     architecture: "MobileNetV1",
@@ -253,6 +245,18 @@ export async function run() {
 
   setStatusText("Loading Avatar file...");
   await parseSVG(girlSVG.default, true);
+}
+
+export async function run() {
+  camera = new Context();
+
+  setting();
+
+  setupCanvas();
+
+  toggleLoadingUI(true);
+
+  await loadModels();
 
   toggleLoadingUI(false);
 
@@ -273,6 +277,11 @@ function downloadPDF() {
   link.download = "test.pdf";
   link.click();
 }
+
+document.getElementById("goBackButton").addEventListener("click", function () {
+  window.location.href = "/videoList";
+});
+
 // 아바타 선택 창 토글 함수
 function toggleAvatarSelection() {
   var avatarSelection = document.getElementById("avatarSelection");

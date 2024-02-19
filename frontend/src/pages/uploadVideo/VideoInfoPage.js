@@ -102,10 +102,6 @@ const Image = styled.img`
   margin-top: 10px;
 `;
 
-const ResultContainer = styled.div`
-  display: flex;
-`;
-
 const VideoInfo = () => {
   const videoData = useSelector((state) => state.videoData.value);
 
@@ -132,10 +128,7 @@ const VideoInfo = () => {
 
   const handleSubmit = async () => {
     const token = sessionStorage.getItem("token");
-
-    console.log("현재 토큰 값:", token);
-    const id = 33;
-
+    const id = sessionStorage.getItem("videoID");
     const title = formData.title;
     const content = formData.description;
     const subject = formData.category;
@@ -171,20 +164,10 @@ const VideoInfo = () => {
       console.error("요청 실패", error.response.status);
     }
 
-    console.log("제목:", title);
-    console.log("강의 설명:", content);
-    console.log("카테고리:", subject);
-
     console.log("강의자료:", formData.pdfFile);
     console.log("썸네일:", formData.imageFile);
 
     console.log("자막:", subtitle);
-    console.log("x:", x);
-    console.log("y:", y);
-    console.log("너비:", width);
-    console.log("높이:", height);
-    console.log("영상 너비:", videoWidth);
-    console.log("영상 높이:", videoHeight);
   };
 
   return (

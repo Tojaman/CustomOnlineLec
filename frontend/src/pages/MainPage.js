@@ -14,6 +14,7 @@ const MainContainer = styled.div`
 `;
 
 const PageBackGround = styled.div`
+  position: fixed;
   position: absolute;
   width: 100vw;
   height: 100vh;
