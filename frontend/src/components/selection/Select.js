@@ -120,19 +120,18 @@ const voices = [
 ];
 
 const avatars = [
-  { name: "아바타1", img: "https://via.placeholder.com/150" },
-  { name: "아바타2", img: "https://via.placeholder.com/150" },
-  { name: "아바타3", img: "https://via.placeholder.com/150" },
-  { name: "아바타4", img: "https://via.placeholder.com/150" },
-  { name: "아바타5", img: "https://via.placeholder.com/150" },
-  { name: "아바타6", img: "https://via.placeholder.com/150" },
+  { name: "아바타 1", img: "https://via.placeholder.com/150" },
+  { name: "아바타 2", img: "https://via.placeholder.com/150" },
+  { name: "아바타 3", img: "https://via.placeholder.com/150" },
+  { name: "아바타 4", img: "https://via.placeholder.com/150" },
+  { name: "아바타 5", img: "https://via.placeholder.com/150" },
+  { name: "아바타 6", img: "https://via.placeholder.com/150" },
 ];
 
 const Select = () => {
   const goToCameraPage = () => {
     window.location.href = "/camera.html";
   };
-
   const [selectedVoiceIndex, setSelectedVoiceIndex] = useState(null);
   const [selectedAvatarIndex, setSelectedAvatarIndex] = useState(null);
 
@@ -140,6 +139,7 @@ const Select = () => {
     setSelectedVoiceIndex(index);
     const selectedVoice = voices[index];
     sessionStorage.setItem("selectedVoice", selectedVoice.name);
+    console.log("selected Video:", sessionStorage.getItem("selectedVideoId"));
     console.log("Selected Voice:", sessionStorage.getItem("selectedVoice"));
   };
 

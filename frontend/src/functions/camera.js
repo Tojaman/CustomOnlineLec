@@ -273,3 +273,36 @@ function downloadPDF() {
   link.download = "test.pdf";
   link.click();
 }
+// 아바타 선택 창 토글 함수
+function toggleAvatarSelection() {
+  var avatarSelection = document.getElementById("avatarSelection");
+  avatarSelection.hidden = !avatarSelection.hidden;
+}
+
+// 아바타 선택 이벤트 핸들러
+function handleAvatarSelection(avatarId) {
+  // 선택한 아바타의 ID를 세션 스토리지에 저장
+  sessionStorage.setItem('selectedAvatar', avatarId);
+   // 세션 스토리지에 저장된 내용을 콘솔에 출력
+   console.log("선택된 아바타:", sessionStorage.getItem('selectedAvatar'));
+}
+
+// 버튼 클릭 이벤트 핸들러
+document.getElementById("toggleAvatarButton").addEventListener("click", function() {
+  toggleAvatarSelection();
+});
+
+// 각 아바타 버튼에 클릭 이벤트 핸들러 추가
+document.getElementById("avatar1").addEventListener("click", function() {
+  handleAvatarSelection("avatar1"); // 아바타 1을 선택한 경우
+});
+
+document.getElementById("avatar2").addEventListener("click", function() {
+  handleAvatarSelection("avatar2"); 
+});
+document.getElementById("avatar3").addEventListener("click", function() {
+  handleAvatarSelection("avatar3"); 
+});
+document.getElementById("avatar4").addEventListener("click", function() {
+  handleAvatarSelection("avatar4"); 
+});

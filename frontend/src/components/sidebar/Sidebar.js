@@ -11,6 +11,7 @@ const StepContainer = styled.div`
   z-index: 1000;
   display: flex;
   justify-content: flex-end;
+  margin-top: 20px;
 `;
 
 const StepsWrapper = styled.div`

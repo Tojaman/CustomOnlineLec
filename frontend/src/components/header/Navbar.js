@@ -103,7 +103,18 @@ const Navbar = () => {
       });
     }
   };
-
+  const handleVideoListClick = () => {
+    if (!token) {
+      Swal.fire({
+        icon: "warning",
+        title: "로그인 필요",
+        text: "강의 목록을 확인하시려면 로그인이 필요합니다.",
+        toast: true,
+      }).then(() => {
+        navigate("/");
+      });
+    }
+  };
   const handleLogout = () => {
     sessionStorage.clear();
     if (history.location.pathname === "/") {
@@ -124,7 +135,7 @@ const Navbar = () => {
         <NavItem to="/attach" onClick={handleUploadClick}>
           강의 업로드
         </NavItem>
-        <NavItem to="/videoList">강의 목록</NavItem>
+        <NavItem to="/videoList" onClick={handleVideoListClick}>강의 목록</NavItem>
         {token ? <NavItem to="/mypage">마이페이지</NavItem> : null}
       </NavElement>
       {!token && (
