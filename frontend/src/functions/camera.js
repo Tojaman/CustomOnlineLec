@@ -5,7 +5,7 @@ import * as tf from "@tensorflow/tfjs";
 import * as paper from "paper";
 import "@tensorflow-models/face-detection";
 import "babel-polyfill";
-
+import AWS from "aws-sdk";
 import { SVGUtils } from "./utils/svgUtils";
 import { PoseIllustration } from "./utils/illustration";
 import { Skeleton } from "./utils/skeleton";
@@ -252,9 +252,7 @@ async function loadSelectedAvatar() {
      case 'avatar5':
         selectedAvatarSVG = test5SVG.default;
         break; 
-    case 'avatar6':
-        selectedAvatarSVG = girlSVG.default;
-        break;   
+
       // 다른 아바타에 대한 처리 추가
       default:
         console.log("Unknown selected avatar ID:", selectedAvatarId);
@@ -290,24 +288,49 @@ async function loadModels() {
 }
 
 function displayPreviousSessionInfo() {
-
   const selectedVideoInfoString = sessionStorage.getItem("selectedVideoInfo");
   const selectedVideoInfo = JSON.parse(selectedVideoInfoString);
+  
   if (selectedVideoInfo) {
     document.getElementById("title").textContent = selectedVideoInfo.title;
     document.getElementById("instructor").textContent = selectedVideoInfo.nickname;
     document.getElementById("description").textContent = selectedVideoInfo.content;
-    document.getElementById("date").textContent = selectedVideoInfo.data;
-    document.getElementById("profile").src = selectedVideoInfo.lecturenete;
+    document.getElementById("date").textContent = selectedVideoInfo.date;
 
+    // S3에서 동영상 정보 가져오기
+    const s3 = new AWS.S3({
+      accessKeyId: process.env.REACT_APP_AWS_ACCESS_KEY_ID,
+      secretAccessKey: process.env.REACT_APP_AWS_SECRET_ACCESS_KEY,
+      region: process.env.REACT_APP_AWS_DEFAULT_REGION,
+    });
+
+    const params = {
+      Bucket: process.env.REACT_APP_S3_BUCKET,
+      Key: selectedVideoInfo.convertVideoS3Path
+    };
+
+    s3.getObject(params, (err, data) => {
+      if (err) {
+        console.error("S3 동영상 객체 가져오기 오류:", err);
+      } else {
+        console.log("S3 동영상 객체 가져옴:", data);
+
+        const videoBlob = new Blob([data.Body], { type: data.ContentType });
+        const videoUrl = URL.createObjectURL(videoBlob);
+        
+        const videoElement = document.getElementById("originVideo");
+        videoElement.src = videoUrl;
+      }
+    });
   } else {
     console.log("이전에 저장된 세션 정보가 없습니다.");
   }
 }
 
+
 export async function run() {
-  camera = new Context();
   displayPreviousSessionInfo();
+  camera = new Context();
 
   setting();
 
@@ -326,16 +349,48 @@ run();
 
 document.addEventListener("DOMContentLoaded", function () {
   var downloadButton = document.getElementById("downloadButton");
-  downloadButton.addEventListener("click", downloadPDF);
+  downloadButton.addEventListener("click", downloadPDFFromS3); // downloadPDF 대신 downloadPDFFromS3를 호출
+
+  function downloadPDFFromS3() {
+    const selectedVideoInfoString = sessionStorage.getItem("selectedVideoInfo");
+    const selectedVideoInfo = JSON.parse(selectedVideoInfoString);
+
+    if (!selectedVideoInfo) {
+      console.log("이전에 저장된 세션 정보가 없습니다.");
+      return;
+    }
+
+    const s3 = new AWS.S3({
+      accessKeyId: process.env.REACT_APP_AWS_ACCESS_KEY_ID,
+      secretAccessKey: process.env.REACT_APP_AWS_SECRET_ACCESS_KEY,
+      region: process.env.REACT_APP_AWS_DEFAULT_REGION,
+    });
+
+    const params2 = {
+      Bucket: process.env.REACT_APP_S3_BUCKET,
+      Key: selectedVideoInfo.lecturenote // 강의 자료의 S3 키를 세션에서 가져옴
+    };
+
+    s3.getObject(params2, (err, data) => {
+      if (err) {
+        console.error("S3 강의 자료 객체 가져오기 오류:", err);
+      } else {
+        console.log("S3 강의 자료 객체 가져옴:", data);
+
+        const pdfBlob = new Blob([data.Body], { type: data.ContentType });
+        const pdfUrl = URL.createObjectURL(pdfBlob);
+        
+        const link = document.createElement("a");
+        link.href = pdfUrl;
+         // 다운로드될 파일 이름 설정
+         const fileName = selectedVideoInfo.lecturenote.split("/").pop(); // S3 키에서 파일 이름 추출
+         link.download = fileName;
+        link.click();
+      }
+    });
+  }
 });
 
-function downloadPDF() {
-  var pdfFilePath = "/test1.pdf";
-  var link = document.createElement("a");
-  link.href = pdfFilePath;
-  link.download = "test.pdf";
-  link.click();
-}
 
 document.getElementById("goBackButton").addEventListener("click", function () {
   window.location.href = "/videoList";
@@ -376,9 +431,6 @@ document.getElementById("avatar4").addEventListener("click", function() {
 });
 document.getElementById("avatar5").addEventListener("click", function() {
   handleAvatarSelection("avatar5"); 
-});
-document.getElementById("avatar6").addEventListener("click", function() {
-  handleAvatarSelection("avatar6"); 
 });
 
 
