@@ -1,11 +1,17 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import styled from "styled-components";
 import { GoArrowRight } from "react-icons/go";
 import Slider from "react-slick";
+import axios from "axios";
 
 import Navbar from "../../components/header/Navbar";
 import Background from "../../assets/img/Group.png";
+import avatarImg1 from "../../assets/avatarImg/기본아바타여1.jpg"
+import avatarImg2 from "../../assets/avatarImg/기본아바타남1.jpg"
+import avatarImg3 from "../../assets/avatarImg/윤석열.jpg"
+import avatarImg4 from "../../assets/avatarImg/트럼프.jpg"
+import avatarImg5 from "../../assets/avatarImg/키키.jpg"
 
 import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
@@ -119,13 +125,14 @@ const voices = [
 ];
 
 const avatars = [
-  { name: "아바타 1", img: "https://via.placeholder.com/150" },
-  { name: "아바타 2", img: "https://via.placeholder.com/150" },
-  { name: "아바타 3", img: "https://via.placeholder.com/150" },
-  { name: "아바타 4", img: "https://via.placeholder.com/150" },
-  { name: "아바타 5", img: "https://via.placeholder.com/150" },
+  { name: "기본아바타 여성", img: avatarImg1 },
+  { name: "기본아바타 남성", img: avatarImg2 },
+  { name: "윤석열", img: avatarImg3 },
+  { name: "트럼프", img: avatarImg4 },
+  { name: "키키", img: avatarImg5 },
   { name: "아바타 6", img: "https://via.placeholder.com/150" },
 ];
+
 
 const Select = () => {
   const goToCameraPage = () => {
@@ -133,6 +140,33 @@ const Select = () => {
   };
   const [selectedVoiceIndex, setSelectedVoiceIndex] = useState(null);
   const [selectedAvatarIndex, setSelectedAvatarIndex] = useState(null);
+  const token = sessionStorage.getItem("token");
+
+  useEffect(() => {
+   
+    const selectedVideoId = sessionStorage.getItem("selectedVideoId");
+  
+    if (selectedVideoId) {
+      axios
+        .post(
+          `http://localhost:8080/videos/info`,
+          { id: selectedVideoId },
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        )
+        .then((response) => {
+          console.log("요청 성공");
+          console.log("Received video info:", response.data);
+
+          sessionStorage.setItem('selectedVideoInfo', JSON.stringify(response.data));
+        })
+        .catch((error) => console.error("Error:", error));
+    }
+  }, [token]);
+  
 
   const handleVoiceSelection = (index) => {
     setSelectedVoiceIndex(index);

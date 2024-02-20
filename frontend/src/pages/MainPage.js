@@ -131,6 +131,18 @@ export default function MainPage() {
       });
     }
   };
+  const handleVideoListClick = () => {
+    if (!token) {
+      Swal.fire({
+        icon: "warning",
+        title: "로그인 필요",
+        text: "강의 목록을 확인하시려면 로그인이 필요합니다.",
+        toast: true,
+      }).then(() => {
+        navigate("/");
+      });
+    }
+  };
 
   return (
     <MainContainer>
@@ -148,7 +160,7 @@ export default function MainPage() {
               강의 업로드 하러가기
               <GoArrowRight />
             </GradientButton>
-            <LectureLink to="/videoList">
+            <LectureLink to="/videoList" onClick={handleVideoListClick}>
               강의 시청하기
               <FaRegCirclePlay/>
             </LectureLink>
