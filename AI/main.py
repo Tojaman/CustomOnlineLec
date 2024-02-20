@@ -105,9 +105,10 @@ class ConvertVoice(Resource):
             tmp1 = "jimin700"
             tmp2 = "윤석열"
             tmp3 = "timcook"
-            process_uploaded_file.delay(convert_video_dir, local_video_path, local_audio_path, tmp1, video_id).get()
-            process_uploaded_file.delay(convert_video_dir, local_video_path, local_audio_path, tmp2, video_id).get()
-            process_uploaded_file.delay(convert_video_dir, local_video_path, local_audio_path, tmp3, video_id).get()
+            
+            process_uploaded_file.delay(convert_video_dir, local_video_path, local_audio_path, tmp1, video_id)
+            process_uploaded_file.delay(convert_video_dir, local_video_path, local_audio_path, tmp2, video_id)
+            process_uploaded_file.delay(convert_video_dir, local_video_path, local_audio_path, tmp3, video_id)
             # 모델 목록
             # model_list = ["jimin700", "timcook", "Elonmusk", "윤석열"]
             #model_list = ["jimin700", "timcook", "Karina_V2", "윤석열"]
