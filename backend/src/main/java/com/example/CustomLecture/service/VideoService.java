@@ -86,7 +86,9 @@ public class VideoService {
     public void uploadVideo(VideoSaveRequestDTO videoSaveRequestDTO, String jwtToken) {
 
         String token = jwtToken.replace("Bearer ", "");
-
+	// 좌표값 전부 출력
+	
+	
         // JWTUtil을 사용하여 사용자 이름 추출
         String username = jwtUtil.getUsername(token);
 
