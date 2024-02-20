@@ -101,20 +101,20 @@ class ConvertVoice(Resource):
             print("DB 저장 완료")
             # RVC 음성 변환(celery 비동기)
             RVC_model = "Karina_V2"
-            process_uploaded_file.delay(convert_video_dir, local_video_path, local_audio_path, RVC_model, video_id)
-            tmp1 = "Elonmusk"
+            process_uploaded_file.delay(convert_video_dir, local_video_path, local_audio_path, RVC_model, video_id).get()
+            tmp1 = "jimin700"
             tmp2 = "윤석열"
-            tmp2 = "timcook"
-            #process_uploaded_file.delay(convert_video_dir, local_video_path, local_audio_path, tmp1, video_id)
-            #process_uploaded_file.delay(convert_video_dir, local_video_path, local_audio_path, tmp2, video_id)
-            #process_uploaded_file.delay(convert_video_dir, local_video_path, local_audio_path, tmp3, video_id)
+            tmp3 = "timcook"
+            process_uploaded_file.delay(convert_video_dir, local_video_path, local_audio_path, tmp1, video_id).get()
+            process_uploaded_file.delay(convert_video_dir, local_video_path, local_audio_path, tmp2, video_id).get()
+            process_uploaded_file.delay(convert_video_dir, local_video_path, local_audio_path, tmp3, video_id).get()
             # 모델 목록
             # model_list = ["jimin700", "timcook", "Elonmusk", "윤석열"]
-            model_list = ["jimin700", "timcook", "Elonmusk", "윤석열"]
+            #model_list = ["jimin700", "timcook", "Karina_V2", "윤석열"]
 
 
             # 모든 모델을 동시에 처리
-            #tasks = group(
+            #tasks_group = group(
                 #process_uploaded_file.s(convert_video_dir, local_video_path, local_audio_path, model, video_id) for model in model_list)
             #tasks.delay()
             # 작업 그룹을 비동기적으로 실행
