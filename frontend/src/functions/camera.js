@@ -294,7 +294,7 @@ async function loadModels() {
 function displayPreviousSessionInfo() {
   const selectedVideoInfoString = sessionStorage.getItem("selectedVideoInfo");
   const selectedVideoInfo = JSON.parse(selectedVideoInfoString);
-
+  const convertVideoS3Path = sessionStorage.getItem("convertVideoS3Path");
   if (selectedVideoInfo) {
     document.getElementById("title").textContent = selectedVideoInfo.title;
     document.getElementById("instructor").textContent = selectedVideoInfo.nickname;
@@ -310,7 +310,7 @@ function displayPreviousSessionInfo() {
 
     const params = {
       Bucket: process.env.REACT_APP_S3_BUCKET,
-      Key: selectedVideoInfo.convertVideoS3Path
+      Key: convertVideoS3Path
     };
 
     s3.getObject(params, (err, data) => {
@@ -447,6 +447,5 @@ document.getElementById("avatar4").addEventListener("click", function() {
 document.getElementById("avatar5").addEventListener("click", function() {
   handleAvatarSelection("avatar5"); 
 });
-
 
 

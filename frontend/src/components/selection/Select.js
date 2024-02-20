@@ -164,8 +164,7 @@ const Select = () => {
         .post(
           `http://localhost:8080/videos/info`,
           {
-            videoid: selectedVideoId,
-            voicename: selectedVoice,
+            videoid: selectedVideoId
           },
           {
             headers: {
@@ -182,7 +181,26 @@ const Select = () => {
           const selectedVideoInfo = JSON.parse(selectedVideoInfoString);
           console.log("Stored video info:", selectedVideoInfo);
   
-          console.log("convertVideoS3Path:", selectedVideoInfo.convertVideoS3Path);
+          let selectedS3Path;
+
+          if (selectedVideoInfo.Elonmusk !== undefined) {
+            console.log("Elonmusk:", selectedVideoInfo.Elonmusk);
+            selectedS3Path = selectedVideoInfo.Elonmusk;
+          } else if (selectedVideoInfo.Jimin700 !== undefined) {
+            console.log("Jimin700:", selectedVideoInfo.Jimin700);
+            selectedS3Path = selectedVideoInfo.Jimin700;
+          } else if (selectedVideoInfo.yoon !== undefined) {
+            console.log("yoon:", selectedVideoInfo.yoon);
+            selectedS3Path = selectedVideoInfo.yoon;
+          } else if (selectedVideoInfo.Timcook !== undefined) {
+            console.log("Timcook:", selectedVideoInfo.Timcook);
+            selectedS3Path = selectedVideoInfo.Timcook;
+          }
+          
+          if (selectedS3Path !== undefined) {
+            console.log("Selected S3 Path:", selectedS3Path);
+            sessionStorage.setItem("convertVideoS3Path", selectedS3Path);
+          }
 
   })
   .catch((error) => console.error("Error:", error));
