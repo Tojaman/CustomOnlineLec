@@ -156,7 +156,7 @@ public class VideoService {
     }
 
     // POST 영상 재생을 위한 정보
-    public String returnVideo(Long videoid, String voicename) {
+    public String returnVideo(Long videoid) {
         Video video = videoRepository.findById(videoid)
                 .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 userId 입니다."));
 
