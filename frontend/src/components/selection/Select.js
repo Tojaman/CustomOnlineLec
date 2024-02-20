@@ -120,7 +120,6 @@ const voices = [
   { name: "jimin700", img: "https://via.placeholder.com/150" },
   { name: "timcook", img: "https://via.placeholder.com/150" },
   { name: "Elonmusk", img: "https://via.placeholder.com/150" },
-
 ];
 
 const avatars = [
@@ -165,8 +164,8 @@ const Select = () => {
         .post(
           `http://localhost:8080/videos/info`,
           {
-            videoid: 95,
-            voicename: "jimin700",
+            videoid: selectedVideoId,
+            voicename: selectedVoice,
           },
           {
             headers: {

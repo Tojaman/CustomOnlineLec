@@ -108,7 +108,7 @@ const VideoInfo = () => {
 
   const subtitle = useSelector((state) => state.subtitle.value);
   const x = videoData ? videoData.x : "N/A";
-  const y = videoData ? videoData.x : "N/A";
+  const y = videoData ? videoData.y : "N/A";
   const width = videoData ? videoData.width : "N/A";
   const height = videoData ? videoData.height : "N/A";
   const videoWidth = videoData ? videoData.videoWidth : "N/A";
