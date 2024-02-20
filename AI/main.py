@@ -104,10 +104,10 @@ class ConvertVoice(Resource):
             process_uploaded_file.delay(convert_video_dir, local_video_path, local_audio_path, RVC_model, video_id)
             tmp1 = "Elonmusk"
             tmp2 = "윤석열"
-            tmp2 = "timcook"
-            #process_uploaded_file.delay(convert_video_dir, local_video_path, local_audio_path, tmp1, video_id)
-            #process_uploaded_file.delay(convert_video_dir, local_video_path, local_audio_path, tmp2, video_id)
-            #process_uploaded_file.delay(convert_video_dir, local_video_path, local_audio_path, tmp3, video_id)
+            tmp3 = "timcook"
+            process_uploaded_file.delay(convert_video_dir, local_video_path, local_audio_path, tmp1, video_id)
+            process_uploaded_file.delay(convert_video_dir, local_video_path, local_audio_path, tmp2, video_id)
+            process_uploaded_file.delay(convert_video_dir, local_video_path, local_audio_path, tmp3, video_id)
             # 모델 목록
             # model_list = ["jimin700", "timcook", "Elonmusk", "윤석열"]
             model_list = ["jimin700", "timcook", "Elonmusk", "윤석열"]
