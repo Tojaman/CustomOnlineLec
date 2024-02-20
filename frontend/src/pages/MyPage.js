@@ -4,6 +4,7 @@ import styled from "styled-components";
 import { IoIosArrowForward } from "react-icons/io";
 import { FaPencilAlt } from "react-icons/fa";
 import Navbar from "../components/header/Navbar";
+import originProfileImage from "../assets/origin_profile.jpg";
 
 const Container = styled.div`
   margin-right: 100px;
@@ -139,7 +140,7 @@ const videos = [
 ];
 
 const MyPage = () => {
-  const [userProfileImageUrl, setUserProfileImageUrl] = useState("/favicon.ico");
+  const [userProfileImageUrl, setUserProfileImageUrl] = useState(originProfileImage);
   const [userName, setUserName] = useState("John Doe");
   const [emailAddress, setEmailAddress] = useState("john.doe@example.com");
   const [isEditing, setIsEditing] = useState(false);

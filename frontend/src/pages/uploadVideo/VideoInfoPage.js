@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { Link } from "react-router-dom";
 import styled from "styled-components";
 import axios from "axios";
+import AWS from "aws-sdk";
 import Sidebar from "../../components/sidebar/Sidebar";
 import Navbar from "../../components/header/Navbar";
 
@@ -128,12 +129,51 @@ const VideoInfo = () => {
 
   const handleSubmit = async () => {
     const token = sessionStorage.getItem("token");
-    const id = sessionStorage.getItem("videoID");
+    const id = 35;
+    // const id = sessionStorage.getItem("UploadVideoID");
     const title = formData.title;
     const content = formData.description;
     const subject = formData.category;
-    const thumbnailS3Path = "formData.pdfFile";
-    const lectureNoteS3Path = "formData.imageFile";
+
+    const lectureNoteFileName = formData.pdfFile.name;
+    const thumbnailFileName = formData.imageFile.name;
+
+    const lectureNoteS3Path = `lecture_note/${lectureNoteFileName}`;
+    const thumbnailS3Path = `thumbnail/${thumbnailFileName}`;
+
+    AWS.config.update({
+      accessKeyId: process.env.REACT_APP_AWS_ACCESS_KEY_ID,
+      secretAccessKey: process.env.REACT_APP_AWS_SECRET_ACCESS_KEY,
+      region: process.env.REACT_APP_AWS_DEFAULT_REGION,
+    });
+
+    const s3 = new AWS.S3();
+
+    const lectureNoteParams = {
+      Bucket: process.env.REACT_APP_S3_BUCKET,
+      Key: lectureNoteS3Path,
+      Body: formData.pdfFile,
+    };
+
+    try {
+      const data = await s3.upload(lectureNoteParams).promise();
+      console.log("Lecture note upload successful:", data.Location);
+    } catch (error) {
+      console.error("Error uploading lecture note:", error);
+    }
+
+    const thumbnailParams = {
+      Bucket: process.env.REACT_APP_S3_BUCKET,
+      Key: thumbnailS3Path,
+      Body: formData.imageFile,
+    };
+
+    try {
+      const data = await s3.upload(thumbnailParams).promise();
+      console.log("Thumbnail upload successful:", data.Location);
+    } catch (error) {
+      console.error("Error uploading thumbnail:", error);
+    }
 
     try {
       const response = await axios.post(
@@ -163,9 +203,6 @@ const VideoInfo = () => {
     } catch (error) {
       console.error("요청 실패", error.response.status);
     }
-
-    console.log("강의자료:", formData.pdfFile);
-    console.log("썸네일:", formData.imageFile);
 
     console.log("자막:", subtitle);
   };
