@@ -123,11 +123,11 @@ public class VideoController {
     })
     public ResponseEntity<String> returnVideoInfo(@RequestBody VideoInfoRequestDTO requestDTO) {
         Long videoid = requestDTO.getVideoid();
-        String voicename = requestDTO.getVoicename();
+        //String voicename = requestDTO.getVoicename();
 
         try {
             // 메소드 내부에 예외 발생 가능한 부분을 try 블록 안에 위치시킵니다.
-            String videoInfo = videoService.returnVideo(videoid, voicename);
+            String videoInfo = videoService.returnVideo(videoid);
 
             // 정상적인 경우에는 OK 상태코드와 함께 반환합니다.
             return ResponseEntity.status(HttpStatus.OK).body(videoInfo);

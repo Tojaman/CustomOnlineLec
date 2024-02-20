@@ -85,8 +85,7 @@ public class Video {
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
         return this.date.format(formatter);
     }
-
-    public VideoInfoResponseDTO toVideoInfoResponseDTO(UserEntity user, VideoData videoData, String s3Path) {
+    public VideoInfoResponseDTO toVideoInfoResponseDTO(UserEntity user, VideoData videoData, ConvertVideos s3Path) {
         return new VideoInfoResponseDTO(
                 // 영상 정보
                 this.getTitle(),
@@ -99,14 +98,17 @@ public class Video {
                 user.getNickname(),
 
                 // 영상 상세 정보
-                videoData.getY(),
                 videoData.getX(),
+                videoData.getY(),
                 videoData.getWidth(),
                 videoData.getHeight(),
                 videoData.getVideoHeight(),
                 videoData.getVideoHeight(),
 
-                s3Path
+                s3Path.getElonmusk(),
+                s3Path.getYoon(),
+                s3Path.getTimcook(),
+                s3Path.getJimin700()
         );
     }
 
