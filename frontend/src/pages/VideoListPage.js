@@ -69,7 +69,6 @@ const VideoItems = styled.div`
 
 const VideoList = () => {
   const [videos, setVideos] = useState([]);
-  const [setSelectedVideoId] = useState(null);
   const token = sessionStorage.getItem("token");
 
   useEffect(() => {
@@ -88,13 +87,13 @@ const VideoList = () => {
         }));
         setVideos(videoData);
       })
-      .catch((error) => console.error("Error fetching videos:", error));
+      .catch((error) => console.error("Error:", error));
   }, [token]);
 
   // 비디오를 클릭할 때 선택된 비디오 ID를 세션 스토리지에 저장하는 함수
   const handleVideoClick = (videoId) => {
-    setSelectedVideoId(videoId);
     sessionStorage.setItem("selectedVideoId", videoId);
+    console.log("selected Video:", sessionStorage.getItem("selectedVideoId"));
   };
 
   return (

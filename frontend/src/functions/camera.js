@@ -247,8 +247,25 @@ async function loadModels() {
   await parseSVG(girlSVG.default, true);
 }
 
+function displayPreviousSessionInfo() {
+
+  const selectedVideoInfoString = sessionStorage.getItem("selectedVideoInfo");
+  const selectedVideoInfo = JSON.parse(selectedVideoInfoString);
+  if (selectedVideoInfo) {
+    document.getElementById("title").textContent = selectedVideoInfo.title;
+    document.getElementById("instructor").textContent = selectedVideoInfo.nickname;
+    document.getElementById("description").textContent = selectedVideoInfo.content;
+    document.getElementById("date").textContent = selectedVideoInfo.data;
+    document.getElementById("profile").src = selectedVideoInfo.lecturenete;
+
+  } else {
+    console.log("이전에 저장된 세션 정보가 없습니다.");
+  }
+}
+
 export async function run() {
   camera = new Context();
+  displayPreviousSessionInfo();
 
   setting();
 
@@ -315,3 +332,6 @@ document.getElementById("avatar3").addEventListener("click", function() {
 document.getElementById("avatar4").addEventListener("click", function() {
   handleAvatarSelection("avatar4"); 
 });
+
+
+
