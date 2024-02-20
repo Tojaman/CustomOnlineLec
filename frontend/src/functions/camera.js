@@ -11,6 +11,11 @@ import { PoseIllustration } from "./utils/illustration";
 import { Skeleton } from "./utils/skeleton";
 
 import * as girlSVG from "./resources/illustration/girl.svg";
+import * as test1SVG from "./resources/illustration/test1.svg";
+import * as test2SVG from "./resources/illustration/test2.svg";
+import * as test3SVG from "./resources/illustration/윤석열.svg";
+import * as test4SVG from "./resources/illustration/트럼프.svg";
+import * as test5SVG from "./resources/illustration/키키.svg";
 
 class Context {
   constructor() {
@@ -157,6 +162,7 @@ function detectPose() {
     let poses = [];
 
     const input = tf.browser.fromPixels(camera.camCanvas);
+    const selectedAvatarSVG = await loadSelectedAvatar(); // 아바타
     faceDetection = await facemesh.estimateFaces(input, false, false, { scoreThreshold: 0.1 });
 
     poseDetection = await posenet.estimatePoses(camFlipCanvas, {
@@ -190,9 +196,9 @@ function detectPose() {
           const leftEAR = getEAR(eyesDetection.annotations.leftEyeLower0, eyesDetection.annotations.leftEyeUpper0);
           let blinked = leftEAR <= EAR_THRESHOLD && rightEAR <= EAR_THRESHOLD;
           if (blinked) {
-            parseSVG(girlSVG.default, blinked);
+            parseSVG(selectedAvatarSVG, blinked);
           } else {
-            parseSVG(girlSVG.default, blinked);
+            parseSVG(selectedAvatarSVG, blinked);
           }
         });
       } else {
@@ -226,8 +232,44 @@ async function parseSVG(target, blinking) {
   illustration.bindSkeleton(skeleton, svgScope, blinking);
 }
 
+async function loadSelectedAvatar() {
+  const selectedAvatarId = sessionStorage.getItem('selectedAvatar');
+  if (selectedAvatarId) {
+    let selectedAvatarSVG;
+    switch (selectedAvatarId) {
+      case 'avatar1':
+        selectedAvatarSVG = test1SVG.default;
+        break;
+      case 'avatar2':
+        selectedAvatarSVG = test2SVG.default;
+        break;
+      case 'avatar3':
+        selectedAvatarSVG = test3SVG.default;
+        break;
+      case 'avatar4':
+        selectedAvatarSVG = test4SVG.default;
+        break;
+     case 'avatar5':
+        selectedAvatarSVG = test5SVG.default;
+        break; 
+    case 'avatar6':
+        selectedAvatarSVG = girlSVG.default;
+        break;   
+      // 다른 아바타에 대한 처리 추가
+      default:
+        console.log("Unknown selected avatar ID:", selectedAvatarId);
+        return null;
+    }
+    return selectedAvatarSVG; // 선택된 아바타의 SVG 경로 반환
+  } else {
+    console.log("No selected avatar ID found in session storage.");
+    return null;
+  }
+}
+
 async function loadModels() {
   setStatusText("Loading PoseNet model...");
+  const selectedAvatarSVG = await loadSelectedAvatar();
   posenet = await posenet_module.load({
     architecture: "MobileNetV1",
     outputStride: 16,
@@ -244,7 +286,7 @@ async function loadModels() {
   });
 
   setStatusText("Loading Avatar file...");
-  await parseSVG(girlSVG.default, true);
+  await parseSVG(selectedAvatarSVG, true);
 }
 
 function displayPreviousSessionInfo() {
@@ -331,6 +373,12 @@ document.getElementById("avatar3").addEventListener("click", function() {
 });
 document.getElementById("avatar4").addEventListener("click", function() {
   handleAvatarSelection("avatar4"); 
+});
+document.getElementById("avatar5").addEventListener("click", function() {
+  handleAvatarSelection("avatar5"); 
+});
+document.getElementById("avatar6").addEventListener("click", function() {
+  handleAvatarSelection("avatar6"); 
 });
 
 
