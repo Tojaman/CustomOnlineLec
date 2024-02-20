@@ -19,7 +19,7 @@ public class ConvertVideos {
     private Video video;
 
     @Column(unique = true)
-    private String 윤석열;
+    private String yoon;
 
     @Column(unique = true)
     private String jimin700;
