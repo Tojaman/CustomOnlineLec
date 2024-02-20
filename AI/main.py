@@ -101,13 +101,13 @@ class ConvertVoice(Resource):
             print("DB 저장 완료")
             # RVC 음성 변환(celery 비동기)
             RVC_model = "Karina_V2"
-            process_uploaded_file.delay(convert_video_dir, local_video_path, local_audio_path, RVC_model, video_id)
+            process_uploaded_file.delay(convert_video_dir, local_video_path, local_audio_path, RVC_model, video_id).get()
             tmp1 = "jimin700"
             tmp2 = "윤석열"
             tmp3 = "timcook"
-            process_uploaded_file.delay(convert_video_dir, local_video_path, local_audio_path, tmp1, video_id)
-            process_uploaded_file.delay(convert_video_dir, local_video_path, local_audio_path, tmp2, video_id)
-            process_uploaded_file.delay(convert_video_dir, local_video_path, local_audio_path, tmp3, video_id)
+            process_uploaded_file.delay(convert_video_dir, local_video_path, local_audio_path, tmp1, video_id).get()
+            process_uploaded_file.delay(convert_video_dir, local_video_path, local_audio_path, tmp2, video_id).get()
+            process_uploaded_file.delay(convert_video_dir, local_video_path, local_audio_path, tmp3, video_id).get()
             # 모델 목록
             # model_list = ["jimin700", "timcook", "Elonmusk", "윤석열"]
             #model_list = ["jimin700", "timcook", "Karina_V2", "윤석열"]

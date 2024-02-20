@@ -102,8 +102,8 @@ public class Video {
                 videoData.getY(),
                 videoData.getWidth(),
                 videoData.getHeight(),
-                videoData.getVideoHeight(),
-                videoData.getVideoHeight(),
+                videoData.getVideoWidth(),
+		videoData.getVideoHeight(),
 
                 s3Path.getElonmusk(),
                 s3Path.getYoon(),
