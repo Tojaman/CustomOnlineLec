@@ -10,6 +10,6 @@ import lombok.NoArgsConstructor;
 public class VideoInfoRequestDTO {
 
     private Long videoid;
-    private String voicename;
+//    private String voicename;
 
 }

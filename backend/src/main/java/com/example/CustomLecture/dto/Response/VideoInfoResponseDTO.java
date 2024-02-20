@@ -30,5 +30,9 @@ public class VideoInfoResponseDTO {
     private Integer videoHeight;
 
     // 변환 영상 s3 경로
-    private String convertVideoS3Path;
+    //private String convertVideoS3Path;
+    private String Elonmusk;
+    private String yoon;
+    private String Timcook;
+    private String Jimin700;
 }
