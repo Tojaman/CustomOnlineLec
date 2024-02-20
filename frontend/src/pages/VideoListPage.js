@@ -4,6 +4,7 @@ import styled from "styled-components";
 import Navbar from "../components/header/Navbar";
 import Background from "../assets/img/Group.png";
 import axios from "axios";
+import AWS from "aws-sdk";
 
 const ListContainer = styled.div`
   display: flex;
@@ -72,6 +73,14 @@ const VideoList = () => {
   const token = sessionStorage.getItem("token");
 
   useEffect(() => {
+    AWS.config.update({
+      accessKeyId: process.env.REACT_APP_AWS_ACCESS_KEY_ID,
+      secretAccessKey: process.env.REACT_APP_AWS_SECRET_ACCESS_KEY,
+      region: process.env.REACT_APP_AWS_DEFAULT_REGION,
+    });
+
+    const s3 = new AWS.S3();
+
     axios
       .get("http://localhost:8080/videos/list", {
         headers: {
@@ -85,12 +94,28 @@ const VideoList = () => {
           thumbnail: video.thumbnail,
           nickname: video.nickname,
         }));
-        setVideos(videoData);
+
+        const getThumbnails = videoData.map((video) => {
+          return s3.getSignedUrlPromise("getObject", {
+            Bucket: process.env.REACT_APP_S3_BUCKET,
+            Key: video.thumbnail,
+            Expires: 300,
+          });
+        });
+
+        Promise.all(getThumbnails)
+          .then((urls) => {
+            const updatedVideoData = videoData.map((video, index) => ({
+              ...video,
+              thumbnail: urls[index],
+            }));
+            setVideos(updatedVideoData);
+          })
+          .catch((error) => console.error("Error:", error));
       })
       .catch((error) => console.error("Error:", error));
   }, [token]);
 
-  // 비디오를 클릭할 때 선택된 비디오 ID를 세션 스토리지에 저장하는 함수
   const handleVideoClick = (videoId) => {
     sessionStorage.setItem("selectedVideoId", videoId);
     console.log("selected Video:", sessionStorage.getItem("selectedVideoId"));

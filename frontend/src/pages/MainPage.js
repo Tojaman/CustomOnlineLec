@@ -117,7 +117,7 @@ const MainImg = styled.img.attrs({
 
 export default function MainPage() {
   const token = sessionStorage.getItem("token");
-  const navigate= useNavigate();
+  const navigate = useNavigate();
 
   const handleUploadClick = () => {
     if (!token) {
