@@ -1,11 +1,13 @@
 package com.example.CustomLecture.entity;
 
 import jakarta.persistence.*;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 @Entity
 @Table(name = "convertVideos")
 @NoArgsConstructor
+@Getter
 public class ConvertVideos {
 
     @Id
@@ -17,14 +19,14 @@ public class ConvertVideos {
     private Video video;
 
     @Column(unique = true)
-    private String AconvertS3Path;
+    private String 윤석열;
 
     @Column(unique = true)
-    private String BconvertS3Path;
+    private String jimin700;
 
     @Column(unique = true)
-    private String CconvertS3Path;
+    private String timcook;
 
     @Column(unique = true)
-    private String DconvertS3Path;
+    private String Elonmusk;
 }

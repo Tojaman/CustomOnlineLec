@@ -15,8 +15,8 @@ public class VideoInfoResponseDTO {
     private String title;
     private String content;
     private String category;
-    private String lecturenete;
-    private Date data;
+    private String lecturenote;
+    private String date;
 
     // 강사 정보
     private String nickname;
@@ -29,6 +29,6 @@ public class VideoInfoResponseDTO {
     private Integer videoWidth;
     private Integer videoHeight;
 
-
-
+    // 변환 영상 s3 경로
+    private String convertVideoS3Path;
 }

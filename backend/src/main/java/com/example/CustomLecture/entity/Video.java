@@ -9,7 +9,8 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.sql.Timestamp;
-import java.util.Date;
+import java.time.format.DateTimeFormatter;
+import java.time.LocalDateTime;
 
 @Entity
 @Getter
@@ -41,7 +42,7 @@ public class Video {
     private String content;
 
     @Column(nullable = false) // columnDefinition을 제거합니다.
-    private Date date;
+    private LocalDateTime date;
 
     private String subject;
 
@@ -76,18 +77,23 @@ public class Video {
         this.setSubject(videoSaveRequestDTO.getSubject());
         this.setThumbnailS3Path(videoSaveRequestDTO.getThumbnailS3Path());
         this.setLectureNoteS3Path(videoSaveRequestDTO.getLectureNoteS3Path());
-        this.setDate(new Timestamp(System.currentTimeMillis()));
+        this.setDate(LocalDateTime.now());
 
     }
 
-    public VideoInfoResponseDTO toVideoInfoResponseDTO(UserEntity user, VideoData videoData) {
+    public String getFormattedDate() {
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+        return this.date.format(formatter);
+    }
+
+    public VideoInfoResponseDTO toVideoInfoResponseDTO(UserEntity user, VideoData videoData, String s3Path) {
         return new VideoInfoResponseDTO(
                 // 영상 정보
                 this.getTitle(),
                 this.getContent(),
                 this.getSubject(),
                 this.getLectureNoteS3Path(),
-                this.getDate(),
+                this.getFormattedDate(),
 
                 // 강사 정보
                 user.getNickname(),
@@ -98,7 +104,9 @@ public class Video {
                 videoData.getWidth(),
                 videoData.getHeight(),
                 videoData.getVideoHeight(),
-                videoData.getVideoHeight()
+                videoData.getVideoHeight(),
+
+                s3Path
         );
     }
 

@@ -1,6 +1,7 @@
 package com.example.CustomLecture.controller;
 
 import com.example.CustomLecture.dto.Request.VideoConvertRequestDTO;
+import com.example.CustomLecture.dto.Request.VideoInfoRequestDTO;
 import com.example.CustomLecture.dto.Request.VideoSaveRequestDTO;
 import com.example.CustomLecture.service.VideoService;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -120,12 +121,13 @@ public class VideoController {
             @ApiResponse(responseCode = "200", description = "OK"),
             @ApiResponse(responseCode = "500", description = "Server Error")
     })
-    public ResponseEntity<String> returnVideoInfo(@RequestBody Map<String, Long> requestBody) {
-        Long id = requestBody.get("id");
+    public ResponseEntity<String> returnVideoInfo(@RequestBody VideoInfoRequestDTO requestDTO) {
+        Long videoid = requestDTO.getVideoid();
+        String voicename = requestDTO.getVoicename();
 
         try {
             // 메소드 내부에 예외 발생 가능한 부분을 try 블록 안에 위치시킵니다.
-            String videoInfo = videoService.returnVideo(id);
+            String videoInfo = videoService.returnVideo(videoid, voicename);
 
             // 정상적인 경우에는 OK 상태코드와 함께 반환합니다.
             return ResponseEntity.status(HttpStatus.OK).body(videoInfo);
