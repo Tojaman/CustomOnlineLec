@@ -1,6 +1,7 @@
 import React, { useState, useRef, useEffect } from "react";
 import { Link } from "react-router-dom";
 import axios from "axios";
+import AWS from "aws-sdk";
 import Sidebar from "../../components/sidebar/Sidebar";
 import styled from "styled-components";
 import Navbar from "../../components/header/Navbar";
@@ -84,6 +85,7 @@ const NextButton = styled(Link)`
 
 const Attach = () => {
   const dispatch = useDispatch();
+  const [file, setFile] = useState(null);
   const [videoURL, setVideoURL] = useState("");
   const videoRef = useRef(null);
   const canvasRef = useRef(null);
@@ -102,11 +104,10 @@ const Attach = () => {
 
   const updateVideo = async (event) => {
     URL.revokeObjectURL(videoRef.current.src);
-    const file = event.target.files[0];
+    const newFile = event.target.files[0];
+    setFile(newFile);
 
-    console.log("동영상 파일:", file);
-
-    setVideoURL(URL.createObjectURL(file));
+    setVideoURL(URL.createObjectURL(newFile));
 
     videoRef.current.load();
     await new Promise((resolve) => {
@@ -124,6 +125,29 @@ const Attach = () => {
   };
 
   const handleSubmit = async () => {
+    const VideoFileName = file.name;
+    const url = `original_video/${VideoFileName}`;
+
+    AWS.config.update({
+      accessKeyId: process.env.REACT_APP_AWS_ACCESS_KEY_ID,
+      secretAccessKey: process.env.REACT_APP_AWS_SECRET_ACCESS_KEY,
+      region: process.env.REACT_APP_AWS_DEFAULT_REGION,
+    });
+
+    const s3 = new AWS.S3();
+    const VideoNoteParams = {
+      Bucket: process.env.REACT_APP_S3_BUCKET,
+      Key: url,
+      Body: file,
+    };
+
+    try {
+      const data = await s3.upload(VideoNoteParams).promise();
+      console.log("Lecture note upload successful:", data.Location);
+    } catch (error) {
+      console.error("Error uploading lecture note:", error);
+    }
+
     const token = sessionStorage.getItem("token");
     const rect = rectRef.current;
 
@@ -137,7 +161,6 @@ const Attach = () => {
     };
     dispatch(videoData(videoInfo));
 
-    const url = "original_video/oj.mp4";
     try {
       const response = await axios.post(
         "http://localhost:8080/videos/uploadVideo",
@@ -151,13 +174,13 @@ const Attach = () => {
         }
       );
       console.log("API 응답:", response.data.video_id);
-      sessionStorage.setItem("videoID", response.data.video_id);
+      sessionStorage.setItem("UploadVideoID", response.data.video_id);
       console.log("요청 성공");
     } catch (error) {
       if (error.response) {
-        console.error("요청 실패1", error.response.status);
+        console.error("요청 실패", error.response.status);
       } else {
-        console.error("요청 실패2", error.message);
+        console.error("요청 실패", error.message);
       }
     }
   };
