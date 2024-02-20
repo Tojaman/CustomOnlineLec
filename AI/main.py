@@ -110,7 +110,7 @@ class ConvertVoice(Resource):
             #process_uploaded_file.delay(convert_video_dir, local_video_path, local_audio_path, tmp3, video_id)
             # 모델 목록
             # model_list = ["jimin700", "timcook", "Elonmusk", "윤석열"]
-            model_list = ["jimin700", "Winterfromaespa", "Elonmusk", "윤석열"]
+            model_list = ["jimin700", "timcook", "Elonmusk", "윤석열"]
 
 
             # 모든 모델을 동시에 처리
