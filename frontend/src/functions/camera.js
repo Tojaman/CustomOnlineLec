@@ -17,6 +17,44 @@ import * as test3SVG from "./resources/illustration/윤석열.svg";
 import * as test4SVG from "./resources/illustration/트럼프.svg";
 import * as test5SVG from "./resources/illustration/키키.svg";
 
+
+
+
+let camera;
+let illustration = null;
+
+let detection = null;
+let facemesh = null;
+let posenet = null;
+
+let eyesDetection = null;
+let faceDetection = null;
+let poseDetection = null;
+
+let canvasScope;
+
+const selectedVideoInfoString = sessionStorage.getItem("selectedVideoInfo");
+const selectedVideoInfo = JSON.parse(selectedVideoInfoString);
+
+let originWidth = selectedVideoInfo.videoWidth;
+let originHeight = selectedVideoInfo.videoHeight;
+let pointWidth = 640;
+let sx = selectedVideoInfo.x;
+let sy = selectedVideoInfo.y;
+let sw = selectedVideoInfo.width;
+let sh = selectedVideoInfo.height;
+
+const EAR_THRESHOLD = 0.27;
+
+function setting() {
+  camera.originVideo.width = originWidth;
+  let rate = originWidth / pointWidth;
+  sx = sx * rate;
+  sy = sy * rate;
+  sw = sw * rate;
+  sh = sh * rate;
+}
+
 class Context {
   constructor() {
     this.originVideo = document.getElementById("originVideo");
@@ -34,40 +72,6 @@ class Context {
     this.canvas = document.querySelector(".illustrationCanvas");
   }
 }
-
-let camera;
-let illustration = null;
-
-let detection = null;
-let facemesh = null;
-let posenet = null;
-
-let eyesDetection = null;
-let faceDetection = null;
-let poseDetection = null;
-
-let canvasScope;
-
-let originWeight = 1280;
-let originHeight = 720;
-let pointWeight = 640;
-let pointHeight = 360;
-let sx = 505;
-let sy = 125;
-let sw = 135;
-let sh = 95;
-
-const EAR_THRESHOLD = 0.27;
-
-function setting() {
-  camera.originVideo.width = originWeight;
-  let rate = originWeight / pointWeight;
-  sx = sx * rate;
-  sy = sy * rate;
-  sw = sw * rate;
-  sh = sh * rate;
-}
-
 function setupCanvas() {
   canvasScope = paper.default;
   canvasScope.setup(camera.canvas);
@@ -90,13 +94,13 @@ function setStatusText(text) {
 }
 
 function drawVideoToCanvas() {
-  camera.originVideo.width = originWeight;
+  camera.originVideo.width = originWidth;
   camera.originVideo.height = originHeight;
 
-  camera.copyCanvas.width = originWeight;
+  camera.copyCanvas.width = originWidth;
   camera.copyCanvas.height = originHeight;
 
-  camera.mergedCanvas.width = originWeight;
+  camera.mergedCanvas.width = originWidth;
   camera.mergedCanvas.height = originHeight;
 
   camera.camCanvas.width = sw;
@@ -105,7 +109,7 @@ function drawVideoToCanvas() {
   camera.camFlipCanvas.width = sw;
   camera.camFlipCanvas.height = sh;
 
-  camera.mergedCanvas.width = originWeight;
+  camera.mergedCanvas.width = originWidth;
   camera.mergedCanvas.height = originHeight;
 
   camera.copyctx.clearRect(0, 0, camera.copyCanvas.width, camera.copyCanvas.height);
@@ -290,7 +294,7 @@ async function loadModels() {
 function displayPreviousSessionInfo() {
   const selectedVideoInfoString = sessionStorage.getItem("selectedVideoInfo");
   const selectedVideoInfo = JSON.parse(selectedVideoInfoString);
-  
+
   if (selectedVideoInfo) {
     document.getElementById("title").textContent = selectedVideoInfo.title;
     document.getElementById("instructor").textContent = selectedVideoInfo.nickname;
@@ -322,6 +326,17 @@ function displayPreviousSessionInfo() {
         videoElement.src = videoUrl;
       }
     });
+    // 프로필 이미지 확인
+    const profileImage = selectedVideoInfo.profile;
+    if (profileImage) {
+      const profileElement = document.getElementById("profile");
+      profileElement.src = profileImage;
+    } else {
+      // 프로필 이미지가 없는 경우 기본 이미지로 대체
+      const defaultProfileImagePath = "src/assets/origin_profile.jpg"; // 기본 이미지 경로
+      const profileElement = document.getElementById("profile");
+      profileElement.src = defaultProfileImagePath;
+    }
   } else {
     console.log("이전에 저장된 세션 정보가 없습니다.");
   }
