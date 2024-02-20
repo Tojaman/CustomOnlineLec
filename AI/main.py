@@ -98,19 +98,31 @@ class ConvertVoice(Resource):
 
             # DB에 convert_file_path_s3 저장
             video_id = video_dao.update_video_s3_path(connection, date, user_id, original_video_s3_path)
-
+            print("DB 저장 완료")
             # RVC 음성 변환(celery 비동기)
-            # process_uploaded_file.delay(convert_video_dir, local_video_path, local_audio_path, RVC_model, video_id)
-
+            RVC_model = "Karina_V2"
+            process_uploaded_file.delay(convert_video_dir, local_video_path, local_audio_path, RVC_model, video_id)
+            tmp1 = "Elonmusk"
+            tmp2 = "윤석열"
+            tmp2 = "timcook"
+            #process_uploaded_file.delay(convert_video_dir, local_video_path, local_audio_path, tmp1, video_id)
+            #process_uploaded_file.delay(convert_video_dir, local_video_path, local_audio_path, tmp2, video_id)
+            #process_uploaded_file.delay(convert_video_dir, local_video_path, local_audio_path, tmp3, video_id)
             # 모델 목록
             # model_list = ["jimin700", "timcook", "Elonmusk", "윤석열"]
-            model_list = ["jimin700"]
+            model_list = ["jimin700", "Winterfromaespa", "Elonmusk", "윤석열"]
 
 
             # 모든 모델을 동시에 처리
-            tasks = group(
-                process_uploaded_file.s(convert_video_dir, local_video_path, local_audio_path, model, video_id) for model in model_list)
-            tasks.delay()
+            #tasks = group(
+                #process_uploaded_file.s(convert_video_dir, local_video_path, local_audio_path, model, video_id) for model in model_list)
+            #tasks.delay()
+            # 작업 그룹을 비동기적으로 실행
+            #result_group = tasks_group.delay()
+
+            # 작업이 완료될 때까지 대기
+            #while not result_group.ready():
+                #time.sleep(1)  # 작업이 완료되지 않았으면 1초 대기
 
             # DB와 연결 해제
             connection.close()

@@ -32,9 +32,9 @@ def process_uploaded_file(convert_video_dir, local_video_path, local_audio_path,
     s3 = s3_connection()
 
     # RVC 변환(return 변환 음성 저장 경로)
-    # convert_voice_path = execute_voice_conversion(RVC_model, local_audio_path)
+    convert_voice_path = execute_voice_conversion(RVC_model, local_audio_path)
     # print("경로당~~" + convert_voice_path)
-    convert_voice_path = local_audio_path
+    #convert_voice_path = local_audio_path
 
 
     # 원본 영상 + 변환 음성

@@ -29,7 +29,7 @@ class VideoDao:
             elif rvc_model == "timcook":
                 cursor.execute('INSERT INTO convertVideos (timcook) VALUES (%s)', (convertS3Path,))
                 connection.commit()
-            elif rvc_model == "Elonmusk":
+            else:
                 cursor.execute('INSERT INTO convertVideos (Elonmusk) VALUES (%s)', (convertS3Path,))
                 connection.commit()
 
