@@ -153,13 +153,29 @@ public class VideoService {
                 .collect(Collectors.toList());
     }
 
-    public String returnVideo(Long id) {
-        Video video = videoRepository.findById(id)
+    // POST 영상 재생을 위한 정보
+    public String returnVideo(Long videoid, String voicename) {
+        Video video = videoRepository.findById(videoid)
                 .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 userId 입니다."));
+
+        String s3Path = "";
+        if (Objects.equals(voicename, "윤석열")) {
+            s3Path = video.getConvertVideos().get윤석열();
+        }
+        else if (Objects.equals(voicename, "jimin700")) {
+            s3Path = video.getConvertVideos().getJimin700();
+        }
+        else if (Objects.equals(voicename, "timcook")) {
+            s3Path = video.getConvertVideos().getTimcook();
+        }
+        else {
+            s3Path = video.getConvertVideos().getElonmusk();
+        }
+
 
         // 객체를 json으로 만들기 위해서 jackson, gson,  두 가지 라이브러리가 있다.(JSON-SIMPLE도 있는데 일단 제외)
         // 빅데이터 같이 큰 데이터는 jackson 우위, 작은 데이터는 gson 우위 -> 여기선 gson 사용
-        VideoInfoResponseDTO videoInfoResponseDTO = video.toVideoInfoResponseDTO(video.getMember(), video.getVideoData());
+        VideoInfoResponseDTO videoInfoResponseDTO = video.toVideoInfoResponseDTO(video.getMember(), video.getVideoData(), s3Path);
 
         // Gson 객체 생성
         Gson gson = new Gson();
