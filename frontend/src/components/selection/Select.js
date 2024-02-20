@@ -125,12 +125,12 @@ const voices = [
 ];
 
 const avatars = [
-  { name: "기본아바타 여성", img: avatarImg1 },
-  { name: "기본아바타 남성", img: avatarImg2 },
-  { name: "윤석열", img: avatarImg3 },
-  { name: "트럼프", img: avatarImg4 },
-  { name: "키키", img: avatarImg5 },
-  { name: "아바타 6", img: "https://via.placeholder.com/150" },
+  { id: "avatar1", name: "기본아바타 여성", img: avatarImg1 },
+  { id: "avatar2", name: "기본아바타 남성", img: avatarImg2 },
+  { id: "avatar3", name: "윤석열", img: avatarImg3 },
+  { id: "avatar4", name: "트럼프", img: avatarImg4 },
+  { id: "avatar5", name: "키키", img: avatarImg5 },
+  { id: "avatar6", name: "아바타 6", img: "https://via.placeholder.com/150" },
 ];
 
 
@@ -179,7 +179,7 @@ const Select = () => {
   const handleAvatarSelection = (index) => {
     setSelectedAvatarIndex(index);
     const selectedAvatar = avatars[index];
-    sessionStorage.setItem("selectedAvatar", selectedAvatar.name);
+    sessionStorage.setItem("selectedAvatar", selectedAvatar.id);
     console.log("Selected Avatar:", sessionStorage.getItem("selectedAvatar"));
   };
 
