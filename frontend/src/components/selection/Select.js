@@ -116,12 +116,11 @@ const settings = {
 };
 
 const voices = [
-  { name: "음성1", img: "https://via.placeholder.com/150" },
-  { name: "음성2", img: "https://via.placeholder.com/150" },
-  { name: "음성3", img: "https://via.placeholder.com/150" },
-  { name: "음성4", img: "https://via.placeholder.com/150" },
-  { name: "음성5", img: "https://via.placeholder.com/150" },
-  { name: "음성6", img: "https://via.placeholder.com/150" },
+  { name: "윤석열", img: "https://via.placeholder.com/150" },
+  { name: "jimin700", img: "https://via.placeholder.com/150" },
+  { name: "timcook", img: "https://via.placeholder.com/150" },
+  { name: "Elonmusk", img: "https://via.placeholder.com/150" },
+
 ];
 
 const avatars = [
@@ -129,8 +128,7 @@ const avatars = [
   { id: "avatar2", name: "기본아바타 남성", img: avatarImg2 },
   { id: "avatar3", name: "윤석열", img: avatarImg3 },
   { id: "avatar4", name: "트럼프", img: avatarImg4 },
-  { id: "avatar5", name: "키키", img: avatarImg5 },
-  { id: "avatar6", name: "아바타 6", img: "https://via.placeholder.com/150" },
+  { id: "avatar5", name: "키키", img: avatarImg5 }
 ];
 
 
@@ -141,32 +139,6 @@ const Select = () => {
   const [selectedVoiceIndex, setSelectedVoiceIndex] = useState(null);
   const [selectedAvatarIndex, setSelectedAvatarIndex] = useState(null);
   const token = sessionStorage.getItem("token");
-
-  useEffect(() => {
-   
-    const selectedVideoId = sessionStorage.getItem("selectedVideoId");
-  
-    if (selectedVideoId) {
-      axios
-        .post(
-          `http://localhost:8080/videos/info`,
-          { id: selectedVideoId },
-          {
-            headers: {
-              Authorization: `Bearer ${token}`,
-            },
-          }
-        )
-        .then((response) => {
-          console.log("요청 성공");
-          console.log("Received video info:", response.data);
-
-          sessionStorage.setItem('selectedVideoInfo', JSON.stringify(response.data));
-        })
-        .catch((error) => console.error("Error:", error));
-    }
-  }, [token]);
-  
 
   const handleVoiceSelection = (index) => {
     setSelectedVoiceIndex(index);
@@ -183,6 +155,41 @@ const Select = () => {
     console.log("Selected Avatar:", sessionStorage.getItem("selectedAvatar"));
   };
 
+  useEffect(() => {
+   
+    const selectedVideoId = sessionStorage.getItem("selectedVideoId");
+    const selectedVoice = sessionStorage.getItem("selectedVoice");
+
+    if (selectedVideoId) {
+      axios
+        .post(
+          `http://localhost:8080/videos/info`,
+          {
+            videoid: 95,
+            voicename: "jimin700",
+          },
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        )
+        .then((response) => {
+          console.log("요청 성공");
+          console.log("Received video info:", response.data);
+  
+          sessionStorage.setItem("selectedVideoInfo", JSON.stringify(response.data));
+          const selectedVideoInfoString = sessionStorage.getItem("selectedVideoInfo");
+          const selectedVideoInfo = JSON.parse(selectedVideoInfoString);
+          console.log("Stored video info:", selectedVideoInfo);
+  
+          console.log("convertVideoS3Path:", selectedVideoInfo.convertVideoS3Path);
+
+  })
+  .catch((error) => console.error("Error:", error));
+}
+}, [token]);
+  
   return (
     <SelectContainer>
       <Navbar />
