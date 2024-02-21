@@ -3,6 +3,10 @@ import { Link } from "react-router-dom";
 import styled from "styled-components";
 import Navbar from "../components/header/Navbar";
 
+
+
+import originProfileImage from "../assets/origin_profile.jpg";
+
 const Container = styled.div`
   padding: 40px;
   margin-top: 4rem;
@@ -56,7 +60,7 @@ const UploadList = () => {
       <Navbar />
       {videos.map((video) => (
         <VideoContainer onClick={() => handleVideoClick(video.id, video.title, video.person)}>
-          <ImageContainer src="/favicon.ico" alt="썸네일" />
+          <ImageContainer src={originProfileImage} alt="썸네일" />
           <TextContainer>
             <Text>{video.title}</Text>
             <Text>{video.person}</Text>

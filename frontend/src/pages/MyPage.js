@@ -3,27 +3,50 @@ import { Link } from "react-router-dom";
 import styled from "styled-components";
 import { IoIosArrowForward } from "react-icons/io";
 import { FaPencilAlt } from "react-icons/fa";
+import Background from "../assets/img/Group.png";
 import Navbar from "../components/header/Navbar";
 import originProfileImage from "../assets/origin_profile.jpg";
 
 const Container = styled.div`
-  margin-right: 100px;
-  margin-left: 100px;
-  margin-top: 4rem;
+  display: flex;
+  flex-direction: column;
+  margin-top: 2rem;
+`;
+
+const PageBackGround = styled.div`
+  position: fixed;
+  position: absolute;
+  width: 100vw;
+  height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-image: url(${Background});
+  background-size: 100% 100%;
+  background-position: center center;
+  z-index: -1;
 `;
 
 const SubTitle = styled.p`
+  display: flex;
+  width: 730px;
   font-weight: bold;
   font-size: 20px;
+  margin: 0 auto;
+  margin-top: 40px;
+  margin-bottom: 10px;
 `;
 
 const ProfileContainer = styled.div`
+  background-color: #fff;
+  width: 650px;
   display: flex;
   flex-direction: column;
   align-items: flex-start;
   padding: 40px;
   border-radius: 10px;
   border: 2px solid #000;
+  margin: 0 auto;
 `;
 
 const ProfileImageContainer = styled.div`
@@ -62,7 +85,7 @@ const InputFile = styled.input`
 const Input = styled.input`
   background-color: white;
   padding: 8px;
-  width: 300px;
+  width: 40%;
   border-radius: 10px;
   margin-bottom: 20px;
 `;
@@ -79,10 +102,12 @@ const ButtonContent = styled.div`
 const UploadListContainer = styled.div`
   display: flex;
   flex-wrap: wrap;
+  width: 730px;
   background-color: lightgrey;
-  padding: 20px;
+  padding-top: 30px;
   border-radius: 10px;
   position: relative;
+  margin: 0 auto;
 `;
 
 const ListLink = styled(Link)`
@@ -109,7 +134,8 @@ const VideoContainer = styled.div`
   border: 1px solid #000;
   border-radius: 10px;
   overflow: hidden;
-  margin-right: 50px;
+  margin-left: 30px;
+  margin-bottom: 20px;
 `;
 
 const Thumbnail = styled.img`
@@ -121,45 +147,57 @@ const Text = styled.span`
   max-width: 100%;
   max-height: 50px;
   margin-top: 10px;
+  margin-left: 10px;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+`;
+
+const ButtonContainer = styled.div`
+  width: 730px;
+  font-weight: bold;
+  margin: 0 auto;
+  margin-top: 40px;
+  margin-bottom: 40px;
 `;
 
 const WithdrawalButton = styled.span`
   cursor: pointer;
   font-size: 15px;
   display: block;
-  margin-top: 40px;
 `;
 
 const videos = [
-  { id: 1, title: "간지나게 사는 방법", person: "Tony" },
-  { id: 2, title: "리액트 컴포넌트 디자인", person: "Alice" },
-  { id: 3, title: "웹 개발 기초", person: "Bob" },
+  { id: 1, title: "간지나게 사는 방법", person: "john" },
+  { id: 2, title: "리액트 컴포넌트 디자인", person: "john" },
+  { id: 3, title: "웹 개발 기초", person: "john" },
+  { id: 4, title: "웹 개발 기초", person: "john" },
+  { id: 5, title: "웹 개발 기초", person: "john" },
+  { id: 6, title: "웹 개발 기초", person: "john" },
+  { id: 7, title: "웹 개발 기초", person: "john" },
 ];
 
 const MyPage = () => {
   const [userProfileImageUrl, setUserProfileImageUrl] = useState(originProfileImage);
-  const [userName, setUserName] = useState("John Doe");
-  const [emailAddress, setEmailAddress] = useState("john.doe@example.com");
+  const [nickname, setNickname] = useState("john");
+  const [password, setPassword] = useState("a");
   const [isEditing, setIsEditing] = useState(false);
-  const [editedUserName, setEditedUserName] = useState(userName);
-  const [editedEmailAddress, setEditedEmailAddress] = useState(emailAddress);
+  const [editedNickname, setEditedNickname] = useState(nickname);
+  const [editedPassword, setEditedPassword] = useState(password);
 
   const handleEditClick = () => {
     setIsEditing(true);
   };
 
   const handleSaveClick = () => {
-    setUserName(editedUserName);
-    setEmailAddress(editedEmailAddress);
+    setNickname(editedNickname);
+    setPassword(editedPassword);
     setIsEditing(false);
   };
 
   const handleCancelClick = () => {
-    setEditedUserName(userName);
-    setEditedEmailAddress(emailAddress);
+    setEditedNickname(nickname);
+    setEditedPassword(password);
     setIsEditing(false);
   };
 
@@ -178,6 +216,7 @@ const MyPage = () => {
     <div>
       <Navbar />
       <Container>
+        <PageBackGround />
         <SubTitle>User Profile</SubTitle>
         <ProfileContainer>
           <ProfileImageContainer>
@@ -187,17 +226,17 @@ const MyPage = () => {
               <InputFile id="fileInput" type="file" accept="image/*" onChange={handleImageChange} />
             </EditIcon>
           </ProfileImageContainer>
-          <InfoText>User Name</InfoText>
+          <InfoText>Nickname</InfoText>
           {isEditing ? (
-            <Input value={editedUserName} onChange={(e) => setEditedUserName(e.target.value)} />
+            <Input value={editedNickname} onChange={(e) => setEditedNickname(e.target.value)} />
           ) : (
-            <Input value={userName} readOnly />
+            <Input value={nickname} readOnly />
           )}
-          <InfoText>Email Address</InfoText>
+          <InfoText>Password</InfoText>
           {isEditing ? (
-            <Input value={editedEmailAddress} onChange={(e) => setEditedEmailAddress(e.target.value)} />
+            <Input value={editedPassword} onChange={(e) => setEditedPassword(e.target.value)} />
           ) : (
-            <Input value={emailAddress} readOnly />
+            <Input type="password" value={password} readOnly />
           )}
           {isEditing && (
             <ButtonContent>
@@ -209,9 +248,9 @@ const MyPage = () => {
         </ProfileContainer>
         <SubTitle>업로드 영상 목록</SubTitle>
         <UploadListContainer>
-          {videos.map((video) => (
+          {videos.slice(0, 3).map((video) => (
             <VideoContainer>
-              <Thumbnail src="/favicon.ico" alt="썸네일" />
+              <Thumbnail src={originProfileImage} alt="썸네일" />
               <Text>{video.title}</Text>
               <Text>{video.person}</Text>
             </VideoContainer>
@@ -223,10 +262,12 @@ const MyPage = () => {
             </ListLink>
           </MoreButton>
         </UploadListContainer>
-        <WithdrawalButton>
-          탈퇴하기
-          <IoIosArrowForward />
-        </WithdrawalButton>
+        <ButtonContainer>
+          <WithdrawalButton>
+            탈퇴하기
+            <IoIosArrowForward />
+          </WithdrawalButton>
+        </ButtonContainer>
       </Container>
     </div>
   );
