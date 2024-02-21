@@ -17,9 +17,6 @@ import * as test3SVG from "./resources/illustration/윤석열.svg";
 import * as test4SVG from "./resources/illustration/트럼프.svg";
 import * as test5SVG from "./resources/illustration/키키.svg";
 
-
-
-
 let camera;
 let illustration = null;
 

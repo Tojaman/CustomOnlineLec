@@ -7,11 +7,11 @@ import axios from "axios";
 
 import Navbar from "../../components/header/Navbar";
 import Background from "../../assets/img/Group.png";
-import avatarImg1 from "../../assets/avatarImg/기본아바타여1.jpg"
-import avatarImg2 from "../../assets/avatarImg/기본아바타남1.jpg"
-import avatarImg3 from "../../assets/avatarImg/윤석열.jpg"
-import avatarImg4 from "../../assets/avatarImg/트럼프.jpg"
-import avatarImg5 from "../../assets/avatarImg/키키.jpg"
+import avatarImg1 from "../../assets/avatarImg/기본아바타여1.jpg";
+import avatarImg2 from "../../assets/avatarImg/기본아바타남1.jpg";
+import avatarImg3 from "../../assets/avatarImg/윤석열.jpg";
+import avatarImg4 from "../../assets/avatarImg/트럼프.jpg";
+import avatarImg5 from "../../assets/avatarImg/키키.jpg";
 
 import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
@@ -39,12 +39,12 @@ const ContentContainer = styled.div`
   display: flex;
   flex-direction: column;
   align-items: center;
-  margin-top: 50px;
+  margin-top: 30px;
 `;
 
 const Selection = styled.div`
   display: flex;
-  margin-top: 30px;
+  margin-top: 10px;
 `;
 
 const SelectText = styled.p`
@@ -52,7 +52,7 @@ const SelectText = styled.p`
   font-size: 20px;
   line-height: 15px;
   margin-left: 12px;
-  margin-top: 60px;
+  margin-top: 80px;
 `;
 
 const CustomSlider = styled(Slider)`
@@ -64,24 +64,32 @@ const CustomSlider = styled(Slider)`
   }
 
   .slick-slide {
-    height: 150px;
     margin: 0 10px;
     border: 1px solid #e1dddd;
-    padding: 1px;
+    background-color: white;
 
     &:hover {
+      height: 150px;
       border: 1px solid #499be9;
     }
   }
   .slick-track {
     display: flex;
   }
+
   .selected {
+    height: 150px;
     border: 1px solid #499be9;
+  }
+
+  .slick-prev:before,
+  .slick-next:before {
+    color: #499be9;
   }
 `;
 
 const Img = styled.img`
+  border: 1px solid #e9ecef;
   max-width: 100%;
   max-height: 125px;
   margin-bottom: 5px;
@@ -89,10 +97,10 @@ const Img = styled.img`
 
 const Name = styled.div`
   font-family: "Inter";
-  font-style: normal;
   font-weight: 600;
   font-size: 18px;
   line-height: 15px;
+  margin: 2px;
 `;
 
 const NextButton = styled(Link)`
@@ -123,13 +131,12 @@ const voices = [
 ];
 
 const avatars = [
-  { id: "avatar1", name: "기본아바타 여성", img: avatarImg1 },
-  { id: "avatar2", name: "기본아바타 남성", img: avatarImg2 },
+  { id: "avatar1", name: "기본 여성", img: avatarImg1 },
+  { id: "avatar2", name: "기본 남성", img: avatarImg2 },
   { id: "avatar3", name: "윤석열", img: avatarImg3 },
   { id: "avatar4", name: "트럼프", img: avatarImg4 },
-  { id: "avatar5", name: "키키", img: avatarImg5 }
+  { id: "avatar5", name: "키키", img: avatarImg5 },
 ];
-
 
 const Select = () => {
   const goToCameraPage = () => {
@@ -155,7 +162,6 @@ const Select = () => {
   };
 
   useEffect(() => {
-   
     const selectedVideoId = sessionStorage.getItem("selectedVideoId");
     const selectedVoice = sessionStorage.getItem("selectedVoice");
 
@@ -164,7 +170,7 @@ const Select = () => {
         .post(
           `http://localhost:8080/videos/info`,
           {
-            videoid: selectedVideoId
+            videoid: selectedVideoId,
           },
           {
             headers: {
@@ -175,12 +181,12 @@ const Select = () => {
         .then((response) => {
           console.log("요청 성공");
           console.log("Received video info:", response.data);
-  
+
           sessionStorage.setItem("selectedVideoInfo", JSON.stringify(response.data));
           const selectedVideoInfoString = sessionStorage.getItem("selectedVideoInfo");
           const selectedVideoInfo = JSON.parse(selectedVideoInfoString);
           console.log("Stored video info:", selectedVideoInfo);
-  
+
           let selectedS3Path;
 
           if (selectedVideoInfo.Elonmusk !== undefined) {
@@ -196,17 +202,16 @@ const Select = () => {
             console.log("Timcook:", selectedVideoInfo.Timcook);
             selectedS3Path = selectedVideoInfo.Timcook;
           }
-          
+
           if (selectedS3Path !== undefined) {
             console.log("Selected S3 Path:", selectedS3Path);
             sessionStorage.setItem("convertVideoS3Path", selectedS3Path);
           }
+        })
+        .catch((error) => console.error("Error:", error));
+    }
+  }, [token]);
 
-  })
-  .catch((error) => console.error("Error:", error));
-}
-}, [token]);
-  
   return (
     <SelectContainer>
       <Navbar />
