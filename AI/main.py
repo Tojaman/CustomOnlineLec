@@ -1,9 +1,9 @@
 from flask import Flask, request, jsonify
-from tasks import process_uploaded_file
+from tasks import process_uploaded_file, stt
 from DB.config import DB
 from DB.connection import get_connection
 from dao.dao import VideoDao
-import os, tempfile, boto3, shutil
+import os, tempfile, boto3, shutil, time
 from datetime import datetime
 from celery import group
 
@@ -43,20 +43,9 @@ upload_model = api.model('UploadModel', {
 class ConvertVoice(Resource):
     @ai_serving_api.expect(upload_model)
     def post(self):
-        """
-        body 메시지 예시
-        {
-            "url": "original_video/ojtube.wav",
-            "RVC_model": "Elonmusk"
-        }
-        """
         try:
-            json_data = request.json
-            print(json_data)
             user_id = request.json['userId']
             original_video_s3_path = request.json['url']
-            # RVC_model = "te"
-            #RVC_model = request.json['rvcModel']
 
 
             # s3 연결 및 객체 생성
@@ -72,58 +61,53 @@ class ConvertVoice(Resource):
             # 원본 영상을 저장할 경로 설정
             local_video_path = os.path.join(original_video_path, original_filename)
 
-
             # 원본 영상 다운로드
-            if s3_get_object(s3, S3_BUCKET, original_video_s3_path, local_video_path):
-                print("파일 다운 성공")
-            else:
+            if not s3_get_object(s3, S3_BUCKET, original_video_s3_path, local_video_path):
                 print("파일 다운 실패")
 
             # 음성 추출
             local_audio_path = extract_audio(extract_voice_path, local_video_path)
 
-            # 자막 추출(Flask 동기)
-            # Whisper STT로 문장 단위 JSON 형식 자막
-            # subtitle = stt(local_audio_path)
-
-
             # DB와 연결
             connection = get_connection(DB)
 
-            # 현재 시간을 가져옵니다.
+            # 현재 시간
             current_time = datetime.now()
 
-            # DATE 형식에 맞게 변환합니다.
+            # DATE 형식에 맞게 변환
             date = current_time.strftime('%Y-%m-%d')
 
-            # DB에 convert_file_path_s3 저장
+            # DB에 convert_file_path_s3 저장 ★date not null 삭제해서 안넣어도 됨★
             video_id = video_dao.update_video_s3_path(connection, date, user_id, original_video_s3_path)
-            print("DB 저장 완료")
-            # RVC 음성 변환(celery 비동기)
-            RVC_model = "Karina_V2"
-            process_uploaded_file.delay(convert_video_dir, local_video_path, local_audio_path, RVC_model, video_id).get()
-            tmp1 = "jimin700"
-            tmp2 = "윤석열"
-            tmp3 = "timcook"
-            
-            process_uploaded_file.delay(convert_video_dir, local_video_path, local_audio_path, tmp1, video_id)
-            process_uploaded_file.delay(convert_video_dir, local_video_path, local_audio_path, tmp2, video_id)
-            process_uploaded_file.delay(convert_video_dir, local_video_path, local_audio_path, tmp3, video_id)
+
             # 모델 목록
-            # model_list = ["jimin700", "timcook", "Elonmusk", "윤석열"]
-            #model_list = ["jimin700", "timcook", "Karina_V2", "윤석열"]
+            model_list = ["jimin", "timcook", "Karina", "윤석열"]
+            rvc_results = {}  # 각 모델의 결과를 저장할 딕셔너리
 
+            # RVC 변한(비동기)
+            for model in model_list:
+                rvc_results[model] = process_uploaded_file(convert_video_dir, local_video_path, local_audio_path, model, video_id).delay()
 
-            # 모든 모델을 동시에 처리
-            #tasks_group = group(
-                #process_uploaded_file.s(convert_video_dir, local_video_path, local_audio_path, model, video_id) for model in model_list)
-            #tasks.delay()
-            # 작업 그룹을 비동기적으로 실행
-            #result_group = tasks_group.delay()
+            # Whisper 자막 생성(비동기)
+            subtitle_task = stt().delay(local_audio_path)
+            subtitle = []
 
             # 작업이 완료될 때까지 대기
-            #while not result_group.ready():
-                #time.sleep(1)  # 작업이 완료되지 않았으면 1초 대기
+            while not (all(result.ready() for result in rvc_results.values()) and subtitle_task.ready()):
+                if subtitle_task.ready():
+                    subtitle = subtitle_task.get()
+                else:
+                    print("Subtitle task is still processing...")
+
+                if all(result.ready() for result in rvc_results.values()):
+                    pass
+                else:
+                    print("Result group is still processing...")
+
+                time.sleep(1)
+
+            # ★한번에 DB에 값을 update(자막, 변환 영상 s3 경로)★
+            video_dao.upload_subtitle_onvert_s3_path(connection, video_id, subtitle, rvc_results)
 
             # DB와 연결 해제
             connection.close()
@@ -131,7 +115,7 @@ class ConvertVoice(Resource):
             # JSON 형식 자막, s3 경로 저장한 테이블 기본키 HTTP body에 넣어서 프론트에 return
             response_data = {
                 'video_id': video_id,
-                # 'subtitle': subtitle
+                'subtitle': subtitle
             }
 
             # HTTP 응답 생성
@@ -153,7 +137,6 @@ class ConvertVoice(Resource):
 
 # S3 연결 및 S3 객체 반환
 def s3_connection():
-
     try:
         s3 = boto3.client(
             service_name='s3',
@@ -170,7 +153,6 @@ def s3_connection():
 
 # S3에서 파일 다운로드
 def s3_get_object(s3, bucket, s3_filepath, local_filepath):
-
     try:
         s3.download_file(bucket, s3_filepath, local_filepath)
         print("s3 file download")
@@ -201,18 +183,16 @@ def extract_audio(temp_dir, file_path):
     return output_audio_path
 
 
-def stt(local_audio_path):
-    model = whisper.load_model("medium")
-    sentence_result = model.transcribe(local_audio_path)
-    sentencelevel_info = []
-
-    # Whisper로 추출한 text에서 문장과 timestamp만 추출
-    for each in sentence_result['segments'][1:]:
-        # print (word['word'], "  ",word['start']," - ",word['end'])
-        sentencelevel_info.append({'text': each['text'], 'start': each['start'], 'end': each['end']})
-
-    return sentencelevel_info
-
-
 if __name__ == '__main__':
     app.run('0.0.0.0', port=5000, debug=True)
+
+# ========================================== RVC 음성 변환(celery 비동기) ==========================================
+    # RVC_model = "Karina_V2"
+    # tmp1 = "jimin700"
+    # tmp2 = "윤석열"
+    # tmp3 = "timcook"
+    # process_uploaded_file.delay(convert_video_dir, local_video_path, local_audio_path, RVC_model, video_id).get()
+    # process_uploaded_file.delay(convert_video_dir, local_video_path, local_audio_path, tmp1, video_id)
+    # process_uploaded_file.delay(convert_video_dir, local_video_path, local_audio_path, tmp2, video_id)
+    # process_uploaded_file.delay(convert_video_dir, local_video_path, local_audio_path, tmp3, video_id)
+# ===============================================================================================================

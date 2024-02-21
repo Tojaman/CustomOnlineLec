@@ -53,7 +53,7 @@ public class Video {
 //    private String convertS3Path;
 
     @Column(unique = true)
-    private String subtitleS3Path;
+    private String subtitle;
 
     private String thumbnailS3Path;
     private String lectureNoteS3Path;
