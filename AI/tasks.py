@@ -2,8 +2,7 @@ from celery import Celery
 import os, boto3, jsonify, subprocess, re
 from dotenv import load_dotenv
 from moviepy.editor import VideoFileClip, AudioFileClip
-from DB.connection import get_connection
-from dao.dao import VideoDao
+# import whisper
 
 load_dotenv()
 
@@ -25,47 +24,32 @@ celery = Celery('FlaskAiModelServing', broker='redis://127.0.0.1:6379/0', backen
 
 
 @celery.task
-def process_uploaded_file(convert_video_dir, local_video_path, local_audio_path, RVC_model, video_id):
+def process_uploaded_file(convert_video_dir, local_video_path, local_audio_path, RVC_model):
     result = []
 
     # s3 연결 및 객체 생성
     s3 = s3_connection()
 
     # RVC 변환(return 변환 음성 저장 경로)
-    convert_voice_path = execute_voice_conversion(RVC_model, local_audio_path)
-    # print("경로당~~" + convert_voice_path)
-    #convert_voice_path = local_audio_path
+    # convert_voice_path = execute_voice_conversion(RVC_model, local_audio_path)
+    convert_voice_path = local_audio_path
 
 
     # 원본 영상 + 변환 음성
     convert_video_path = merge_video_audio(convert_video_dir, local_video_path, convert_voice_path)
-    print("변환 비디오 경로" + convert_video_path)
 
     # 최종 변환 파일 이름 추출
     convert_video_name_mp4 = os.path.basename(convert_video_path)
     convert_video_name, convert_video_mp4 = os.path.splitext(convert_video_name_mp4)
     convert_video_name = convert_video_name + "_" + RVC_model + convert_video_mp4
-    print("변환 비디오 이름" + convert_video_name)
 
 
     # s3 업로드
     convert_video_path_s3 = "convert_video/" + convert_video_name  # 저장할 S3 경로
-    if s3_put_object(s3, S3_BUCKET, convert_video_path, convert_video_path_s3):
-        result.append("파일 업로드 성공")
-    else:
-        result.append("파일 업로드 실패")
+    if not s3_put_object(s3, S3_BUCKET, convert_video_path, convert_video_path_s3):
+        print("파일 업로드 실패")
 
-    # DAO 객체 생성
-    video_dao = VideoDao()
-
-    # DB와 연결
-    connection = get_connection(DB)
-
-    # DB에 convert_file_path_s3 저장
-    video_dao.add_convert_s3_path(connection, video_id, convert_video_path_s3, RVC_model)
-
-    # DB와 연결 해제
-    connection.close()
+    return convert_video_path_s3
 
 
 # 원본 영상 + 변환 음성
@@ -152,3 +136,16 @@ def execute_voice_conversion(model_name, local_file_dir):
     process.wait()
 
     return cover_path
+
+@celery.task
+def stt(local_audio_path):
+    model = whisper.load_model("medium")
+    sentence_result = model.transcribe(local_audio_path)
+    sentencelevel_info = []
+
+    # Whisper로 추출한 text에서 문장과 timestamp만 추출
+    for each in sentence_result['segments'][1:]:
+        # print (word['word'], "  ",word['start']," - ",word['end'])
+        sentencelevel_info.append({'text': each['text'], 'start': each['start'], 'end': each['end']})
+
+    return sentencelevel_info
