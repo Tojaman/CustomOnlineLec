@@ -22,11 +22,11 @@ public class ConvertVideos {
     private String yoon;
 
     @Column(unique = true)
-    private String jimin700;
+    private String jimin;
 
     @Column(unique = true)
     private String timcook;
 
     @Column(unique = true)
-    private String Elonmusk;
+    private String karina;
 }

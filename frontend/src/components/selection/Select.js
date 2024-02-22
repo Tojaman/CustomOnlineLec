@@ -70,7 +70,7 @@ const CustomSlider = styled(Slider)`
 
     &:hover {
       height: 150px;
-      border: 1px solid #499be9;
+      border: 1px solid #ffeb0b;
     }
   }
   .slick-track {
@@ -79,7 +79,7 @@ const CustomSlider = styled(Slider)`
 
   .selected {
     height: 150px;
-    border: 1px solid #499be9;
+    border: 2px solid #ffeb0b;
   }
 
   .slick-prev:before,
@@ -124,10 +124,10 @@ const settings = {
 };
 
 const voices = [
-  { name: "윤석열", img: "https://via.placeholder.com/150" },
-  { name: "jimin700", img: "https://via.placeholder.com/150" },
-  { name: "timcook", img: "https://via.placeholder.com/150" },
-  { name: "Elonmusk", img: "https://via.placeholder.com/150" },
+  { id: "yoon", name: "윤석열", img: "https://via.placeholder.com/150" },
+  { id: "Jimin700", name: "BTS 지민", img: "https://via.placeholder.com/150" },
+  { id: "Timcook", name: "Timcook", img: "https://via.placeholder.com/150" },
+  { id: "karina", name: "에스파 카리나", img: "https://via.placeholder.com/150" },
 ];
 
 const avatars = [
@@ -146,11 +146,40 @@ const Select = () => {
   const [selectedAvatarIndex, setSelectedAvatarIndex] = useState(null);
   const token = sessionStorage.getItem("token");
 
+  useEffect(() => {
+    const selectedVideoId = sessionStorage.getItem("selectedVideoId");
+    console.log("selected Video:", sessionStorage.getItem("selectedVideoId"));
+
+    if (selectedVideoId) {
+      axios
+        .post(
+          `http://localhost:8080/videos/info`,
+          {
+            videoid: selectedVideoId
+          },
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        )
+        .then((response) => {
+          console.log("요청 성공");
+  
+          sessionStorage.setItem("selectedVideoInfo", JSON.stringify(response.data));
+          const selectedVideoInfoString = sessionStorage.getItem("selectedVideoInfo");
+          const selectedVideoInfo = JSON.parse(selectedVideoInfoString);
+          console.log("Stored video info:", selectedVideoInfo);
+
+        })
+        .catch((error) => console.error("Error:", error));
+    }
+  }, [token]);
+
   const handleVoiceSelection = (index) => {
     setSelectedVoiceIndex(index);
     const selectedVoice = voices[index];
-    sessionStorage.setItem("selectedVoice", selectedVoice.name);
-    console.log("selected Video:", sessionStorage.getItem("selectedVideoId"));
+    sessionStorage.setItem("selectedVoice", selectedVoice.id);
     console.log("Selected Voice:", sessionStorage.getItem("selectedVoice"));
   };
 
@@ -161,56 +190,7 @@ const Select = () => {
     console.log("Selected Avatar:", sessionStorage.getItem("selectedAvatar"));
   };
 
-  useEffect(() => {
-    const selectedVideoId = sessionStorage.getItem("selectedVideoId");
-    const selectedVoice = sessionStorage.getItem("selectedVoice");
-
-    if (selectedVideoId) {
-      axios
-        .post(
-          `http://localhost:8080/videos/info`,
-          {
-            videoid: selectedVideoId,
-          },
-          {
-            headers: {
-              Authorization: `Bearer ${token}`,
-            },
-          }
-        )
-        .then((response) => {
-          console.log("요청 성공");
-          console.log("Received video info:", response.data);
-
-          sessionStorage.setItem("selectedVideoInfo", JSON.stringify(response.data));
-          const selectedVideoInfoString = sessionStorage.getItem("selectedVideoInfo");
-          const selectedVideoInfo = JSON.parse(selectedVideoInfoString);
-          console.log("Stored video info:", selectedVideoInfo);
-
-          let selectedS3Path;
-
-          if (selectedVideoInfo.Elonmusk !== undefined) {
-            console.log("Elonmusk:", selectedVideoInfo.Elonmusk);
-            selectedS3Path = selectedVideoInfo.Elonmusk;
-          } else if (selectedVideoInfo.Jimin700 !== undefined) {
-            console.log("Jimin700:", selectedVideoInfo.Jimin700);
-            selectedS3Path = selectedVideoInfo.Jimin700;
-          } else if (selectedVideoInfo.yoon !== undefined) {
-            console.log("yoon:", selectedVideoInfo.yoon);
-            selectedS3Path = selectedVideoInfo.yoon;
-          } else if (selectedVideoInfo.Timcook !== undefined) {
-            console.log("Timcook:", selectedVideoInfo.Timcook);
-            selectedS3Path = selectedVideoInfo.Timcook;
-          }
-
-          if (selectedS3Path !== undefined) {
-            console.log("Selected S3 Path:", selectedS3Path);
-            sessionStorage.setItem("convertVideoS3Path", selectedS3Path);
-          }
-        })
-        .catch((error) => console.error("Error:", error));
-    }
-  }, [token]);
+ 
 
   return (
     <SelectContainer>
