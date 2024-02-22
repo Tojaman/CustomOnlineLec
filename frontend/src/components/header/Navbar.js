@@ -132,10 +132,23 @@ const Navbar = () => {
       <NavElement>
         <TfiMenuStyled />
         <NavItem to="/">Home</NavItem>
-        <NavItem to="/attach" onClick={handleUploadClick}>
+        <NavItem to="/attach" onClick={handleUploadClick}
+         style={{
+          color: location.pathname === "/attach" || location.pathname === "/modify"|| location.pathname === "/inform" ? "#499be9" : "",
+          fontWeight: location.pathname === "/attach" || location.pathname === "/modify"|| location.pathname === "/inform" ? "bold" : "normal"
+       }}>
           강의 업로드
         </NavItem>
-        <NavItem to="/videoList" onClick={handleVideoListClick}>강의 목록</NavItem>
+      <NavItem
+         to="/videoList"
+         onClick={handleVideoListClick}
+         style={{
+            color: location.pathname === "/videoList" || location.pathname === "/select" ? "#499be9" : "",
+            fontWeight: location.pathname === "/videoList" || location.pathname === "/select" ? "bold" : "normal"
+         }}
+        >
+        강의 목록
+      </NavItem>
         {token ? <NavItem to="/mypage">마이페이지</NavItem> : null}
       </NavElement>
       {!token && (
