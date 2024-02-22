@@ -23,6 +23,8 @@ public class UserEntity {
     @Column(unique = true, length = 20)
     private String nickname;
 
+    private String profileS3Path;
+
     //유저에 대한 권한을 나타낼  role값
     private String role;
 

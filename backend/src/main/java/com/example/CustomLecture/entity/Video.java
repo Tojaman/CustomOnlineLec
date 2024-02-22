@@ -96,6 +96,7 @@ public class Video {
 
                 // 강사 정보
                 user.getNickname(),
+                user.getProfileS3Path(),
 
                 // 영상 상세 정보
                 videoData.getX(),
