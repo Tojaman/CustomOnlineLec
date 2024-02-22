@@ -1,6 +1,8 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import styled from "styled-components";
+import axios from "axios";
+import AWS from "aws-sdk";
 import { IoIosArrowForward } from "react-icons/io";
 import { FaPencilAlt } from "react-icons/fa";
 import Background from "../assets/img/Group.png";
@@ -167,16 +169,6 @@ const WithdrawalButton = styled.span`
   display: block;
 `;
 
-const videos = [
-  { id: 1, title: "간지나게 사는 방법", person: "john" },
-  { id: 2, title: "리액트 컴포넌트 디자인", person: "john" },
-  { id: 3, title: "웹 개발 기초", person: "john" },
-  { id: 4, title: "웹 개발 기초", person: "john" },
-  { id: 5, title: "웹 개발 기초", person: "john" },
-  { id: 6, title: "웹 개발 기초", person: "john" },
-  { id: 7, title: "웹 개발 기초", person: "john" },
-];
-
 const MyPage = () => {
   const [userProfileImageUrl, setUserProfileImageUrl] = useState(originProfileImage);
   const [nickname, setNickname] = useState("john");
@@ -184,6 +176,9 @@ const MyPage = () => {
   const [isEditing, setIsEditing] = useState(false);
   const [editedNickname, setEditedNickname] = useState(nickname);
   const [editedPassword, setEditedPassword] = useState(password);
+  const [videos, setVideos] = useState([]);
+
+  const token = sessionStorage.getItem("token");
 
   const handleEditClick = () => {
     setIsEditing(true);
@@ -211,6 +206,52 @@ const MyPage = () => {
       reader.readAsDataURL(file);
     }
   };
+
+  useEffect(() => {
+    AWS.config.update({
+      accessKeyId: process.env.REACT_APP_AWS_ACCESS_KEY_ID,
+      secretAccessKey: process.env.REACT_APP_AWS_SECRET_ACCESS_KEY,
+      region: process.env.REACT_APP_AWS_DEFAULT_REGION,
+    });
+
+    const s3 = new AWS.S3();
+
+    axios
+      .get("http://localhost:8080/videos/list", {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      })
+      .then((response) => {
+        const videoData = response.data
+          .map((video) => ({
+            id: video.id,
+            title: video.title,
+            thumbnail: video.thumbnail,
+            nickname: video.nickname,
+          }))
+          .filter((video) => video.title !== null && video.thumbnail !== null && video.nickname !== null);
+
+        const getThumbnails = videoData.map((video) => {
+          return s3.getSignedUrlPromise("getObject", {
+            Bucket: process.env.REACT_APP_S3_BUCKET,
+            Key: video.thumbnail,
+            Expires: 300,
+          });
+        });
+
+        Promise.all(getThumbnails)
+          .then((urls) => {
+            const updatedVideoData = videoData.map((video, index) => ({
+              ...video,
+              thumbnail: urls[index],
+            }));
+            setVideos(updatedVideoData);
+          })
+          .catch((error) => console.error("Error:", error));
+      })
+      .catch((error) => console.error("Error:", error));
+  }, [token]);
 
   return (
     <div>
@@ -249,8 +290,8 @@ const MyPage = () => {
         <SubTitle>업로드 영상 목록</SubTitle>
         <UploadListContainer>
           {videos.slice(0, 3).map((video) => (
-            <VideoContainer>
-              <Thumbnail src={originProfileImage} alt="썸네일" />
+            <VideoContainer key={video.id}>
+              <Thumbnail src={video.thumbnail} alt="썸네일" />
               <Text>{video.title}</Text>
               <Text>{video.person}</Text>
             </VideoContainer>

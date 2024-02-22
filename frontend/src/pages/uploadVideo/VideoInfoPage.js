@@ -129,7 +129,6 @@ const VideoInfo = () => {
 
   const handleSubmit = async () => {
     const token = sessionStorage.getItem("token");
-    // const id = 35;
     const id = sessionStorage.getItem("UploadVideoID");
     const title = formData.title;
     const content = formData.description;
