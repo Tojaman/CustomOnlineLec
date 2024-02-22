@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import styled from "styled-components";
+import { FaSearch } from "react-icons/fa";
 import Navbar from "../components/header/Navbar";
 import Background from "../assets/img/Group.png";
 import axios from "axios";
@@ -25,7 +26,12 @@ const PageBackGround = styled.div`
 `;
 
 const ContentContainer = styled.div`
-  padding: 75px;
+  width: 900px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  margin: auto;
+  margin-top: 80px;
 `;
 
 const VideoContainer = styled.div`
@@ -41,11 +47,36 @@ const VideoContainer = styled.div`
   margin: 0 10px 10px 0;
 `;
 
-const SearchContent = styled.div``;
+const SearchContent = styled.div`
+  display: flex;
+  align-items: center;
+`;
 
-const Search = styled.input``;
+const Search = styled.input`
+  width: 300px;
+  border-radius: 20px;
+  padding: 7px;
+`;
 
-const FilterButton = styled.button``;
+const SearchButton = styled.button`
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 8px;
+`;
+
+const Select = styled.select`
+  padding: 5px;
+  width: 100px;
+  margin-left: 10px;
+`;
+
+const Option = styled.option``;
+
+const PlainLink = styled(Link)`
+  text-decoration: none;
+  color: inherit;
+`;
 
 const Thumbnail = styled.img`
   max-width: 100%;
@@ -65,11 +96,15 @@ const Text = styled.div`
 const VideoItems = styled.div`
   display: flex;
   flex-wrap: wrap;
-  margin-top: 50px;
+  margin-top: 30px;
 `;
 
 const VideoList = () => {
   const [videos, setVideos] = useState([]);
+  const [searchTerm, setSearchTerm] = useState("");
+  const [filteredVideos, setFilteredVideos] = useState([]);
+  const [searched, setSearched] = useState(false);
+
   const token = sessionStorage.getItem("token");
 
   useEffect(() => {
@@ -88,12 +123,14 @@ const VideoList = () => {
         },
       })
       .then((response) => {
-        const videoData = response.data.map((video) => ({
-          id: video.id,
-          title: video.title,
-          thumbnail: video.thumbnail,
-          nickname: video.nickname,
-        }));
+        const videoData = response.data
+          .map((video) => ({
+            id: video.id,
+            title: video.title,
+            thumbnail: video.thumbnail,
+            nickname: video.nickname,
+          }))
+          .filter((video) => video.title !== null && video.thumbnail !== null && video.nickname !== null);
 
         const getThumbnails = videoData.map((video) => {
           return s3.getSignedUrlPromise("getObject", {
@@ -121,25 +158,54 @@ const VideoList = () => {
     console.log("selected Video:", sessionStorage.getItem("selectedVideoId"));
   };
 
+  const handleSearchButtonClick = () => {
+    setFilteredVideos(videos.filter((video) => video.title.toLowerCase().includes(searchTerm.toLowerCase())));
+    setSearched(true);
+  };
+
   return (
     <ListContainer>
       <Navbar />
       <PageBackGround />
       <ContentContainer>
         <SearchContent>
-          <Search placeholder="검색"></Search>
-          <FilterButton>필터링</FilterButton>
+          <Search placeholder="검색" value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)} />
+          <SearchButton onClick={handleSearchButtonClick}>
+            <FaSearch />
+          </SearchButton>
+          <Select>
+            <Option value="">날짜</Option>
+            <Option value="Recent">최신순</Option>
+            <Option value="Old">오래된순</Option>
+          </Select>
+          <Select>
+            <Option value="">카테고리</Option>
+            <Option value="C">C언어</Option>
+            <Option value="Python">파이썬</Option>
+            <Option value="Java">자바</Option>
+            <Option value="JavaScript">자바스크립트</Option>
+          </Select>
         </SearchContent>
         <VideoItems>
-          {videos.map((video) => (
-            <Link to="/select" key={video.id} onClick={() => handleVideoClick(video.id)}>
-              <VideoContainer>
-                <Thumbnail src={video.thumbnail} alt="썸네일" />
-                <Text>{video.title}</Text>
-                <Text>{video.nickname}</Text>
-              </VideoContainer>
-            </Link>
-          ))}
+          {searched
+            ? filteredVideos.map((video) => (
+                <PlainLink to="/select" key={video.id} onClick={() => handleVideoClick(video.id)}>
+                  <VideoContainer>
+                    <Thumbnail src={video.thumbnail} alt="썸네일" />
+                    <Text>{video.title}</Text>
+                    <Text>{video.nickname}</Text>
+                  </VideoContainer>
+                </PlainLink>
+              ))
+            : videos.map((video) => (
+                <PlainLink to="/select" key={video.id} onClick={() => handleVideoClick(video.id)}>
+                  <VideoContainer>
+                    <Thumbnail src={video.thumbnail} alt="썸네일" />
+                    <Text>{video.title}</Text>
+                    <Text>{video.nickname}</Text>
+                  </VideoContainer>
+                </PlainLink>
+              ))}
         </VideoItems>
       </ContentContainer>
     </ListContainer>
