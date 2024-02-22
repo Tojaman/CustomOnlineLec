@@ -2,7 +2,7 @@ from celery import Celery
 import os, boto3, jsonify, subprocess, re
 from dotenv import load_dotenv
 from moviepy.editor import VideoFileClip, AudioFileClip
-import whisper
+# import whisper
 
 load_dotenv()
 
@@ -24,15 +24,15 @@ celery = Celery('FlaskAiModelServing', broker='redis://127.0.0.1:6379/0', backen
 
 
 @celery.task
-def process_uploaded_file(convert_video_dir, local_video_path, local_audio_path, RVC_model, video_id):
+def process_uploaded_file(convert_video_dir, local_video_path, local_audio_path, RVC_model):
     result = []
 
     # s3 연결 및 객체 생성
     s3 = s3_connection()
 
     # RVC 변환(return 변환 음성 저장 경로)
-    convert_voice_path = execute_voice_conversion(RVC_model, local_audio_path)
-    #convert_voice_path = local_audio_path
+    # convert_voice_path = execute_voice_conversion(RVC_model, local_audio_path)
+    convert_voice_path = local_audio_path
 
 
     # 원본 영상 + 변환 음성

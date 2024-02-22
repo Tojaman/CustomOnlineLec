@@ -68,6 +68,30 @@ class ConvertVoice(Resource):
             # 음성 추출
             local_audio_path = extract_audio(extract_voice_path, local_video_path)
 
+            # 모델 목록
+            model_list = ["yoon", "jimin", "timcook", "karina"]
+            # model_list = ["yoon", "jimin"]
+            rvc_results = {}  # 각 모델의 결과를 저장할 딕셔너리
+
+            # Whisper 자막 생성(비동기)
+            # subtitle_task = stt().delay(local_audio_path)
+            # subtitle = []
+
+            # RVC 변한(비동기)
+            for model in model_list:
+                rvc_results[model] = process_uploaded_file.delay(convert_video_dir, local_video_path, local_audio_path, model)
+
+            # while not all(result.ready() for result in rvc_results.values()) and subtitle_task.ready():
+            while not all(result.ready() for result in rvc_results.values()):
+                print("변환중...")
+                time.sleep(1)
+
+            # 작업이 완료되면 결과를 저장
+            for model, result in rvc_results.items():
+                rvc_results[model] = result.get()
+
+            # if subtitle.values().ready():
+
             # DB와 연결
             connection = get_connection(DB)
 
@@ -77,37 +101,9 @@ class ConvertVoice(Resource):
             # DATE 형식에 맞게 변환
             date = current_time.strftime('%Y-%m-%d')
 
-            # DB에 convert_file_path_s3 저장 ★date not null 삭제해서 안넣어도 됨★
-            video_id = video_dao.update_video_s3_path(connection, date, user_id, original_video_s3_path)
+            video_id = video_dao.upload_convert_s3_path(connection, date, user_id, original_video_s3_path, rvc_results)
 
-            # 모델 목록
-            model_list = ["jimin", "timcook", "Karina", "윤석열"]
-            rvc_results = {}  # 각 모델의 결과를 저장할 딕셔너리
-
-            # RVC 변한(비동기)
-            for model in model_list:
-                rvc_results[model] = process_uploaded_file(convert_video_dir, local_video_path, local_audio_path, model, video_id).delay()
-
-            # Whisper 자막 생성(비동기)
-            subtitle_task = stt().delay(local_audio_path)
-            subtitle = []
-
-            # 작업이 완료될 때까지 대기
-            while not (all(result.ready() for result in rvc_results.values()) and subtitle_task.ready()):
-                if subtitle_task.ready():
-                    subtitle = subtitle_task.get()
-                else:
-                    print("Subtitle task is still processing...")
-
-                if all(result.ready() for result in rvc_results.values()):
-                    pass
-                else:
-                    print("Result group is still processing...")
-
-                time.sleep(1)
-
-            # ★한번에 DB에 값을 update(자막, 변환 영상 s3 경로)★
-            video_dao.upload_subtitle_onvert_s3_path(connection, video_id, subtitle, rvc_results)
+            print("업로드 성공")
 
             # DB와 연결 해제
             connection.close()
@@ -115,7 +111,7 @@ class ConvertVoice(Resource):
             # JSON 형식 자막, s3 경로 저장한 테이블 기본키 HTTP body에 넣어서 프론트에 return
             response_data = {
                 'video_id': video_id,
-                'subtitle': subtitle
+                # 'subtitle': subtitle
             }
 
             # HTTP 응답 생성

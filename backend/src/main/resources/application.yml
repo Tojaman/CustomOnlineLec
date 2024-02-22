@@ -9,9 +9,9 @@
 spring:
     datasource:
         driver-class-name: com.mysql.cj.jdbc.Driver
-        url: jdbc:mysql://custom-mysql.cdmw0mi0eexi.ap-northeast-2.rds.amazonaws.com:3306/customdb?useSSL=false&useUnicode=true&serverTimezone=Asia/Seoul&allowPublicKeyRetrieval=true
-        username: admin
-        password: "130424010"
+        url: jdbc:mysql://tojaman.mooo.com:3306/custom?useSSL=false&useUnicode=true&serverTimezone=Asia/Seoul&allowPublicKeyRetrieval=true
+        username: user
+        password: "00000000"
     jpa:
         show-sql: true
         hibernate:
