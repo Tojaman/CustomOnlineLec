@@ -20,6 +20,7 @@ public class VideoInfoResponseDTO {
 
     // 강사 정보
     private String nickname;
+    private String profileS3Path;
 
     // 영상 상세 정보
     private Integer x;
