@@ -289,9 +289,33 @@ async function loadModels() {
 }
 
 function displayPreviousSessionInfo() {
+  const selectedVoice = sessionStorage.getItem("selectedVoice");
   const selectedVideoInfoString = sessionStorage.getItem("selectedVideoInfo");
   const selectedVideoInfo = JSON.parse(selectedVideoInfoString);
-  const convertVideoS3Path = sessionStorage.getItem("convertVideoS3Path");
+
+  let selectedS3Path;
+
+  switch(selectedVoice) {
+    case "karina":
+      console.log("karina:", selectedVideoInfo.karina);
+      selectedS3Path = selectedVideoInfo.karina;
+      break;
+    case "Jimin700":
+      console.log("Jimin700:", selectedVideoInfo.Jimin700);
+      selectedS3Path = selectedVideoInfo.Jimin700;
+      break;
+    case "yoon":
+      console.log("yoon:", selectedVideoInfo.yoon);
+      selectedS3Path = selectedVideoInfo.yoon;
+      break;
+    case "Timcook":
+      console.log("Timcook:", selectedVideoInfo.Timcook);
+      selectedS3Path = selectedVideoInfo.Timcook;
+      break;
+    default:
+      console.log("Invalid selectedVoice:", selectedVoice);
+  }
+  
   if (selectedVideoInfo) {
     document.getElementById("title").textContent = selectedVideoInfo.title;
     document.getElementById("instructor").textContent = selectedVideoInfo.nickname;
@@ -307,7 +331,7 @@ function displayPreviousSessionInfo() {
 
     const params = {
       Bucket: process.env.REACT_APP_S3_BUCKET,
-      Key: convertVideoS3Path
+      Key: selectedS3Path
     };
 
     s3.getObject(params, (err, data) => {
@@ -341,6 +365,7 @@ function displayPreviousSessionInfo() {
 
 
 export async function run() {
+  
   displayPreviousSessionInfo();
   camera = new Context();
 

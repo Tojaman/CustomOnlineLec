@@ -103,12 +103,12 @@ public class Video {
                 videoData.getWidth(),
                 videoData.getHeight(),
                 videoData.getVideoWidth(),
-		videoData.getVideoHeight(),
+		        videoData.getVideoHeight(),
 
-                s3Path.getElonmusk(),
+                s3Path.getKarina(),
                 s3Path.getYoon(),
                 s3Path.getTimcook(),
-                s3Path.getJimin700()
+                s3Path.getJimin()
         );
     }
 
