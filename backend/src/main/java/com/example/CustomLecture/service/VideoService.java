@@ -1,10 +1,6 @@
 package com.example.CustomLecture.service;
-
-import com.example.CustomLecture.dto.JoinDTO;
-import com.example.CustomLecture.dto.Request.VideoDeleteRequestDTO;
 import com.example.CustomLecture.dto.Request.VideoSaveRequestDTO;
 import com.example.CustomLecture.dto.Response.VideoInfoResponseDTO;
-import com.example.CustomLecture.entity.ConvertVideos;
 import com.example.CustomLecture.entity.UserEntity;
 import com.example.CustomLecture.entity.Video;
 import com.example.CustomLecture.entity.VideoData;
@@ -23,9 +19,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.client.RestTemplate;
-
-
-import java.sql.Timestamp;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -39,7 +32,6 @@ public class VideoService {
     private final UserRepository userRepository;
     private final VideoRepository videoRepository;
     private final VideoDataRepository videoDataRepository;
-    private final ConvertVideoRepository convertVideoRepository;
     private final RestTemplate restTemplate;
     private final JWTUtil jwtUtil;
 
@@ -90,9 +82,9 @@ public class VideoService {
     public void uploadVideo(VideoSaveRequestDTO videoSaveRequestDTO, String jwtToken) {
 
         String token = jwtToken.replace("Bearer ", "");
-	// 좌표값 전부 출력
-	
-	
+        // 좌표값 전부 출력
+
+
         // JWTUtil을 사용하여 사용자 이름 추출
         String username = jwtUtil.getUsername(token);
 

@@ -3,7 +3,7 @@ from tasks import process_uploaded_file, stt
 from DB.config import DB
 from DB.connection import get_connection
 from dao.dao import VideoDao
-import os, tempfile, boto3, shutil, time
+import os, tempfile, boto3, shutil, time, tempfile
 from datetime import datetime
 from celery import group
 
@@ -43,92 +43,68 @@ upload_model = api.model('UploadModel', {
 class ConvertVoice(Resource):
     @ai_serving_api.expect(upload_model)
     def post(self):
-        try:
-            user_id = request.json['userId']
-            original_video_s3_path = request.json['url']
+        # 임시 폴더 생성
+        with tempfile.TemporaryDirectory() as temp_dir:
+            try:
+                user_id = request.json['userId']
+                original_video_s3_path = request.json['url']
 
+                # s3 연결 및 객체 생성
+                s3 = s3_connection()
 
-            # s3 연결 및 객체 생성
-            s3 = s3_connection()
+                # 원본 영상 파일명 추출
+                original_filename = os.path.basename(original_video_s3_path)
 
-            original_video_path = "./original_video/"
-            extract_voice_path = "./extract_voice/"
-            convert_video_dir = "./convert_video/"
+                # 원본 영상을 저장할 경로 설정
+                local_video_path = os.path.join(temp_dir, original_filename)
 
-            # 원본 영상 파일명 추출
-            original_filename = os.path.basename(original_video_s3_path)
+                # 원본 영상 다운로드
+                if not s3_get_object(s3, S3_BUCKET, original_video_s3_path, local_video_path):
+                    print("파일 다운 실패")
 
-            # 원본 영상을 저장할 경로 설정
-            local_video_path = os.path.join(original_video_path, original_filename)
+                # 음성 추출
+                local_audio_path = extract_audio(temp_dir, local_video_path)
 
-            # 원본 영상 다운로드
-            if not s3_get_object(s3, S3_BUCKET, original_video_s3_path, local_video_path):
-                print("파일 다운 실패")
+                # 모델 목록
+                model_list = ["yoon", "jimin", "timcook", "karina"]
+                rvc_results = {}  # 각 모델의 결과를 저장할 딕셔너리
 
-            # 음성 추출
-            local_audio_path = extract_audio(extract_voice_path, local_video_path)
+                # RVC 변환(비동기)
+                for model in model_list:
+                    rvc_results[model] = process_uploaded_file.delay(temp_dir, local_video_path, local_audio_path, model)
 
-            # 모델 목록
-            model_list = ["yoon", "jimin", "timcook", "karina"]
-            # model_list = ["yoon", "jimin"]
-            rvc_results = {}  # 각 모델의 결과를 저장할 딕셔너리
+                while not all(result.ready() for result in rvc_results.values()):
+                    print("변환중...")
+                    time.sleep(1)
 
-            # Whisper 자막 생성(비동기)
-            # subtitle_task = stt().delay(local_audio_path)
-            # subtitle = []
+                # 작업이 완료되면 결과를 저장
+                for model, result in rvc_results.items():
+                    rvc_results[model] = result.get()
 
-            # RVC 변한(비동기)
-            for model in model_list:
-                rvc_results[model] = process_uploaded_file.delay(convert_video_dir, local_video_path, local_audio_path, model)
+                # DB 업로드
+                connection = get_connection(DB)
+                video_id = video_dao.upload_convert_s3_path(connection, user_id, original_video_s3_path, rvc_results)
+                connection.close()
 
-            # while not all(result.ready() for result in rvc_results.values()) and subtitle_task.ready():
-            while not all(result.ready() for result in rvc_results.values()):
-                print("변환중...")
-                time.sleep(1)
+                # JSON 형식 자막, s3 경로 저장한 테이블 기본키 HTTP body에 넣어서 프론트에 return
+                response_data = {
+                    'video_id': video_id,
+                }
 
-            # 작업이 완료되면 결과를 저장
-            for model, result in rvc_results.items():
-                rvc_results[model] = result.get()
+                # HTTP 응답 생성
+                response = jsonify(response_data)
+                response.status_code = 200  # 성공적인 요청을 나타내는 HTTP 상태 코드
 
-            # if subtitle.values().ready():
+                # 응답 반환
+                return response
 
-            # DB와 연결
-            connection = get_connection(DB)
+            except ValueError:
+                # 잘못된 요청일 경우 HTTP 상태 코드 400 반환
+                return {'error': 'Bad Request'}, 400
 
-            # 현재 시간
-            current_time = datetime.now()
-
-            # DATE 형식에 맞게 변환
-            date = current_time.strftime('%Y-%m-%d')
-
-            video_id = video_dao.upload_convert_s3_path(connection, date, user_id, original_video_s3_path, rvc_results)
-
-            print("업로드 성공")
-
-            # DB와 연결 해제
-            connection.close()
-
-            # JSON 형식 자막, s3 경로 저장한 테이블 기본키 HTTP body에 넣어서 프론트에 return
-            response_data = {
-                'video_id': video_id,
-                # 'subtitle': subtitle
-            }
-
-            # HTTP 응답 생성
-            response = jsonify(response_data)
-            response.status_code = 200  # 성공적인 요청을 나타내는 HTTP 상태 코드
-
-            # 응답 반환
-            return response
-
-
-        except ValueError:
-            # 잘못된 요청일 경우 HTTP 상태 코드 400 반환
-            return {'error': 'Bad Request'}, 400
-
-        except Exception as e:
-            # 서버에서 오류가 발생한 경우 HTTP 상태 코드 500과 오류 메시지 반환
-            return {'error': str(e)}, 500
+            except Exception as e:
+                # 서버에서 오류가 발생한 경우 HTTP 상태 코드 500과 오류 메시지 반환
+                return {'error': str(e)}, 500
 
 
 # S3 연결 및 S3 객체 반환
@@ -168,7 +144,7 @@ def extract_audio(temp_dir, file_path):
     file_name = os.path.splitext(os.path.basename(file_path))[0] # splitext : 파일의 확장자를 분리해서 저장하기 위함
 
     # 오피오 파일 경로 설정
-    output_audio_path = os.path.join(temp_dir, f'{file_name}_audio.wav')
+    output_audio_path = os.path.join(temp_dir, f'{file_name}_extract_audio.wav')
 
     # 오디오를 WAV 파일로 저장
     audio_clip.write_audiofile(output_audio_path, codec='pcm_s16le', fps=audio_clip.fps)
