@@ -1,6 +1,7 @@
 package com.example.CustomLecture.controller;
 
 import com.example.CustomLecture.dto.Request.VideoConvertRequestDTO;
+import com.example.CustomLecture.dto.Request.VideoDeleteRequestDTO;
 import com.example.CustomLecture.dto.Request.VideoInfoRequestDTO;
 import com.example.CustomLecture.dto.Request.VideoSaveRequestDTO;
 import com.example.CustomLecture.service.VideoService;
@@ -139,6 +140,22 @@ public class VideoController {
         } catch (Exception e) {
             // 그 외 예상치 못한 예외 발생 시 클라이언트에게 InternalServerError 반환
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("서버 오류가 발생했습니다: " + e.getMessage());
+        }
+    }
+    @DeleteMapping("/{videoid}")
+    @Operation(summary = "강의 삭제", description = "영상 업로드 도중 취소하면 관련 정보 삭제")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "OK"),
+            @ApiResponse(responseCode = "500", description = "Server Error")
+    })
+    public ResponseEntity<String> deleteVideo(@PathVariable Long videoid) {
+
+        try {
+
+            videoService.deleteVideo(videoid);
+            return ResponseEntity.status(HttpStatus.OK).body("게시물 삭제 성공");
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("삭제 실패");
         }
     }
 }
