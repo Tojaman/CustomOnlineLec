@@ -1,7 +1,6 @@
 package com.example.CustomLecture.controller;
 
 import com.example.CustomLecture.dto.Request.VideoConvertRequestDTO;
-import com.example.CustomLecture.dto.Request.VideoDeleteRequestDTO;
 import com.example.CustomLecture.dto.Request.VideoInfoRequestDTO;
 import com.example.CustomLecture.dto.Request.VideoSaveRequestDTO;
 import com.example.CustomLecture.service.VideoService;
