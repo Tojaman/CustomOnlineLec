@@ -16,9 +16,9 @@ public class VideoData {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @OneToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "videoId")
-    private Video video;
+//    @OneToOne(fetch = FetchType.LAZY)
+//    @JoinColumn(name = "videoId")
+//    private Video video;
 
     private Integer x;
     private Integer y;
@@ -28,7 +28,7 @@ public class VideoData {
     private Integer videoHeight;
 
     public void setVideoData(VideoSaveRequestDTO videoSaveRequestDTO, Video video) {
-        this.video = video;
+//        this.video = video;
         this.x = videoSaveRequestDTO.getX();
         this.y = videoSaveRequestDTO.getY();
         this.width = videoSaveRequestDTO.getWidth();

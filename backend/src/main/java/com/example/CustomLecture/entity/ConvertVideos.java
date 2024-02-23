@@ -14,9 +14,9 @@ public class ConvertVideos {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @OneToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "videoId")
-    private Video video;
+//    @OneToOne(fetch = FetchType.LAZY)
+//    @JoinColumn(name = "videoId")
+//    private Video video;
 
     @Column(unique = true)
     private String yoon;

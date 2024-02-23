@@ -1,12 +1,15 @@
 package com.example.CustomLecture.service;
 
 import com.example.CustomLecture.dto.JoinDTO;
+import com.example.CustomLecture.dto.Request.VideoDeleteRequestDTO;
 import com.example.CustomLecture.dto.Request.VideoSaveRequestDTO;
 import com.example.CustomLecture.dto.Response.VideoInfoResponseDTO;
+import com.example.CustomLecture.entity.ConvertVideos;
 import com.example.CustomLecture.entity.UserEntity;
 import com.example.CustomLecture.entity.Video;
 import com.example.CustomLecture.entity.VideoData;
 import com.example.CustomLecture.jwt.JWTUtil;
+import com.example.CustomLecture.repository.ConvertVideoRepository;
 import com.example.CustomLecture.repository.UserRepository;
 import com.example.CustomLecture.repository.VideoDataRepository;
 import com.example.CustomLecture.repository.VideoRepository;
@@ -36,6 +39,7 @@ public class VideoService {
     private final UserRepository userRepository;
     private final VideoRepository videoRepository;
     private final VideoDataRepository videoDataRepository;
+    private final ConvertVideoRepository convertVideoRepository;
     private final RestTemplate restTemplate;
     private final JWTUtil jwtUtil;
 
@@ -106,7 +110,7 @@ public class VideoService {
 
 
         // VideoData 레코드 생성
-        Optional<VideoData> existingVideoDataOptional = videoDataRepository.findByVideo(video);
+        Optional<VideoData> existingVideoDataOptional = Optional.ofNullable(video.getVideoData());
 
         if (existingVideoDataOptional.isPresent()) {
             // 기존 레코드가 존재할 경우 업데이트
@@ -169,6 +173,14 @@ public class VideoService {
 
         // VideoInfoResponseDTO 객체를 JSON 문자열로 변환
         return gson.toJson(videoInfoResponseDTO);
+
+    }
+
+    public void deleteVideo(Long videoid) {
+        Video video = videoRepository.findById(videoid)
+                .orElseThrow(() -> new NoSuchElementException("video가 존재하지 않습니다."));
+
+        videoRepository.delete(video);
 
     }
 }
