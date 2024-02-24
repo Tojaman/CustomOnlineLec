@@ -1,5 +1,7 @@
 package com.example.CustomLecture.entity;
 
+import com.example.CustomLecture.dto.ProfileDTO;
+import com.example.CustomLecture.dto.Response.VideoInfoResponseDTO;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.Pattern;
@@ -23,6 +25,8 @@ public class UserEntity {
     @Column(unique = true, length = 20)
     private String nickname;
 
+    private String profileS3Path;
+
     //유저에 대한 권한을 나타낼  role값
     private String role;
 
@@ -37,5 +41,15 @@ public class UserEntity {
 
     public UserEntity() {
 
+    }
+
+
+    public void updateProfile(String nickname, String newUsername) {
+        if (nickname != null) {
+            this.nickname = nickname;
+        }
+        if (newUsername != null) {
+            this.username = newUsername;
+        }
     }
 }

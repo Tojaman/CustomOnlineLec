@@ -2,6 +2,9 @@ package com.example.CustomLecture.controller;
 
 import com.example.CustomLecture.dto.JoinDTO;
 import com.example.CustomLecture.service.JoinService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -24,6 +27,11 @@ public class JoinController {
     }
 
     @PostMapping("/join")
+    @Operation(summary = "회원가입하기", description = "회원가입하기")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "OK"),
+            @ApiResponse(responseCode = "500", description = "Server Error")
+    })
     public ResponseEntity<String> joinProcess(@Valid @RequestBody JoinDTO joinDTO, BindingResult bindingResult) {
         if (bindingResult.hasErrors()) {
             // 유효성 검사 에러가 있는 경우

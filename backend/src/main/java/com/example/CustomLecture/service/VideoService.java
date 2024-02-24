@@ -1,6 +1,5 @@
 package com.example.CustomLecture.service;
 
-import com.example.CustomLecture.dto.JoinDTO;
 import com.example.CustomLecture.dto.Request.VideoSaveRequestDTO;
 import com.example.CustomLecture.dto.Response.VideoInfoResponseDTO;
 import com.example.CustomLecture.entity.UserEntity;
@@ -20,9 +19,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.client.RestTemplate;
-
-
-import java.sql.Timestamp;
+import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -124,6 +121,7 @@ public class VideoService {
 
     }
 
+    //모든 영상 id 불러오기
     public List<Long> getAllVideoIds() {
         List<Video> videoIds = videoRepository.findAll();
         return videoIds.stream()
@@ -131,20 +129,23 @@ public class VideoService {
                 .collect(Collectors.toList());
     }
 
+    //모든 영상 제목 불러오기
     public List<String> getAllVideoTitles() {
         List<Video> videoTitles = videoRepository.findAll();
         return videoTitles.stream()
-                .map(Video::getTitle)
+                .map(video -> video.getTitle() != null ? video.getTitle() : " ") // null 값 대체
                 .collect(Collectors.toList());
     }
 
+    //모든 영상 썸네일 불러오기
     public List<String> getAllVideoThumbnails(){
         List<Video> videoThumbnails = videoRepository.findAll();
         return videoThumbnails.stream()
-                .map(Video::getThumbnailS3Path)
+                .map(video -> video.getThumbnailS3Path() != null ? video.getThumbnailS3Path() : " ") // null 값 대체
                 .collect(Collectors.toList());
     }
 
+    //모든 영상 닉네임 불러오기
     public List<String> getAllNicknames() {
         List<Video> videos = videoRepository.findAll();
         return videos.stream()
@@ -155,25 +156,27 @@ public class VideoService {
                 .collect(Collectors.toList());
     }
 
+    //모든 영상 주제 불러오기
+    public List<String> getAllSubject(){
+        List<Video> subject = videoRepository.findAll();
+        return subject.stream()
+                .map(video -> video.getSubject() != null ? video.getSubject() : " ") // null 값 대체
+                .collect(Collectors.toList());
+    }
+
+    //모든 영상 날짜 불러오기
+    public List<LocalDateTime> getAllDate(){
+        List<Video> date = videoRepository.findAll();
+        return date.stream()
+                .map(Video::getDate)
+                .collect(Collectors.toList());
+    }
+
+
     // POST 영상 재생을 위한 정보
     public String returnVideo(Long videoid) {
         Video video = videoRepository.findById(videoid)
                 .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 userId 입니다."));
-
-        String s3Path = "";
-	//if (Objects.equals(voicename, "윤석열")) {
-        //    s3Path = video.getConvertVideos().get윤석열();
-        //}
-        //else if (Objects.equals(voicename, "jimin700")) {
-          //  s3Path = video.getConvertVideos().getJimin700();
-        //}
-        //else if (Objects.equals(voicename, "timcook")) {
-         //   s3Path = video.getConvertVideos().getTimcook();
-        //}
-        //else {
-         //   s3Path = video.getConvertVideos().getElonmusk();
-        //}
-
 
         // 객체를 json으로 만들기 위해서 jackson, gson,  두 가지 라이브러리가 있다.(JSON-SIMPLE도 있는데 일단 제외)
         // 빅데이터 같이 큰 데이터는 jackson 우위, 작은 데이터는 gson 우위 -> 여기선 gson 사용
@@ -184,6 +187,14 @@ public class VideoService {
 
         // VideoInfoResponseDTO 객체를 JSON 문자열로 변환
         return gson.toJson(videoInfoResponseDTO);
+
+    }
+
+    public void deleteVideo(Long videoid) {
+        Video video = videoRepository.findById(videoid)
+                .orElseThrow(() -> new NoSuchElementException("video가 존재하지 않습니다."));
+
+        videoRepository.delete(video);
 
     }
 }

@@ -17,6 +17,7 @@ import org.springframework.web.bind.annotation.*;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -93,27 +94,35 @@ public class VideoController {
     }
 
     @GetMapping("/list")
+    @Operation(summary = "강의 목록 조회", description = "전체 강의 목록 조회하기")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "OK"),
+            @ApiResponse(responseCode = "500", description = "Server Error")
+    })
     public ResponseEntity<List<Map<String, Object>>> getAllVideoDetails() {
         List<Map<String, Object>> result = new ArrayList<>();
 
         List<Long> videoIds = videoService.getAllVideoIds();
         List<String> videoTitles = videoService.getAllVideoTitles();
         List<String> videoThumbnails = videoService.getAllVideoThumbnails();
-        List<String> nicknames = videoService.getAllNicknames(); // Change to nicknames
+        List<String> nicknames = videoService.getAllNicknames();
+        List<String> subjects = videoService.getAllSubject();
+        List<LocalDateTime> dates = videoService.getAllDate();
 
-        IntStream.range(0, Math.min(Math.min(videoIds.size(), videoTitles.size()), Math.min(videoThumbnails.size(), nicknames.size())))
+        IntStream.range(0, Math.min(Math.min(Math.min(Math.min(videoIds.size(), videoTitles.size()), videoThumbnails.size()), nicknames.size()), Math.min(subjects.size(), dates.size())))
                 .forEach(i -> {
                     Map<String, Object> map = new HashMap<>();
                     map.put("id", videoIds.get(i));
                     map.put("title", videoTitles.get(i));
                     map.put("thumbnail", videoThumbnails.get(i));
-                    map.put("nickname", nicknames.get(i)); // Change to nickname
+                    map.put("nickname", nicknames.get(i));
+                    map.put("subject", subjects.get(i));
+                    map.put("date", dates.get(i));
                     result.add(map);
                 });
 
         return new ResponseEntity<>(result, HttpStatus.OK);
     }
-
 
     @PostMapping("/info")
     @Operation(summary = "강의 영상 정보 반환", description = "반환하다 친구들아!")
@@ -139,6 +148,22 @@ public class VideoController {
         } catch (Exception e) {
             // 그 외 예상치 못한 예외 발생 시 클라이언트에게 InternalServerError 반환
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("서버 오류가 발생했습니다: " + e.getMessage());
+        }
+    }
+    @DeleteMapping("/{videoid}")
+    @Operation(summary = "강의 삭제", description = "영상 업로드 도중 취소하면 관련 정보 삭제")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "OK"),
+            @ApiResponse(responseCode = "500", description = "Server Error")
+    })
+    public ResponseEntity<String> deleteVideo(@PathVariable Long videoid) {
+
+        try {
+
+            videoService.deleteVideo(videoid);
+            return ResponseEntity.status(HttpStatus.OK).body("게시물 삭제 성공");
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("삭제 실패");
         }
     }
 }
