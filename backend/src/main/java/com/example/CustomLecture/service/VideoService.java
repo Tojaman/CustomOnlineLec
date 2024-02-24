@@ -1,11 +1,11 @@
 package com.example.CustomLecture.service;
-
 import com.example.CustomLecture.dto.Request.VideoSaveRequestDTO;
 import com.example.CustomLecture.dto.Response.VideoInfoResponseDTO;
 import com.example.CustomLecture.entity.UserEntity;
 import com.example.CustomLecture.entity.Video;
 import com.example.CustomLecture.entity.VideoData;
 import com.example.CustomLecture.jwt.JWTUtil;
+import com.example.CustomLecture.repository.ConvertVideoRepository;
 import com.example.CustomLecture.repository.UserRepository;
 import com.example.CustomLecture.repository.VideoDataRepository;
 import com.example.CustomLecture.repository.VideoRepository;
@@ -83,9 +83,9 @@ public class VideoService {
     public void uploadVideo(VideoSaveRequestDTO videoSaveRequestDTO, String jwtToken) {
 
         String token = jwtToken.replace("Bearer ", "");
-	// 좌표값 전부 출력
-	
-	
+        // 좌표값 전부 출력
+
+
         // JWTUtil을 사용하여 사용자 이름 추출
         String username = jwtUtil.getUsername(token);
 
@@ -103,7 +103,7 @@ public class VideoService {
 
 
         // VideoData 레코드 생성
-        Optional<VideoData> existingVideoDataOptional = videoDataRepository.findByVideo(video);
+        Optional<VideoData> existingVideoDataOptional = Optional.ofNullable(video.getVideoData());
 
         if (existingVideoDataOptional.isPresent()) {
             // 기존 레코드가 존재할 경우 업데이트

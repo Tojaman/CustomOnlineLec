@@ -65,7 +65,7 @@ def merge_video_audio(convert_voice_path, video_path, audio_path):
     file_name = os.path.splitext(os.path.basename(video_path))[0]  # splitext : 파일의 확장자를 분리해서 저장하기 위함
 
     # 최종 영상 저장 경로 설정
-    output_path = os.path.join(convert_voice_path, f'{file_name}_video.mp4')
+    output_path = os.path.join(convert_voice_path, f'{file_name}_convert_video.mp4')
 
     # 새로운 파일로 저장(.mp4)
     video_clip.write_videofile(output_path, codec="libx264", audio_codec="aac", ffmpeg_params=["-preset", "ultrafast"])

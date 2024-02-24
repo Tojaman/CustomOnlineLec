@@ -29,11 +29,11 @@ public class Video {
     @JoinColumn(name = "userId")
     private UserEntity member;
 
-    @OneToOne(fetch = FetchType.LAZY)
+    @OneToOne(fetch = FetchType.LAZY, orphanRemoval = true)
     @JoinColumn(name = "videoDataId")
     private VideoData videoData;
 
-    @OneToOne(fetch = FetchType.LAZY)
+    @OneToOne(fetch = FetchType.LAZY, orphanRemoval = true)
     @JoinColumn(name = "convertVideosId")
     private ConvertVideos convertVideos;
 
@@ -49,11 +49,9 @@ public class Video {
     @Column(unique = true)
     private String originalS3Path;
 
-//    @Column(unique = true)
-//    private String convertS3Path;
 
     @Column(unique = true)
-    private String subtitle;
+    private String subtitleS3Path;
 
     private String thumbnailS3Path;
     private String lectureNoteS3Path;
@@ -96,6 +94,7 @@ public class Video {
 
                 // 강사 정보
                 user.getNickname(),
+                user.getProfileS3Path(),
 
                 // 영상 상세 정보
                 videoData.getX(),

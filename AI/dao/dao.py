@@ -2,9 +2,9 @@ import pymysql, os
 
 class VideoDao:
 
-    def upload_convert_s3_path(self, connection, date, userId, originalS3Path, convert_s3_path):
+    def upload_convert_s3_path(self, connection, userId, originalS3Path, convert_s3_path):
         cursor = connection.cursor()
-        cursor.execute('INSERT INTO videos (date, userId, originalS3Path) VALUES (%s, %s, %s)', (date, userId, originalS3Path))
+        cursor.execute('INSERT INTO videos (userId, originalS3Path) VALUES (%s, %s)', (userId, originalS3Path))
         video_id = cursor.lastrowid  # 기본 키 값을 반환
         cursor.execute('INSERT INTO convertVideos (yoon, jimin, timcook, karina) VALUES (%s, %s, %s, %s)', (convert_s3_path["yoon"], convert_s3_path["jimin"], convert_s3_path["timcook"], convert_s3_path["karina"]))
         convert_video_id = cursor.lastrowid  # 기본 키 값을 반환
