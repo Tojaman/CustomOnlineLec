@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Link } from "react-router-dom";
+import { Link,  useNavigate } from "react-router-dom";
 import styled from "styled-components";
 import axios from "axios";
 import AWS from "aws-sdk";
@@ -8,7 +8,7 @@ import { FaPencilAlt } from "react-icons/fa";
 import Background from "../assets/img/Group.png";
 import Navbar from "../components/header/Navbar";
 import originProfileImage from "../assets/origin_profile.jpg";
-
+import Swal from "sweetalert2";
 const Container = styled.div`
   display: flex;
   flex-direction: column;
@@ -171,24 +171,43 @@ const WithdrawalButton = styled.span`
 
 const MyPage = () => {
   const [userProfileImageUrl, setUserProfileImageUrl] = useState(originProfileImage);
-  const [nickname, setNickname] = useState("john");
-  const [password, setPassword] = useState("a");
+  const [currentPassword, setCurrentPassword] = useState("");
+  const [newPassword, setNewPassword] = useState(""); 
+  const [nickname, setNickname] = useState("");
+  const [password, setPassword] = useState("");
   const [isEditing, setIsEditing] = useState(false);
-  const [editedNickname, setEditedNickname] = useState(nickname);
-  const [editedPassword, setEditedPassword] = useState(password);
+  const [editedNickname, setEditedNickname] = useState("");
+  const [editedPassword, setEditedPassword] = useState("");
+
+
   const [videos, setVideos] = useState([]);
 
   const token = sessionStorage.getItem("token");
-
+  const username = sessionStorage.getItem("username");
+  const navigate = useNavigate(); // useNavigate 훅 사용
   const handleEditClick = () => {
     setIsEditing(true);
   };
 
   const handleSaveClick = () => {
-    setNickname(editedNickname);
-    setPassword(editedPassword);
-    setIsEditing(false);
+    axios.patch(`http://localhost:8080/mypage/update/${username}`, {
+      newNickname: editedNickname,
+      currentPassword: currentPassword, 
+      newPassword: newPassword 
+    }, {
+      headers: {
+        Authorization: `Bearer ${token}` 
+      }
+    })
+    .then(response => {
+      console.log('서버 응답:', response.data);
+      setIsEditing(false); 
+    })
+    .catch(error => {
+      console.error('서버 오류:', error);
+    });
   };
+  
 
   const handleCancelClick = () => {
     setEditedNickname(nickname);
@@ -196,17 +215,57 @@ const MyPage = () => {
     setIsEditing(false);
   };
 
+  const s3 = new AWS.S3({
+    accessKeyId: process.env.REACT_APP_AWS_ACCESS_KEY_ID,
+    secretAccessKey: process.env.REACT_APP_AWS_SECRET_ACCESS_KEY,
+    region: process.env.REACT_APP_AWS_DEFAULT_REGION
+  });
+
   const handleImageChange = (e) => {
     const file = e.target.files[0];
     if (file) {
       const reader = new FileReader();
       reader.onloadend = () => {
         setUserProfileImageUrl(reader.result);
+        uploadFileToS3(file);
       };
       reader.readAsDataURL(file);
     }
   };
 
+    const uploadFileToS3 = (file) => {
+      const params = {
+        Bucket: process.env.REACT_APP_S3_BUCKET,
+        Key: file.name,
+        Body: file
+      };
+    
+      s3.upload(params, (err, data) => {
+        if (err) {
+          console.error("Error uploading file to S3:", err);
+        } else {
+          console.log("S3:", data.Location);
+          sendS3UrlToServer(data.Location);
+        }
+      });
+  };
+
+  const sendS3UrlToServer = (s3Url) => {
+    axios.patch(`http://localhost:8080/mypage/update/profile/${username}`, 
+    { ProfileS3Path: s3Url },
+    {
+    headers: {
+      'Authorization': `Bearer ${token}`
+    }
+    })
+      .then(response => {
+        console.log("S3 URL 전송 성공:", response.data);
+      })
+      .catch(error => {
+        console.error("S3 URL 전송 실패:", error);
+      });
+  };
+  
   useEffect(() => {
     AWS.config.update({
       accessKeyId: process.env.REACT_APP_AWS_ACCESS_KEY_ID,
@@ -215,43 +274,106 @@ const MyPage = () => {
     });
 
     const s3 = new AWS.S3();
-
-    axios
-      .get("http://localhost:8080/videos/list", {
+  async function fetchVideos() {
+    try {
+      const response = await axios.get("http://localhost:8080/videos/list", {
         headers: {
           Authorization: `Bearer ${token}`,
         },
-      })
-      .then((response) => {
-        const videoData = response.data
-          .map((video) => ({
-            id: video.id,
-            title: video.title,
-            thumbnail: video.thumbnail,
-            nickname: video.nickname,
-          }))
-          .filter((video) => video.title !== null && video.thumbnail !== null && video.nickname !== null);
+      });
 
-        const getThumbnails = videoData.map((video) => {
-          return s3.getSignedUrlPromise("getObject", {
-            Bucket: process.env.REACT_APP_S3_BUCKET,
-            Key: video.thumbnail,
-            Expires: 300,
-          });
+      const videoData = response.data
+        .map((video) => ({
+          id: video.id,
+          title: video.title,
+          thumbnail: video.thumbnail,
+          nickname: video.nickname,
+        }))
+        .filter((video) => video.title !== null && video.thumbnail !== null && video.nickname !== null);
+
+      const getThumbnails = videoData.map((video) => {
+        return s3.getSignedUrlPromise("getObject", {
+          Bucket: process.env.REACT_APP_S3_BUCKET,
+          Key: video.thumbnail,
+          Expires: 300,
         });
+      });
 
-        Promise.all(getThumbnails)
-          .then((urls) => {
-            const updatedVideoData = videoData.map((video, index) => ({
-              ...video,
-              thumbnail: urls[index],
-            }));
-            setVideos(updatedVideoData);
-          })
-          .catch((error) => console.error("Error:", error));
-      })
-      .catch((error) => console.error("Error:", error));
-  }, [token]);
+      const urls = await Promise.all(getThumbnails);
+
+      const updatedVideoData = videoData.map((video, index) => ({
+        ...video,
+        thumbnail: urls[index],
+      }));
+
+      setVideos(updatedVideoData);
+    } catch (error) {
+      console.error("Error:", error);
+    }
+  }
+
+  async function fetchProfileInfo() {
+    try {
+      const response = await axios.get(`http://localhost:8080/mypage/${username}`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      console.log("프로필 응답:", response.data.profile);
+      setNickname(response.data.nickname);
+
+      // 프로필이 null이 아닌 경우에만 처리
+    if (response.data.profile !== null) {
+
+      s3.getSignedUrl("getObject", {
+        Bucket: process.env.REACT_APP_S3_BUCKET,
+        Key: response.data.profile,
+        Expires: 300,
+      }, (err, url) => {
+        if (err) {
+          console.error("Error getting profile image from S3:", err);
+        } else {
+          setUserProfileImageUrl(url);
+        }
+      });
+    }
+  } catch (error) {
+    console.error("Error:", error);
+  }
+  }
+
+  fetchVideos();
+  fetchProfileInfo();
+}, [token, username]);
+
+const handleWithdrawalClick = () => {
+  Swal.fire({
+    title: "정말로 탈퇴하시겠습니까?",
+    icon: "warning",
+    showCancelButton: true,
+    confirmButtonText: "예",
+    cancelButtonText: "아니요",
+  }).then((result) => {
+    if (result.isConfirmed) {
+      axios
+        .delete(`http://localhost:8080/mypage/delete/${username}`, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        })
+        .then((response) => {
+          console.log("회원탈퇴 요청 성공:", response.data);
+          sessionStorage.removeItem("token");
+          sessionStorage.removeItem("username");
+          navigate("/");
+        })
+        .catch((error) => {
+          console.error("회원탈퇴 요청 실패:", error);
+        });
+    }
+  });
+};
 
   return (
     <div>
@@ -261,31 +383,39 @@ const MyPage = () => {
         <SubTitle>User Profile</SubTitle>
         <ProfileContainer>
           <ProfileImageContainer>
-            <Image src={userProfileImageUrl} alt="프로필" />
+            <Image src={userProfileImageUrl}/>
             <EditIcon htmlFor="fileInput">
               <FaPencilAlt />
-              <InputFile id="fileInput" type="file" accept="image/*" onChange={handleImageChange} />
+              <InputFile id="fileInput" type="file"  onChange={handleImageChange} />
             </EditIcon>
           </ProfileImageContainer>
-          <InfoText>Nickname</InfoText>
-          {isEditing ? (
-            <Input value={editedNickname} onChange={(e) => setEditedNickname(e.target.value)} />
-          ) : (
-            <Input value={nickname} readOnly />
-          )}
-          <InfoText>Password</InfoText>
-          {isEditing ? (
-            <Input value={editedPassword} onChange={(e) => setEditedPassword(e.target.value)} />
-          ) : (
-            <Input type="password" value={password} readOnly />
-          )}
-          {isEditing && (
-            <ButtonContent>
-              <ChangeButton onClick={handleSaveClick}>저장</ChangeButton>
-              <ChangeButton onClick={handleCancelClick}>취소</ChangeButton>
-            </ButtonContent>
-          )}
-          {!isEditing && <ChangeButton onClick={handleEditClick}>수정</ChangeButton>}
+          <div>
+          <InfoText>닉네임</InfoText>
+      {isEditing ? (
+        <Input value={nickname} onChange={(e) => setEditedNickname(e.target.value)} />
+      ) : (
+        <Input value={nickname}/>
+      )}
+      {isEditing && (
+        <div>
+          <InfoText>현재 비밀번호</InfoText>
+          <Input type="password" onChange={(e) => setCurrentPassword(e.target.value)} />
+        </div>
+      )}
+      {isEditing && (
+        <div>
+          <InfoText>새로운 비밀번호</InfoText>
+          <Input type="password" onChange={(e) => setNewPassword(e.target.value)}/>
+        </div>
+      )}
+</div>
+      {isEditing && (
+        <ButtonContent>
+          <ChangeButton onClick={handleSaveClick}>저장</ChangeButton>
+          <ChangeButton onClick={handleCancelClick}>취소</ChangeButton>
+        </ButtonContent>
+      )}
+      {!isEditing && <ChangeButton onClick={handleEditClick}>수정</ChangeButton>}
         </ProfileContainer>
         <SubTitle>업로드 영상 목록</SubTitle>
         <UploadListContainer>
@@ -304,7 +434,7 @@ const MyPage = () => {
           </MoreButton>
         </UploadListContainer>
         <ButtonContainer>
-          <WithdrawalButton>
+          <WithdrawalButton onClick={handleWithdrawalClick}>
             탈퇴하기
             <IoIosArrowForward />
           </WithdrawalButton>

@@ -347,23 +347,32 @@ function displayPreviousSessionInfo() {
         videoElement.src = videoUrl;
       }
     });
+
     // 프로필 이미지 확인
     const profileImage = selectedVideoInfo.profile;
+
     if (profileImage) {
-      const profileElement = document.getElementById("profile");
-      profileElement.src = profileImage;
-    } else {
-      // 프로필 이미지가 없는 경우 기본 이미지로 대체
-      const defaultProfileImagePath = "src/assets/origin_profile.jpg"; // 기본 이미지 경로
-      const profileElement = document.getElementById("profile");
-      profileElement.src = defaultProfileImagePath;
+      const profileImageParams = {
+        Bucket: process.env.REACT_APP_S3_BUCKET,
+        Key: profileImage
+      };
+    
+      s3.getObject(profileImageParams, (profileErr, profileData) => {
+        if (profileErr) {
+          console.error("프로필 이미지 가져오기 오류:", profileErr);
+        } else {
+          console.log("프로필 이미지 객체 가져옴:", profileData);
+    
+          const profileBlob = new Blob([profileData.Body], { type: profileData.ContentType });
+          const profileImageUrl = URL.createObjectURL(profileBlob);
+          
+          const profileElement = document.getElementById("profile");
+          profileElement.src = profileImageUrl;
+        }
+      });
     }
-  } else {
-    console.log("이전에 저장된 세션 정보가 없습니다.");
   }
 }
-
-
 export async function run() {
   
   displayPreviousSessionInfo();
