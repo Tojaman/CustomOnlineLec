@@ -229,10 +229,14 @@ const VideoInfo = () => {
             <Label2>카테고리</Label2>
             <Select onChange={(e) => setFormData({ ...formData, category: e.target.value })}>
               <Option value="">카테고리 선택</Option>
-              <Option value="C">C언어</Option>
-              <Option value="Python">파이썬</Option>
-              <Option value="Java">자바</Option>
-              <Option value="JavaScript">자바스크립트</Option>
+              <Option value="C">C</Option>
+              <Option value="Python">Python</Option>
+              <Option value="Java">Java</Option>
+              <Option value="C++">C++</Option>
+              <Option value="DB">DB</Option>
+              <Option value="Spring">Spring</Option>
+              <Option value="React">React</Option>
+              <Option value="etc">기타</Option>
             </Select>
 
             <Label2>강의자료</Label2>

@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import styled from "styled-components";
 import { FaSearch } from "react-icons/fa";
+import { FaSyncAlt } from "react-icons/fa";
 import Navbar from "../components/header/Navbar";
 import Background from "../assets/img/Group.png";
 import axios from "axios";
@@ -44,7 +45,6 @@ const VideoContainer = styled.div`
   border-radius: 10px;
   overflow: hidden;
   cursor: pointer;
-  margin: 0 10px 10px 0;
 `;
 
 const SearchContent = styled.div`
@@ -73,9 +73,18 @@ const Select = styled.select`
 
 const Option = styled.option``;
 
+const ResetButton = styled.button`
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0;
+  margin-left: 10px;
+`;
+
 const PlainLink = styled(Link)`
   text-decoration: none;
   color: inherit;
+  margin: 0 10px 10px 0;
 `;
 
 const Thumbnail = styled.img`
@@ -101,9 +110,12 @@ const VideoItems = styled.div`
 
 const VideoList = () => {
   const [videos, setVideos] = useState([]);
-  const [searchTerm, setSearchTerm] = useState("");
   const [filteredVideos, setFilteredVideos] = useState([]);
+  const [searchTerm, setSearchTerm] = useState("");
   const [searched, setSearched] = useState(false);
+  const [sortByDate, setSortByDate] = useState(false);
+  const [selectedCategory, setSelectedCategory] = useState("defaultCategory");
+  const [isSearchActive, setIsSearchActive] = useState(false);
 
   const token = sessionStorage.getItem("token");
 
@@ -129,6 +141,8 @@ const VideoList = () => {
             title: video.title,
             thumbnail: video.thumbnail,
             nickname: video.nickname,
+            date: video.date,
+            subject: video.subject,
           }))
           .filter((video) => video.title !== null && video.thumbnail !== null && video.nickname !== null);
 
@@ -142,11 +156,14 @@ const VideoList = () => {
 
         Promise.all(getThumbnails)
           .then((urls) => {
-            const updatedVideoData = videoData.map((video, index) => ({
-              ...video,
-              thumbnail: urls[index],
-            }));
+            const updatedVideoData = videoData
+              .map((video, index) => ({
+                ...video,
+                thumbnail: urls[index],
+              }))
+              .reverse();
             setVideos(updatedVideoData);
+            setFilteredVideos(updatedVideoData);
           })
           .catch((error) => console.error("Error:", error));
       })
@@ -160,7 +177,65 @@ const VideoList = () => {
 
   const handleSearchButtonClick = () => {
     setFilteredVideos(videos.filter((video) => video.title.toLowerCase().includes(searchTerm.toLowerCase())));
+    setSortByDate("defaultDate");
+    setSelectedCategory("defaultCategory");
     setSearched(true);
+    setIsSearchActive(true);
+  };
+
+  const handleSortAndFilterChange = (event) => {
+    const { name, value } = event.target;
+    if (name === "selectedCategory") {
+      if (value === "defaultCategory") {
+        if (sortByDate === "defaultDate") {
+          setFilteredVideos(videos);
+        } else if (sortByDate === "Recent") {
+          setFilteredVideos([...videos].sort((a, b) => new Date(b.date) - new Date(a.date)));
+        } else if (sortByDate === "Old") {
+          const sortedVideos = [...videos].sort((a, b) => new Date(a.date) - new Date(b.date));
+          const uniqueDates = Array.from(new Set(sortedVideos.map((video) => video.date)));
+          const rearrangedVideos = uniqueDates.map((date) => sortedVideos.filter((video) => video.date === date).reverse()).flat();
+          setFilteredVideos(rearrangedVideos);
+        }
+        setSelectedCategory("defaultCategory");
+      } else {
+        setSelectedCategory(value);
+        let filtered = videos.filter((video) => video.subject === value);
+        if (sortByDate === "Recent") {
+          filtered = filtered.sort((a, b) => new Date(b.date) - new Date(a.date));
+        } else if (sortByDate === "Old") {
+          const sortedVideos = filtered.sort((a, b) => new Date(a.date) - new Date(b.date));
+          const uniqueDates = Array.from(new Set(sortedVideos.map((video) => video.date)));
+          const rearrangedVideos = uniqueDates.map((date) => sortedVideos.filter((video) => video.date === date).reverse()).flat();
+          filtered = rearrangedVideos;
+        }
+        setFilteredVideos(filtered);
+      }
+    } else if (name === "sortByDate") {
+      if (value === "defaultDate") {
+        setFilteredVideos([...filteredVideos].sort((a, b) => new Date(b.date) - new Date(a.date)));
+        setSortByDate("defaultDate");
+      } else if (value === "Recent") {
+        setSortByDate(value);
+        setFilteredVideos([...filteredVideos].sort((a, b) => new Date(b.date) - new Date(a.date)));
+      } else if (value === "Old") {
+        setSortByDate(value);
+        const sortedVideos = [...filteredVideos].sort((a, b) => new Date(a.date) - new Date(b.date));
+        const uniqueDates = Array.from(new Set(sortedVideos.map((video) => video.date)));
+        const rearrangedVideos = uniqueDates.map((date) => sortedVideos.filter((video) => video.date === date).reverse()).flat();
+        setFilteredVideos(rearrangedVideos);
+      }
+    }
+
+    setSearched(true);
+  };
+
+  const handleReset = () => {
+    setFilteredVideos(videos);
+    setSortByDate("defaultDate");
+    setSelectedCategory("defaultCategory");
+    setSearchTerm("");
+    setIsSearchActive(false);
   };
 
   return (
@@ -171,20 +246,32 @@ const VideoList = () => {
         <SearchContent>
           <Search placeholder="검색" value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)} />
           <SearchButton onClick={handleSearchButtonClick}>
-            <FaSearch />
+            <FaSearch style={{ fontSize: "18px" }} />
           </SearchButton>
-          <Select>
-            <Option value="">날짜</Option>
+          <Select name="sortByDate" value={sortByDate} onChange={handleSortAndFilterChange}>
+            <Option value="defaultDate">날짜</Option>
             <Option value="Recent">최신순</Option>
             <Option value="Old">오래된순</Option>
           </Select>
-          <Select>
-            <Option value="">카테고리</Option>
-            <Option value="C">C언어</Option>
-            <Option value="Python">파이썬</Option>
-            <Option value="Java">자바</Option>
-            <Option value="JavaScript">자바스크립트</Option>
+          <Select
+            name="selectedCategory"
+            value={selectedCategory}
+            onChange={handleSortAndFilterChange}
+            style={{ display: isSearchActive ? "none" : "block" }}
+          >
+            <Option value="defaultCategory">카테고리</Option>
+            <Option value="C">C</Option>
+            <Option value="Python">Python</Option>
+            <Option value="Java">Java</Option>
+            <Option value="C++">C++</Option>
+            <Option value="DB">DB</Option>
+            <Option value="Spring">Spring</Option>
+            <Option value="React">React</Option>
+            <Option value="etc">기타</Option>
           </Select>
+          <ResetButton onClick={handleReset}>
+            <FaSyncAlt style={{ fontSize: "20px", display: searched ? "block" : "none" }} />
+          </ResetButton>
         </SearchContent>
         <VideoItems>
           {searched

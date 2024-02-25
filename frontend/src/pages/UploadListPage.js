@@ -45,17 +45,31 @@ const SubTitle = styled.p`
 
 const StatisticsContainer = styled.div`
   height: 150px;
-  background-color: #fff;
+  background-color: #2b5329;
   border-radius: 10px;
-  border: 1px solid #000;
-  margin-bottom: 5px;
+  border: 5px solid #8b4513;
+  box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.5);
+  position: relative;
+  overflow: hidden;
 `;
 
 const Statistics = styled.div`
-  width: 100%;
+  display: flex;
+  height: 50%;
+  align-items: center;
 `;
 
-const VideoItems = styled.div``;
+const StatisticItem = styled.span`
+  font-size: 20px;
+  width: 25%;
+  display: flex;
+  justify-content: center;
+  color: white;
+`;
+
+const VideoItems = styled.div`
+  margin-top: 40px;
+`;
 
 const PlainLink = styled(Link)`
   text-decoration: none;
@@ -91,6 +105,17 @@ const Text = styled.div`
 
 const UploadList = () => {
   const [videos, setVideos] = useState([]);
+  const [categoryStats, setCategoryStats] = useState({
+    C: 0,
+    Python: 0,
+    Java: 0,
+    "C++": 0,
+    DB: 0,
+    Spring: 0,
+    React: 0,
+    etc: 0,
+  });
+
   const token = sessionStorage.getItem("token");
 
   useEffect(() => {
@@ -115,8 +140,29 @@ const UploadList = () => {
             title: video.title,
             thumbnail: video.thumbnail,
             nickname: video.nickname,
+            date: video.date,
+            subject: video.subject,
           }))
           .filter((video) => video.title !== null && video.thumbnail !== null && video.nickname !== null);
+
+        const categoryCount = {
+          C: 0,
+          Python: 0,
+          Java: 0,
+          "C++": 0,
+          DB: 0,
+          Spring: 0,
+          React: 0,
+          etc: 0,
+        };
+
+        videoData.forEach((video) => {
+          if (video.subject in categoryCount) {
+            categoryCount[video.subject]++;
+          }
+        });
+
+        setCategoryStats(categoryCount);
 
         const getThumbnails = videoData.map((video) => {
           return s3.getSignedUrlPromise("getObject", {
@@ -151,8 +197,18 @@ const UploadList = () => {
       <ContentContainer>
         <SubTitle>Upload List</SubTitle>
         <StatisticsContainer>
-          통계
-          <Statistics></Statistics>
+          <Statistics>
+            <StatisticItem>C : {categoryStats.C}</StatisticItem>
+            <StatisticItem>Python : {categoryStats.Python}</StatisticItem>
+            <StatisticItem>Java : {categoryStats.Java}</StatisticItem>
+            <StatisticItem>C++ : {categoryStats["C++"]}</StatisticItem>
+          </Statistics>
+          <Statistics>
+            <StatisticItem>DB : {categoryStats.DB}</StatisticItem>
+            <StatisticItem>Spring : {categoryStats.Spring}</StatisticItem>
+            <StatisticItem>React : {categoryStats.React}</StatisticItem>
+            <StatisticItem>etc : {categoryStats.etc}</StatisticItem>
+          </Statistics>
         </StatisticsContainer>
         <VideoItems>
           {videos.map((video) => (
