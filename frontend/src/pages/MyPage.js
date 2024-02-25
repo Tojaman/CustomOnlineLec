@@ -196,10 +196,10 @@ const MyPage = () => {
   const [currentPassword, setCurrentPassword] = useState("");
   const [newPassword, setNewPassword] = useState("");
   const [nickname, setNickname] = useState("");
-  const [password, setPassword] = useState("");
+  const [password] = useState("");
   const [isEditing, setIsEditing] = useState(false);
   const [editedNickname, setEditedNickname] = useState("");
-  const [editedPassword, setEditedPassword] = useState("");
+  const [setEditedPassword] = useState("");
 
   const [videos, setVideos] = useState([]);
 
@@ -264,7 +264,7 @@ const MyPage = () => {
       Body: file,
     };
 
-    s3.upload(params, (err, data) => {
+    s3.upload(params, (err) => {
       if (err) {
         console.error("Error uploading file to S3:", err);
       } else {

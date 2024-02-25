@@ -349,12 +349,12 @@ function displayPreviousSessionInfo() {
     });
 
     // 프로필 이미지 확인
-    const profileImage = selectedVideoInfo.profile;
+    const profileS3Path = selectedVideoInfo.profileS3Path;
 
-    if (profileImage) {
+    if (profileS3Path!== null) {
       const profileImageParams = {
         Bucket: process.env.REACT_APP_S3_BUCKET,
-        Key: profileImage
+        Key: profileS3Path
       };
     
       s3.getObject(profileImageParams, (profileErr, profileData) => {
