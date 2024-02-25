@@ -117,6 +117,7 @@ const UploadList = () => {
   });
 
   const token = sessionStorage.getItem("token");
+  const userNickname = sessionStorage.getItem("userNickname");
 
   useEffect(() => {
     AWS.config.update({
@@ -157,7 +158,7 @@ const UploadList = () => {
         };
 
         videoData.forEach((video) => {
-          if (video.subject in categoryCount) {
+          if (video.nickname === userNickname && video.subject in categoryCount) {
             categoryCount[video.subject]++;
           }
         });
@@ -178,7 +179,8 @@ const UploadList = () => {
               ...video,
               thumbnail: urls[index],
             }));
-            setVideos(updatedVideoData);
+            const userVideos = updatedVideoData.filter((video) => video.nickname === userNickname);
+            setVideos(userVideos);
           })
           .catch((error) => console.error("Error:", error));
       })
