@@ -30,8 +30,8 @@ public class MypageService {
     }
 
     //회원 프로필 업데이트하기
-    public void updateProfileS3Path(String nickname, String ProfileS3Path) {
-        Optional<UserEntity> optionalUser = userRepository.findByNickname(nickname);
+    public void updateProfileS3Path(String username, String ProfileS3Path) {
+        Optional<UserEntity> optionalUser = userRepository.findByUsername(username);
 
         if (optionalUser.isPresent()) {
             UserEntity user = optionalUser.get();
@@ -39,31 +39,31 @@ public class MypageService {
             userRepository.save(user);
         } else {
             // 해당 ID의 사용자를 찾을 수 없을 경우 예외처리 또는 메시지 반환
-            throw new EntityNotFoundException("User with ID " + nickname + " not found");
+            throw new EntityNotFoundException("User with ID " + username + " not found");
         }
     }
 
 
   
-    public UserEntity getUserByNickname(String nickname) {
-        return userRepository.findByNickname(nickname).orElse(null);
+    public UserEntity getUserByUsername(String username) {
+        return userRepository.findByUsername(username).orElse(null);
     }
 
 
-    public String getUserNicknameByNickname(String nickname) {
-        return userRepository.findByNickname(nickname)
+    public String getUserNicknameByUsername(String username) {
+        return userRepository.findByUsername(username)
                 .map(UserEntity::getNickname)
                 .orElse(null);
     }
 
-    public String getUserPasswordByNickname(String nickname) {
-        return userRepository.findByNickname(nickname)
+    public String getUserPasswordByUsername(String username) {
+        return userRepository.findByUsername(username)
                 .map(UserEntity::getPassword)
                 .orElse(null);
     }
 
-    public String getUserProfileByNickname(String nickname) {
-        return userRepository.findByNickname(nickname)
+    public String getUserProfileByUsername(String username) {
+        return userRepository.findByUsername(username)
                 .map(UserEntity::getProfileS3Path)
                 .orElse(null);
     }
@@ -92,30 +92,30 @@ public class MypageService {
     }
 */
     //회원 탈퇴
-    public void deleteUserByNickname(String nickname) {
-        userRepository.deleteByNickname(nickname);
+    public void deleteUserByNickname(String username) {
+        userRepository.deleteByUsername(username);
     }
 
     // 현재 회원 비밀번호 확인
-    public boolean isCurrentPasswordCorrect(String  nickname, String currentPassword) {
-        String storedPassword = getUserPasswordByNickname(nickname);
+    public boolean isCurrentPasswordCorrect(String username, String currentPassword) {
+        String storedPassword = getUserPasswordByUsername(username);
 
         // 현재 비밀번호가 일치하면 true, 일치하지 않으면 false 반환
         return bCryptPasswordEncoder.matches(currentPassword, storedPassword);
     }
 
     // 회원 정보 업데이트
-    public void updateUserDetail(String nickname, Map<String, String> updateInfo) {
+    public void updateUserDetail(String username, Map<String, String> updateInfo) {
         String currentPassword = updateInfo.get("currentPassword");
 
         // 비밀번호 변경 시 현재 비밀번호 확인
         if (updateInfo.containsKey("newPassword")) {
-            if (!isCurrentPasswordCorrect(nickname, currentPassword)) {
+            if (!isCurrentPasswordCorrect(username, currentPassword)) {
                 throw new IllegalArgumentException("Current password is incorrect");
             }
         }
 
-        Optional<UserEntity> optionalUser = userRepository.findByNickname(nickname);
+        Optional<UserEntity> optionalUser = userRepository.findByUsername(username);
 
         if (optionalUser.isPresent()) {
             UserEntity user = optionalUser.get();
@@ -131,7 +131,7 @@ public class MypageService {
 
             userRepository.save(user);
         } else {
-            throw new EntityNotFoundException("User with ID " + nickname + " not found");
+            throw new EntityNotFoundException("User with ID " + username + " not found");
         }
     }
 }
