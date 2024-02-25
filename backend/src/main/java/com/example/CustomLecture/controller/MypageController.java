@@ -1,6 +1,7 @@
 package com.example.CustomLecture.controller;
 
 
+import com.example.CustomLecture.entity.UserEntity;
 import com.example.CustomLecture.service.MypageService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -27,22 +28,20 @@ public class MypageController {
     final MypageService mypageService;
 
 
-    @GetMapping("/{id}")
+    @GetMapping("/{nickname}")
     @Operation(summary = "회원 정보 조회", description = "회원 정보(프로필, 닉네임, 비밀번호) 조회하기")
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "OK"),
             @ApiResponse(responseCode = "500", description = "Server Error")
     })
-    public ResponseEntity<Map<String, String>> getUserInfo(@PathVariable Long id) {
-        String nickname = mypageService.getUserNicknameById(id);
-        String password = mypageService.getUserPasswordById(id);
-        String profile = mypageService.getUserProfileById(id);
+    public ResponseEntity<Map<String, String>> getUserInfoByNickname(@PathVariable String nickname) {
+        UserEntity user = mypageService.getUserByNickname(nickname);
 
-        if (nickname != null && password != null) {
+        if (user != null) {
             Map<String, String> userInfo = new HashMap<>();
-            userInfo.put("nickname", nickname);
-            userInfo.put("password", password);
-            userInfo.put("profile", profile);
+            userInfo.put("nickname", user.getNickname());
+            userInfo.put("password", user.getPassword());
+            userInfo.put("profile", user.getProfileS3Path());
 
             return new ResponseEntity<>(userInfo, HttpStatus.OK);
         } else {
@@ -50,19 +49,19 @@ public class MypageController {
         }
     }
 
-    @PatchMapping("/update/profile/{id}")
+    @PatchMapping("/update/profile/{nickname}")
     @Operation(summary = "회원 프로필 업데이트", description = "회원 프로필 업데이트하기")
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "OK"),
             @ApiResponse(responseCode = "500", description = "Server Error")
     })
     public ResponseEntity<String> updateProfileS3Path(
-            @PathVariable Long id,
+            @PathVariable String nickname,
             @RequestBody Map<String, String> requestBody) {
 
         try {
             String ProfileS3Path = requestBody.get("ProfileS3Path");
-            mypageService.updateProfileS3Path(id, ProfileS3Path);
+            mypageService.updateProfileS3Path(nickname, ProfileS3Path);
             return new ResponseEntity<>("Profile S3 Path updated successfully", HttpStatus.OK);
         } catch (EntityNotFoundException e) {
             return new ResponseEntity<>("User not found", HttpStatus.NOT_FOUND);
@@ -70,7 +69,7 @@ public class MypageController {
     }
 
 
-    @PatchMapping("/update/{id}")
+    @PatchMapping("/update/{nickname}")
     @Operation(summary = "회원 정보 업데이트", description = "회원 정보 업데이트하기")
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "OK"),
@@ -78,10 +77,10 @@ public class MypageController {
             @ApiResponse(responseCode = "400", description = "Bad Request")
     })
     public ResponseEntity<String> updateUserDetail(
-            @PathVariable Long id,
+            @PathVariable String nickname,
             @RequestBody Map<String, String> request) {
         try {
-            mypageService.updateUserDetail(id, request);
+            mypageService.updateUserDetail(nickname, request);
             return new ResponseEntity<>("User profile updated successfully", HttpStatus.OK);
         } catch (EntityNotFoundException e) {
             return new ResponseEntity<>("User not found", HttpStatus.NOT_FOUND);
@@ -90,15 +89,15 @@ public class MypageController {
         }
     }
 
-    @DeleteMapping("/delete/{id}")
+    @DeleteMapping("/delete/{nickname}")
     @Operation(summary = "회원 탈퇴", description = "회원 탈퇴하기")
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "OK"),
             @ApiResponse(responseCode = "500", description = "Server Error")
     })
-    public ResponseEntity<String> deleteUser(@PathVariable Long id) {
+    public ResponseEntity<String> deleteUser(@PathVariable String nickname) {
         try {
-            mypageService.deleteUserById(id);
+            mypageService.deleteUserByNickname(nickname);
             return new ResponseEntity<>("User deleted successfully", HttpStatus.OK);
         } catch (EmptyResultDataAccessException e) {
             return new ResponseEntity<>("User not found", HttpStatus.NOT_FOUND);
