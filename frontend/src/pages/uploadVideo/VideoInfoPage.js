@@ -99,7 +99,6 @@ const SubmitButton = styled.button`
 
 const Image = styled.img`
   width: 200px;
-  height: 200px;
   margin-top: 10px;
 `;
 

@@ -114,7 +114,6 @@ const ButtonContent = styled.div`
 
 const UploadListContainer = styled.div`
   display: flex;
-  flex-wrap: wrap;
   width: 100%;
   background-color: lightgrey;
   padding-top: 30px;
@@ -196,10 +195,10 @@ const MyPage = () => {
   const [currentPassword, setCurrentPassword] = useState("");
   const [newPassword, setNewPassword] = useState("");
   const [nickname, setNickname] = useState("");
-  const [password] = useState("");
+  const [password, setPassword] = useState("");
   const [isEditing, setIsEditing] = useState(false);
   const [editedNickname, setEditedNickname] = useState("");
-  const [setEditedPassword] = useState("");
+  const [editedPassword, setEditedPassword] = useState("");
 
   const [videos, setVideos] = useState([]);
 
@@ -239,6 +238,7 @@ const MyPage = () => {
       .catch((error) => {
         console.error("서버 오류:", error);
       });
+    sessionStorage.setItem("userNickname", editedNickname);
   };
 
   const handleCancelClick = () => {
@@ -264,7 +264,7 @@ const MyPage = () => {
       Body: file,
     };
 
-    s3.upload(params, (err) => {
+    s3.upload(params, (err, data) => {
       if (err) {
         console.error("Error uploading file to S3:", err);
       } else {
@@ -300,6 +300,41 @@ const MyPage = () => {
     });
 
     const s3 = new AWS.S3();
+
+    async function fetchProfileInfo() {
+      try {
+        const response = await axios.get(`http://localhost:8080/mypage/${username}`, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
+
+        setNickname(response.data.nickname);
+        setEditedNickname(response.data.nickname);
+        sessionStorage.setItem("userNickname", response.data.nickname);
+
+        if (response.data.profile !== null) {
+          s3.getSignedUrl(
+            "getObject",
+            {
+              Bucket: process.env.REACT_APP_S3_BUCKET,
+              Key: response.data.profile,
+              Expires: 300,
+            },
+            (err, url) => {
+              if (err) {
+                console.error("Error getting profile image from S3:", err);
+              } else {
+                setProfileImage(url);
+              }
+            }
+          );
+        }
+      } catch (error) {
+        console.error("Error:", error);
+      }
+    }
+
     async function fetchVideos() {
       try {
         const response = await axios.get("http://localhost:8080/videos/list", {
@@ -333,48 +368,16 @@ const MyPage = () => {
             thumbnail: urls[index],
           }))
           .reverse();
-
-        setVideos(updatedVideoData);
+        const userNickname = sessionStorage.getItem("userNickname");
+        const userVideos = updatedVideoData.filter((video) => video.nickname === userNickname);
+        setVideos(userVideos);
       } catch (error) {
         console.error("Error:", error);
       }
     }
 
-    async function fetchProfileInfo() {
-      try {
-        const response = await axios.get(`http://localhost:8080/mypage/${username}`, {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        });
-
-        setNickname(response.data.nickname);
-        setEditedNickname(response.data.nickname);
-
-        if (response.data.profile !== null) {
-          s3.getSignedUrl(
-            "getObject",
-            {
-              Bucket: process.env.REACT_APP_S3_BUCKET,
-              Key: response.data.profile,
-              Expires: 300,
-            },
-            (err, url) => {
-              if (err) {
-                console.error("Error getting profile image from S3:", err);
-              } else {
-                setProfileImage(url);
-              }
-            }
-          );
-        }
-      } catch (error) {
-        console.error("Error:", error);
-      }
-    }
-
-    fetchVideos();
     fetchProfileInfo();
+    fetchVideos();
   }, [token, username]);
 
   const handleWithdrawalClick = () => {
