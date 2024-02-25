@@ -88,8 +88,9 @@ const RegisterButton = styled.button`
 `;
 
 const Navbar = () => {
-  const token = sessionStorage.getItem("token");
   const navigate = useNavigate();
+
+  const token = sessionStorage.getItem("token");
 
   const handleUploadClick = () => {
     if (!token) {
@@ -103,6 +104,7 @@ const Navbar = () => {
       });
     }
   };
+  
   const handleVideoListClick = () => {
     if (!token) {
       Swal.fire({
@@ -115,13 +117,10 @@ const Navbar = () => {
       });
     }
   };
+
   const handleLogout = () => {
     sessionStorage.clear();
-    if (history.location.pathname === "/") {
-      history.go(0);
-    } else {
-      history.push("/");
-    }
+    navigate("/");
   };
 
   return (
@@ -132,24 +131,38 @@ const Navbar = () => {
       <NavElement>
         <TfiMenuStyled />
         <NavItem to="/">Home</NavItem>
-        <NavItem to="/attach" onClick={handleUploadClick}
-         style={{
-          color: location.pathname === "/attach" || location.pathname === "/modify"|| location.pathname === "/inform" ? "#499be9" : "",
-          fontWeight: location.pathname === "/attach" || location.pathname === "/modify"|| location.pathname === "/inform" ? "bold" : "normal"
-       }}>
+        <NavItem
+          to="/attach"
+          onClick={handleUploadClick}
+          style={{
+            color: location.pathname === "/attach" || location.pathname === "/modify" || location.pathname === "/inform" ? "#499be9" : "",
+            fontWeight:
+              location.pathname === "/attach" || location.pathname === "/modify" || location.pathname === "/inform" ? "bold" : "normal",
+          }}
+        >
           강의 업로드
         </NavItem>
-      <NavItem
-         to="/videoList"
-         onClick={handleVideoListClick}
-         style={{
+        <NavItem
+          to="/videoList"
+          onClick={handleVideoListClick}
+          style={{
             color: location.pathname === "/videoList" || location.pathname === "/select" ? "#499be9" : "",
-            fontWeight: location.pathname === "/videoList" || location.pathname === "/select" ? "bold" : "normal"
-         }}
+            fontWeight: location.pathname === "/videoList" || location.pathname === "/select" ? "bold" : "normal",
+          }}
         >
-        강의 목록
-      </NavItem>
-        {token ? <NavItem to="/mypage">마이페이지</NavItem> : null}
+          강의 목록
+        </NavItem>
+        {token ? (
+          <NavItem
+            to="/mypage"
+            style={{
+              color: location.pathname === "/mypage" || location.pathname === "/uploadList" ? "#499be9" : "",
+              fontWeight: location.pathname === "/mypage" || location.pathname === "/uploadList" ? "bold" : "normal",
+            }}
+          >
+            마이페이지
+          </NavItem>
+        ) : null}
       </NavElement>
       {!token && (
         <BeforeLogin>
