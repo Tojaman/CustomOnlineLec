@@ -1,6 +1,7 @@
 package com.example.CustomLecture.repository;
 
 import com.example.CustomLecture.entity.UserEntity;
+import org.apache.catalina.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
@@ -22,8 +23,7 @@ public interface UserRepository extends JpaRepository<UserEntity, Long> {
 
     Optional<UserEntity> findById(Long id);
 
-
     void deleteByUsername(String username);
 
-
+    UserEntity findByGoogleId(String googleId);
 }
