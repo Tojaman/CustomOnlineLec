@@ -62,6 +62,7 @@ public class LoginFilter extends UsernamePasswordAuthenticationFilter {
         /**
          * token에 담은 검증을 위한 AuthenticationManager로 전달
          * DB에서 user 정보를 가져와서 검증을 진행
+         * 여기서 로그인에 성공하면 바로 아래 successfulAuthentication 실행
          */
         return authenticationManager.authenticate(authToken);
     }
@@ -85,9 +86,9 @@ public class LoginFilter extends UsernamePasswordAuthenticationFilter {
         String role = auth.getAuthority();
 
 
-
+        // JWT 토큰 생성
         String token = jwtUtil.createJwt(username, role,60*60*1000*10L);
-        //header에 담음.
+        //header에 담아서 front에 전달
         response.addHeader("Authorization", "Bearer " + token);
     }
 

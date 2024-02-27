@@ -3,6 +3,7 @@ package com.example.CustomLecture.controller;
 import com.example.CustomLecture.dto.Request.VideoConvertRequestDTO;
 import com.example.CustomLecture.dto.Request.VideoInfoRequestDTO;
 import com.example.CustomLecture.dto.Request.VideoSaveRequestDTO;
+import com.example.CustomLecture.entity.UserEntity;
 import com.example.CustomLecture.service.VideoService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -132,7 +133,7 @@ public class VideoController {
     })
     public ResponseEntity<String> returnVideoInfo(@RequestBody VideoInfoRequestDTO requestDTO) {
         Long videoid = requestDTO.getVideoid();
-        //String voicename = requestDTO.getVoicename();
+
 
         try {
             // 메소드 내부에 예외 발생 가능한 부분을 try 블록 안에 위치시킵니다.

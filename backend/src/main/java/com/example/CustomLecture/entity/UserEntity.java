@@ -30,6 +30,9 @@ public class UserEntity {
     //유저에 대한 권한을 나타낼  role값
     private String role;
 
+    // google 소셜 로그인 구분
+    private String googleId;
+
     public UserEntity(Long id, String username, String password, String nickname, String role) {
         this.id = id;
         this.username = username;

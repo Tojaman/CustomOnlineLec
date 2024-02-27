@@ -1,8 +1,12 @@
 package com.example.CustomLecture.config;
 
+import com.example.CustomLecture.dto.CustomOAuth2User;
+import com.example.CustomLecture.dto.GoogleResponse;
 import com.example.CustomLecture.jwt.JWTFilter;
 import com.example.CustomLecture.jwt.JWTUtil;
 import com.example.CustomLecture.jwt.LoginFilter;
+import com.example.CustomLecture.oauth2.CustomSuccessHandler;
+import com.example.CustomLecture.service.CustomOAuth2UserService;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -27,13 +31,15 @@ public class SecurityConfig {
     private final AuthenticationConfiguration authenticationConfiguration;
     private final JWTUtil jwtUtil;
 
+    // oauth2 google 로그인
+    private final CustomOAuth2UserService customOAuth2UserService;
+    private final CustomSuccessHandler customSuccessHandler;
 
-
-
-
-    public SecurityConfig(AuthenticationConfiguration authenticationConfiguration, JWTUtil jwtUtil) {
+    public SecurityConfig(AuthenticationConfiguration authenticationConfiguration, JWTUtil jwtUtil, CustomOAuth2UserService customOAuth2UserService, CustomSuccessHandler customSuccessHandler) {
         this.authenticationConfiguration = authenticationConfiguration;
         this.jwtUtil = jwtUtil;
+        this.customOAuth2UserService = customOAuth2UserService;
+        this.customSuccessHandler = customSuccessHandler;
     }
 
     //AuthenticationManager Bean 등록
@@ -67,11 +73,13 @@ public class SecurityConfig {
                     configuration.setAllowedHeaders(Collections.singletonList("*"));
                     configuration.setMaxAge(3600L);
 
+//                    configuration.setExposedHeaders(Collections.singletonList("Set-Cookie"));
                     configuration.setExposedHeaders(Collections.singletonList("Authorization"));
 
                     return configuration;
                 }
             })));
+
 
         /**
          * csrf disable : 세션을 stateless 상태로 관리하기 때문에 csrf에 대한 공격을 방어하지 않아도 됨
@@ -89,12 +97,15 @@ public class SecurityConfig {
         //http basic 인증 방식 disable (JWT 방식 사용할꺼라 필요 없음)
         http
                 .httpBasic((auth) -> auth.disable());
-
-
+        //oauth2
+        http
+                .oauth2Login((oauth2) -> oauth2
+                        .userInfoEndpoint((userInfoEndpointConfig) -> userInfoEndpointConfig
+                                .userService(customOAuth2UserService))
+                        .successHandler(customSuccessHandler));
 
         // 경로별 인가 작업
         http
-
             .authorizeHttpRequests((auth) -> auth
                     // 아래 경로에 대해서 모든 권한 허용 -> 이걸 밑밑으로 옮기면 로그인 한 사용자만 접근할 수 있도록 변경
                     .requestMatchers("/login", "/", "/join", "/v3/**", "/swagger-ui/**").permitAll()
@@ -108,7 +119,7 @@ public class SecurityConfig {
         http
             .addFilterBefore(new JWTFilter(jwtUtil), LoginFilter.class);
 
-        //필터 추가 LoginFilter)는 인자를 받음 (AuthenticationManager() 메소드에 authenticationConfiguration 객체를 넣어야 함) 따라서 등록 필요
+        //필터 추가 LoginFilter는 인자를 받음 (AuthenticationManager() 메소드에 authenticationConfiguration 객체를 넣어야 함) 따라서 등록 필요
         http
             .addFilterAt(new LoginFilter(authenticationManager(authenticationConfiguration), jwtUtil), UsernamePasswordAuthenticationFilter.class);
 
