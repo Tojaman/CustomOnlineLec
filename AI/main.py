@@ -67,28 +67,52 @@ class ConvertVoice(Resource):
 
                 # 모델 목록
                 model_list = ["yoon", "jimin", "timcook", "karina"]
-                rvc_results = {}  # 각 모델의 결과를 저장할 딕셔너리
+                # model_list = ["yoon"]
+                results = {}  # 각 모델의 결과를 저장할 딕셔너리
+                rvc_result = ""
+                stt_result = ""
+
+                # STT 실행(비동기)
+                # subtitle = stt().delay(local_audio_path)
 
                 # RVC 변환(비동기)
                 for model in model_list:
-                    rvc_results[model] = process_uploaded_file.delay(temp_dir, local_video_path, local_audio_path, model)
+                    results[model] = process_uploaded_file.delay(temp_dir, local_video_path, local_audio_path, model)
 
-                while not all(result.ready() for result in rvc_results.values()):
+                # while not subtitle.ready() and not all(result.ready() for result in results.values()):
+                while not all(result.ready() for result in results.values()):
                     print("변환중...")
                     time.sleep(1)
+                
+                # subtitle = subtitle.get()
+                # if subtitle['success']:
+                #     subtitle_result = subtitle['data']
+                #     stt_result = "자막 추출 성공"
+                # else :
+                #     stt_result = "자막 추출 실패"
 
+                # 일단 하나라도 실패하면 False 반환
                 # 작업이 완료되면 결과를 저장
-                for model, result in rvc_results.items():
-                    rvc_results[model] = result.get()
+                for model, result in results.items():
+                    actual_result = result.get()
+                    # RVC 변환 성공
+                    if actual_result['success']:
+                        results[model] = actual_result['data']
+                        rvc_result = "음성 변환 완료"
+                    # RVC 변환 실패
+                    else:
+                        rvc_result = "음성 변환 실패"
 
                 # DB 업로드
                 connection = get_connection(DB)
-                video_id = video_dao.upload_convert_s3_path(connection, user_id, original_video_s3_path, rvc_results)
+                video_id = video_dao.upload_convert_s3_path(connection, user_id, original_video_s3_path, results)
                 connection.close()
 
                 # JSON 형식 자막, s3 경로 저장한 테이블 기본키 HTTP body에 넣어서 프론트에 return
                 response_data = {
                     'video_id': video_id,
+                    # 'stt_result': stt_result, # 자막 변환 성공 여부 반환
+                    'rvc_result': rvc_result # RVC 실패한 모델 변환
                 }
 
                 # HTTP 응답 생성
@@ -157,14 +181,3 @@ def extract_audio(temp_dir, file_path):
 
 if __name__ == '__main__':
     app.run('0.0.0.0', port=5000, debug=True)
-
-# ========================================== RVC 음성 변환(celery 비동기) ==========================================
-    # RVC_model = "Karina_V2"
-    # tmp1 = "jimin700"
-    # tmp2 = "윤석열"
-    # tmp3 = "timcook"
-    # process_uploaded_file.delay(convert_video_dir, local_video_path, local_audio_path, RVC_model, video_id).get()
-    # process_uploaded_file.delay(convert_video_dir, local_video_path, local_audio_path, tmp1, video_id)
-    # process_uploaded_file.delay(convert_video_dir, local_video_path, local_audio_path, tmp2, video_id)
-    # process_uploaded_file.delay(convert_video_dir, local_video_path, local_audio_path, tmp3, video_id)
-# ===============================================================================================================

@@ -8,11 +8,8 @@ FROM python:3.10
 # Set working directory
 WORKDIR /AI
 
-# Copy requirements.txt
-COPY requirements.txt .
-
 # Install dependencies
-COPY requirements.txt /backend/
+COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 RUN pip install python-dotenv
 
@@ -20,7 +17,7 @@ RUN pip install python-dotenv
 COPY . .
 
 # Expose Flask port
-EXPOSE 5000
+# EXPOSE 5000
 
 # Command to run the application
-CMD ["python", "main.py"]
+# CMD ["python", "main.py"]

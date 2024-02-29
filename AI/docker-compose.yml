@@ -1,67 +1,52 @@
-version: '3.7'
+version: '3.9'
 
 services:
-  # 순서상 database가 먼저 와야 함
-  mysql:
-    image: mysql:8
-    # 환경 설정 부분
-    env_file:
-      - .env
-    container_name: custom_db
-    ports:
-      - "3306:3306"
-    # 가상 네트워크 연결
-    networks:
-      - custom_net
-
   ai:
+    container_name: AI
     # 환경 설정 부분
     env_file:
       - ./.env
+    environment:
+      - CELERY_BROKER_URL=redis://redis:6379/0
+      - CELERY_RESULT_BACKEND=redis://redis:6379/0
     build:
-      context: .
+      context: ./
       dockerfile: Dockerfile
-    container_name: AI
     volumes:
-      - ./ai:/ai
+      - ai_volume:/AI
     command: sh -c "python main.py"
     restart: on-failure
     ports:
       - "5000:5000"
-    # 가상 네트워크 연결
-    links:
-      - mysql:mysql
-    networks:
-      - custom_net
+    expose:
+      - 5000
     depends_on:
       - celery
       - redis
-    expose:
-      - 5000
 
   celery:
     container_name: celery_service
     env_file:
       - ./.env
+    environment:
+      - CELERY_BROKER_URL=redis://redis:6379/0
+      - CELERY_RESULT_BACKEND=redis://redis:6379/0
     build:
       context: ./
       dockerfile: Dockerfile
-#    command: celery -A tasks worker --loglevel=info
     command: sh -c "celery -A tasks worker -l info"
-
-    # 가상 네트워크 연결
-    networks:
-      - custom_net
+    volumes:
+      - ai_volume:/AI
+    links:
+      - redis
     depends_on:
       - redis
 
 
   redis:
+    container_name: redis
     image: "redis:latest"
-    depends_on:
-      - mysql
+    hostname: redis
 
-networks:
-  custom_net:
-    driver: bridge
-
+volumes:
+  ai_volume:
