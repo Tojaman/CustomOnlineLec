@@ -25,31 +25,37 @@ celery = Celery('FlaskAiModelServing', broker='redis://127.0.0.1:6379/0', backen
 
 @celery.task
 def process_uploaded_file(convert_video_dir, local_video_path, local_audio_path, RVC_model):
-    result = []
+    
+    try:
+        result = []
 
-    # s3 연결 및 객체 생성
-    s3 = s3_connection()
+        # s3 연결 및 객체 생성
+        s3 = s3_connection()
 
-    # RVC 변환(return 변환 음성 저장 경로)
-    # convert_voice_path = execute_voice_conversion(RVC_model, local_audio_path)
-    convert_voice_path = local_audio_path
-
-
-    # 원본 영상 + 변환 음성
-    convert_video_path = merge_video_audio(convert_video_dir, local_video_path, convert_voice_path)
-
-    # 최종 변환 파일 이름 추출
-    convert_video_name_mp4 = os.path.basename(convert_video_path)
-    convert_video_name, convert_video_mp4 = os.path.splitext(convert_video_name_mp4)
-    convert_video_name = convert_video_name + "_" + RVC_model + convert_video_mp4
+        # RVC 변환(return 변환 음성 저장 경로)
+        # convert_voice_path = execute_voice_conversion(RVC_model, local_audio_path)
+        convert_voice_path = local_audio_path
 
 
-    # s3 업로드
-    convert_video_path_s3 = "convert_video/" + convert_video_name  # 저장할 S3 경로
-    if not s3_put_object(s3, S3_BUCKET, convert_video_path, convert_video_path_s3):
-        print("파일 업로드 실패")
+        # 원본 영상 + 변환 음성
+        convert_video_path = merge_video_audio(convert_video_dir, local_video_path, convert_voice_path)
 
-    return convert_video_path_s3
+        # 최종 변환 파일 이름 추출
+        convert_video_name_mp4 = os.path.basename(convert_video_path)
+        convert_video_name, convert_video_mp4 = os.path.splitext(convert_video_name_mp4)
+        convert_video_name = convert_video_name + "_" + RVC_model + convert_video_mp4
+
+
+        # s3 업로드
+        convert_video_path_s3 = "convert_video/" + convert_video_name  # 저장할 S3 경로
+        if not s3_put_object(s3, S3_BUCKET, convert_video_path, convert_video_path_s3):
+            print("파일 업로드 실패")
+
+        return {'success': True, 'data': convert_video_path_s3}
+
+    except Exception as e:
+        # 예외 발생 시 로그를 출력하고 예외를 다시 발생시키지 않음
+        return {'success': False}
 
 
 # 원본 영상 + 변환 음성
@@ -139,13 +145,19 @@ def execute_voice_conversion(model_name, local_file_dir):
 
 @celery.task
 def stt(local_audio_path):
-    model = whisper.load_model("medium")
-    sentence_result = model.transcribe(local_audio_path)
-    sentencelevel_info = []
+    
+    try:
+        model = whisper.load_model("medium")
+        sentence_result = model.transcribe(local_audio_path)
+        sentencelevel_info = []
 
-    # Whisper로 추출한 text에서 문장과 timestamp만 추출
-    for each in sentence_result['segments'][1:]:
-        # print (word['word'], "  ",word['start']," - ",word['end'])
-        sentencelevel_info.append({'text': each['text'], 'start': each['start'], 'end': each['end']})
+        # Whisper로 추출한 text에서 문장과 timestamp만 추출
+        for each in sentence_result['segments'][1:]:
+            # print (word['word'], "  ",word['start']," - ",word['end'])
+            sentencelevel_info.append({'text': each['text'], 'start': each['start'], 'end': each['end']})
 
-    return sentencelevel_info
+        return {'success': True, 'data': sentencelevel_info}
+
+    except Exception as e:
+        # 예외 발생 시 로그를 출력하고 예외를 다시 발생시키지 않음
+        return {'success': False}
