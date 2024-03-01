@@ -251,8 +251,13 @@ const MyPage = () => {
   const handleImageChange = (e) => {
     const file = e.target.files[0];
     if (file) {
+    const reader = new FileReader();
+      reader.onload = () => {
       uploadFileToS3(file);
-    }
+      setProfileImage(reader.result);
+    };
+    reader.readAsDataURL(file);
+  }
   };
 
   const uploadFileToS3 = (file) => {
@@ -362,12 +367,11 @@ const MyPage = () => {
           .filter((video) => video.title !== null && video.thumbnail !== null && video.nickname !== null);
 
         const getThumbnails = videoData.map((video) => {
-          return s3
-            .getSignedUrlPromise("getObject", {
-              Bucket: process.env.REACT_APP_S3_BUCKET,
-              Key: video.thumbnail,
-              Expires: 300,
-            })
+          return s3.getSignedUrlPromise("getObject", {
+            Bucket: process.env.REACT_APP_S3_BUCKET,
+            Key: video.thumbnail,
+            Expires: 300,
+          });
         });
 
         const urls = await Promise.all(getThumbnails);
@@ -382,7 +386,6 @@ const MyPage = () => {
         const userNickname = sessionStorage.getItem("userNickname");
         const userVideos = updatedVideoData.filter((video) => video.nickname === userNickname);
         setVideos(userVideos);
-
       } catch (error) {
         if (error.response) {
           console.error("영상 목록 요청 실패 : ", error.response.status);
