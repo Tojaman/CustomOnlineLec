@@ -145,6 +145,7 @@ const VideoList = () => {
             subject: video.subject,
           }))
           .filter((video) => video.title !== null && video.thumbnail !== null && video.nickname !== null);
+        console.log("영상 목록 요청 성공");
 
         const getThumbnails = videoData.map((video) => {
           return s3.getSignedUrlPromise("getObject", {
@@ -164,15 +165,15 @@ const VideoList = () => {
               .reverse();
             setVideos(updatedVideoData);
             setFilteredVideos(updatedVideoData);
+            console.log("썸네일 출력 성공");
           })
-          .catch((error) => console.error("Error:", error));
+          .catch((error) => console.error("썸네일 출력 실패 : ", error));
       })
-      .catch((error) => console.error("Error:", error));
+      .catch((error) => console.error("영상 목록 요청 실패 : ", error));
   }, [token]);
 
   const handleVideoClick = (videoId) => {
     sessionStorage.setItem("selectedVideoId", videoId);
-    console.log("selected Video:", sessionStorage.getItem("selectedVideoId"));
   };
 
   const handleSearchButtonClick = () => {

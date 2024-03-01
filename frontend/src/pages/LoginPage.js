@@ -4,7 +4,7 @@ import styled from "styled-components";
 import { GoArrowRight } from "react-icons/go";
 import axios from "axios";
 
-import {jwtDecode} from "jwt-decode";
+import { jwtDecode } from "jwt-decode";
 
 import Swal from "sweetalert2";
 import logo from "../assets/img/UUJJ.png";
@@ -136,30 +136,23 @@ const LoginPage = () => {
         username,
         password,
       });
-      
-      // JWT 토큰을 'Bearer ' 부분을 제외한 부분만 추출하여 sessionStorage에 저장
-      const token = response.headers['authorization'].split(' ')[1];
+
+      const token = response.headers["authorization"].split(" ")[1];
       sessionStorage.setItem("token", token);
 
-      // JWT 토큰을 디코딩하여 사용자 이름 추출
       const decodedToken = jwtDecode(token);
       const { username: decodedUsername, role } = decodedToken;
 
-      // 추출된 정보를 sessionStorage에 저장
       sessionStorage.setItem("username", decodedUsername);
       sessionStorage.setItem("role", role);
-  
-      // 세션에 저장된 정보를 콘솔에 출력
+
+      console.log("로그인 요청 성공");
       console.log("Username:", decodedUsername);
       console.log("Role:", role);
-  
-  
-      // 세션에 저장된 정보를 콘솔에 출력
-      console.log("Token:", sessionStorage.getItem("token"));
 
       showToast();
     } catch (error) {
-      console.error("로그인 요청 실패:", error.response.status);
+      console.error("로그인 요청 실패 : ", error.response.status);
       if (error.response.status === 401) {
         showToastError("입력값이 올바르지 않습니다.");
         showToastError("존재하지 않는 아이디 또는 비밀번호입니다.");
@@ -180,7 +173,7 @@ const LoginPage = () => {
       navigate("/");
     });
   };
-  
+
   const showToastError = (message) => {
     Swal.fire({
       icon: "error",
@@ -221,6 +214,6 @@ const LoginPage = () => {
       <GradientButton onClick={handleLogin}>로그인</GradientButton>
     </LoginContainer>
   );
-}
+};
 
 export default LoginPage;

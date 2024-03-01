@@ -145,7 +145,7 @@ const UploadList = () => {
             subject: video.subject,
           }))
           .filter((video) => video.title !== null && video.thumbnail !== null && video.nickname !== null);
-
+        console.log("영상 목록 요청 성공");
         const categoryCount = {
           C: 0,
           Python: 0,
@@ -175,21 +175,23 @@ const UploadList = () => {
 
         Promise.all(getThumbnails)
           .then((urls) => {
-            const updatedVideoData = videoData.map((video, index) => ({
-              ...video,
-              thumbnail: urls[index],
-            }));
+            const updatedVideoData = videoData
+              .map((video, index) => ({
+                ...video,
+                thumbnail: urls[index],
+              }))
+              .reverse();;
             const userVideos = updatedVideoData.filter((video) => video.nickname === userNickname);
             setVideos(userVideos);
+            console.log("썸네일 출력 성공");
           })
-          .catch((error) => console.error("Error:", error));
+          .catch((error) => console.error("썸네일 출력 실패 : ", error));
       })
-      .catch((error) => console.error("Error:", error));
+      .catch((error) => console.error("영상 목록 요청 실패:", error));
   }, [token]);
 
   const handleVideoClick = (videoId) => {
     sessionStorage.setItem("selectedVideoId", videoId);
-    console.log("selected Video:", sessionStorage.getItem("selectedVideoId"));
   };
 
   return (
