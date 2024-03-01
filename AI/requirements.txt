@@ -10,4 +10,4 @@ mysql
 pymysql
 moviepy
 flask_restx
-
+ffmpeg-python
