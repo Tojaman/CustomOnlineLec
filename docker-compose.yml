@@ -1,19 +1,19 @@
 version: '3.9'
 
 services:
-  ai:
+  flask:
     container_name: flask
     # 환경 설정 부분
     env_file:
-      - ./.env
+      - ./AI/.env
     environment:
       - CELERY_BROKER_URL=redis://redis:6379/0
       - CELERY_RESULT_BACKEND=redis://redis:6379/0
     build:
-      context: ./
+      context: ./AI
       dockerfile: dockerfile
     volumes:
-      - .:/AI
+      - ./AI:/AI
     command: sh -c "python main.py && gunicorn", "main:app", "-b", "0.0.0.0:5000"
     restart: on-failure
     ports:
@@ -27,16 +27,16 @@ services:
   celery:
     container_name: celery_service
     env_file:
-      - ./.env
+      - ./AI/.env
     environment:
       - CELERY_BROKER_URL=redis://redis:6379/0
       - CELERY_RESULT_BACKEND=redis://redis:6379/0
     build:
-      context: ./
+      context: AI
       dockerfile: dockerfile
     command: sh -c "celery -A tasks worker -l info"
     volumes:
-      - .:/AI
+      - ./AI:/AI
     depends_on:
       - redis
 
@@ -44,3 +44,31 @@ services:
     container_name: redis
     image: "redis:latest"
     hostname: redis
+  
+  springboot:
+    container_name: springboot
+    # Spring Boot 서버 설정
+    build:
+      context: ./backend
+      dockerfile: dockerfile
+    volumes:
+      - ./backend:/backend
+    ports:
+      - "8080:8080"
+
+  react:
+    container_name: react
+    env_file:
+      - ./frontend/.env
+    # Spring Boot 서버 설정
+    build:
+      context: ./frontend
+      dockerfile: dockerfile
+    volumes:
+      - ./frontend:/frontend
+    restart: always
+    ports:
+      - "3000:3000"
+    depends_on:
+      - springboot
+      - flask

@@ -10,6 +10,7 @@ WORKDIR /AI
 
 # Install dependencies
 COPY requirements.txt .
+RUN pip install --upgrade pip
 RUN pip install --no-cache-dir -r requirements.txt
 RUN pip install python-dotenv
 
@@ -21,3 +22,5 @@ COPY . .
 
 # Command to run the application
 # CMD ["python", "main.py"]
+# Command to run the application
+# CMD ["gunicorn", "main:app", "-b", "0.0.0.0:5000"]
