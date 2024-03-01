@@ -49,7 +49,11 @@ const ModifySubtitle = styled.div`
 
 const ButtonContainer = styled.div`
   display: flex;
-  justify-content: end;
+  justify-content: space-between;
+`;
+
+const SaveButton = styled.button`
+  margin-top: 5px;
 `;
 
 const NextButton = styled(Link)`
@@ -152,9 +156,9 @@ const Modify = () => {
               {editStates[index] && <button onClick={() => handleSaveClick(index)}>저장</button>}
             </ModifySubtitle>
           ))}
-          <button onClick={handleSaveAllClick}>저장</button>
         </SubtitleContainer>
         <ButtonContainer>
+          <SaveButton onClick={handleSaveAllClick}>저장</SaveButton>
           <NextButton to="/inform">
             다음 <GoArrowRight />
           </NextButton>

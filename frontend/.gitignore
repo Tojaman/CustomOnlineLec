@@ -1,4 +1,8 @@
 .cache
+/dist/camera.html
+/dist/camera.283d5d54.js
+/dist/progressBar.dd768398.js
+/dist/*.svg
 
 # See https://help.github.com/articles/ignoring-files/ for more about ignoring files.
 

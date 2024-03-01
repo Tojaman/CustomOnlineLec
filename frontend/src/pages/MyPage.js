@@ -232,13 +232,14 @@ const MyPage = () => {
         }
       )
       .then((response) => {
-        console.log("서버 응답:", response.data);
+        console.log("회원 정보 수정 요청 성공");
         setIsEditing(false);
       })
       .catch((error) => {
-        console.error("서버 오류:", error);
+        console.error("회원 정보 수정 요청 실패 : ", error);
       });
     sessionStorage.setItem("userNickname", editedNickname);
+    setNickname(editedNickname);
   };
 
   const handleCancelClick = () => {
@@ -266,8 +267,9 @@ const MyPage = () => {
 
     s3.upload(params, (err, data) => {
       if (err) {
-        console.error("Error uploading file to S3:", err);
+        console.log("S3에 프로필 사진 업로드 살패 : ", err);
       } else {
+        console.log("S3에 프로필 사진 업로드 성공");
         sendS3UrlToServer(imageS3Path);
       }
     });
@@ -285,10 +287,10 @@ const MyPage = () => {
         }
       )
       .then((response) => {
-        console.log("S3 URL 전송 성공:", response.data);
+        console.log("프로필 사진 링크 업로드 요청 성공");
       })
       .catch((error) => {
-        console.error("S3 URL 전송 실패:", error);
+        console.error("프로필 사진 링크 업로드 요청 실패 : ", error);
       });
   };
 
@@ -308,6 +310,7 @@ const MyPage = () => {
             Authorization: `Bearer ${token}`,
           },
         });
+        console.log("회원 정보 확인 요청 성공");
 
         setNickname(response.data.nickname);
         setEditedNickname(response.data.nickname);
@@ -323,15 +326,20 @@ const MyPage = () => {
             },
             (err, url) => {
               if (err) {
-                console.error("Error getting profile image from S3:", err);
+                console.error("프로필 사진 출력 실패 : ", err);
               } else {
+                console.log("프로필 사진 출력 성공");
                 setProfileImage(url);
               }
             }
           );
         }
       } catch (error) {
-        console.error("Error:", error);
+        if (error.response) {
+          console.error("회원 정보 확인 요청 실패 : ", error.response.status);
+        } else {
+          console.error("회원 정보 확인 요청 실패 : ", error.message);
+        }
       }
     }
 
@@ -342,6 +350,7 @@ const MyPage = () => {
             Authorization: `Bearer ${token}`,
           },
         });
+        console.log("영상 목록 요청 성공");
 
         const videoData = response.data
           .map((video) => ({
@@ -353,11 +362,12 @@ const MyPage = () => {
           .filter((video) => video.title !== null && video.thumbnail !== null && video.nickname !== null);
 
         const getThumbnails = videoData.map((video) => {
-          return s3.getSignedUrlPromise("getObject", {
-            Bucket: process.env.REACT_APP_S3_BUCKET,
-            Key: video.thumbnail,
-            Expires: 300,
-          });
+          return s3
+            .getSignedUrlPromise("getObject", {
+              Bucket: process.env.REACT_APP_S3_BUCKET,
+              Key: video.thumbnail,
+              Expires: 300,
+            })
         });
 
         const urls = await Promise.all(getThumbnails);
@@ -368,11 +378,17 @@ const MyPage = () => {
             thumbnail: urls[index],
           }))
           .reverse();
+        console.log("썸네일 출력 성공");
         const userNickname = sessionStorage.getItem("userNickname");
         const userVideos = updatedVideoData.filter((video) => video.nickname === userNickname);
         setVideos(userVideos);
+
       } catch (error) {
-        console.error("Error:", error);
+        if (error.response) {
+          console.error("영상 목록 요청 실패 : ", error.response.status);
+        } else {
+          console.error("영상 목록 요청 실패 : ", error.message);
+        }
       }
     }
 
@@ -396,13 +412,12 @@ const MyPage = () => {
             },
           })
           .then((response) => {
-            console.log("회원탈퇴 요청 성공:", response.data);
-            sessionStorage.removeItem("token");
-            sessionStorage.removeItem("username");
+            console.log("회원탈퇴 요청 성공");
+            sessionStorage.clear();
             navigate("/");
           })
           .catch((error) => {
-            console.error("회원탈퇴 요청 실패:", error);
+            console.error("회원탈퇴 요청 실패 : ", error);
           });
       }
     });

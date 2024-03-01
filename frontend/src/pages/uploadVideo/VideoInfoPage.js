@@ -155,9 +155,9 @@ const VideoInfo = () => {
 
     try {
       const data = await s3.upload(lectureNoteParams).promise();
-      console.log("Lecture note upload successful:", data.Location);
+      console.log("S3에 강의자료 업로드 성공");
     } catch (error) {
-      console.error("Error uploading lecture note:", error);
+      console.error("S3에 강의자료 업로드 실패 : ", error);
     }
 
     const thumbnailParams = {
@@ -168,9 +168,9 @@ const VideoInfo = () => {
 
     try {
       const data = await s3.upload(thumbnailParams).promise();
-      console.log("Thumbnail upload successful:", data.Location);
+      console.log("S3에 썸네일 업로드 성공");
     } catch (error) {
-      console.error("Error uploading thumbnail:", error);
+      console.error("S3에 썸네일 업로드 실패 : ", error);
     }
 
     try {
@@ -197,12 +197,13 @@ const VideoInfo = () => {
         }
       );
 
-      console.log("요청 성공");
+      console.log("영상 정보 업로드 요청 성공");
+      sessionStorage.removeItem("UploadVideoID");
     } catch (error) {
-      console.error("요청 실패", error.response.status);
+      console.error("영상 정보 업로드 요청 실패 : ", error.response.status);
     }
 
-    console.log("자막:", subtitle);
+    console.log("자막 : ", subtitle);
   };
 
   return (

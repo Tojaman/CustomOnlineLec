@@ -163,7 +163,7 @@ function detectPose() {
     let poses = [];
 
     const input = tf.browser.fromPixels(camera.camCanvas);
-    const selectedAvatarSVG = await loadSelectedAvatar(); // 아바타
+    const selectedAvatarSVG = await loadSelectedAvatar();
     faceDetection = await facemesh.estimateFaces(input, false, false, { scoreThreshold: 0.1 });
 
     poseDetection = await posenet.estimatePoses(camFlipCanvas, {
@@ -234,32 +234,29 @@ async function parseSVG(target, blinking) {
 }
 
 async function loadSelectedAvatar() {
-  const selectedAvatarId = sessionStorage.getItem('selectedAvatar');
+  const selectedAvatarId = sessionStorage.getItem("selectedAvatar");
   if (selectedAvatarId) {
     let selectedAvatarSVG;
     switch (selectedAvatarId) {
-      case 'avatar1':
+      case "avatar1":
         selectedAvatarSVG = test1SVG.default;
         break;
-      case 'avatar2':
+      case "avatar2":
         selectedAvatarSVG = test2SVG.default;
         break;
-      case 'avatar3':
+      case "avatar3":
         selectedAvatarSVG = test3SVG.default;
         break;
-      case 'avatar4':
+      case "avatar4":
         selectedAvatarSVG = test4SVG.default;
         break;
-     case 'avatar5':
+      case "avatar5":
         selectedAvatarSVG = test5SVG.default;
-        break; 
-
-      // 다른 아바타에 대한 처리 추가
+        break;
       default:
-        console.log("Unknown selected avatar ID:", selectedAvatarId);
         return null;
     }
-    return selectedAvatarSVG; // 선택된 아바타의 SVG 경로 반환
+    return selectedAvatarSVG;
   } else {
     console.log("No selected avatar ID found in session storage.");
     return null;
@@ -295,34 +292,28 @@ function displayPreviousSessionInfo() {
 
   let selectedS3Path;
 
-  switch(selectedVoice) {
+  switch (selectedVoice) {
     case "karina":
-      console.log("karina:", selectedVideoInfo.karina);
       selectedS3Path = selectedVideoInfo.karina;
       break;
     case "Jimin700":
-      console.log("Jimin700:", selectedVideoInfo.Jimin700);
       selectedS3Path = selectedVideoInfo.Jimin700;
       break;
     case "yoon":
-      console.log("yoon:", selectedVideoInfo.yoon);
       selectedS3Path = selectedVideoInfo.yoon;
       break;
     case "Timcook":
-      console.log("Timcook:", selectedVideoInfo.Timcook);
       selectedS3Path = selectedVideoInfo.Timcook;
       break;
     default:
-      console.log("Invalid selectedVoice:", selectedVoice);
   }
-  
+
   if (selectedVideoInfo) {
     document.getElementById("title").textContent = selectedVideoInfo.title;
     document.getElementById("instructor").textContent = selectedVideoInfo.nickname;
     document.getElementById("description").textContent = selectedVideoInfo.content;
     document.getElementById("date").textContent = selectedVideoInfo.date;
 
-    // S3에서 동영상 정보 가져오기
     const s3 = new AWS.S3({
       accessKeyId: process.env.REACT_APP_AWS_ACCESS_KEY_ID,
       secretAccessKey: process.env.REACT_APP_AWS_SECRET_ACCESS_KEY,
@@ -331,7 +322,7 @@ function displayPreviousSessionInfo() {
 
     const params = {
       Bucket: process.env.REACT_APP_S3_BUCKET,
-      Key: selectedS3Path
+      Key: selectedS3Path,
     };
 
     s3.getObject(params, (err, data) => {
@@ -342,30 +333,29 @@ function displayPreviousSessionInfo() {
 
         const videoBlob = new Blob([data.Body], { type: data.ContentType });
         const videoUrl = URL.createObjectURL(videoBlob);
-        
+
         const videoElement = document.getElementById("originVideo");
         videoElement.src = videoUrl;
       }
     });
 
-    // 프로필 이미지 확인
     const profileS3Path = selectedVideoInfo.profileS3Path;
 
-    if (profileS3Path!== null) {
+    if (profileS3Path !== null) {
       const profileImageParams = {
         Bucket: process.env.REACT_APP_S3_BUCKET,
-        Key: profileS3Path
+        Key: profileS3Path,
       };
-    
+
       s3.getObject(profileImageParams, (profileErr, profileData) => {
         if (profileErr) {
           console.error("프로필 이미지 가져오기 오류:", profileErr);
         } else {
           console.log("프로필 이미지 객체 가져옴:", profileData);
-    
+
           const profileBlob = new Blob([profileData.Body], { type: profileData.ContentType });
           const profileImageUrl = URL.createObjectURL(profileBlob);
-          
+
           const profileElement = document.getElementById("profile");
           profileElement.src = profileImageUrl;
         }
@@ -373,9 +363,10 @@ function displayPreviousSessionInfo() {
     }
   }
 }
+
 export async function run() {
-  
   displayPreviousSessionInfo();
+
   camera = new Context();
 
   setting();
@@ -395,7 +386,7 @@ run();
 
 document.addEventListener("DOMContentLoaded", function () {
   var downloadButton = document.getElementById("downloadButton");
-  downloadButton.addEventListener("click", downloadPDFFromS3); // downloadPDF 대신 downloadPDFFromS3를 호출
+  downloadButton.addEventListener("click", downloadPDFFromS3);
 
   function downloadPDFFromS3() {
     const selectedVideoInfoString = sessionStorage.getItem("selectedVideoInfo");
@@ -414,7 +405,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
     const params2 = {
       Bucket: process.env.REACT_APP_S3_BUCKET,
-      Key: selectedVideoInfo.lecturenote // 강의 자료의 S3 키를 세션에서 가져옴
+      Key: selectedVideoInfo.lecturenote,
     };
 
     s3.getObject(params2, (err, data) => {
@@ -425,58 +416,50 @@ document.addEventListener("DOMContentLoaded", function () {
 
         const pdfBlob = new Blob([data.Body], { type: data.ContentType });
         const pdfUrl = URL.createObjectURL(pdfBlob);
-        
+
         const link = document.createElement("a");
         link.href = pdfUrl;
-         // 다운로드될 파일 이름 설정
-         const fileName = selectedVideoInfo.lecturenote.split("/").pop(); // S3 키에서 파일 이름 추출
-         link.download = fileName;
+        const fileName = selectedVideoInfo.lecturenote.split("/").pop();
+        link.download = fileName;
         link.click();
       }
     });
   }
 });
 
-
 document.getElementById("goBackButton").addEventListener("click", function () {
   window.location.href = "/videoList";
 });
 
-// 아바타 선택 창 토글 함수
 function toggleAvatarSelection() {
   var avatarSelection = document.getElementById("avatarSelection");
   avatarSelection.hidden = !avatarSelection.hidden;
 }
 
-// 아바타 선택 이벤트 핸들러
 function handleAvatarSelection(avatarId) {
-  // 선택한 아바타의 ID를 세션 스토리지에 저장
-  sessionStorage.setItem('selectedAvatar', avatarId);
-   // 세션 스토리지에 저장된 내용을 콘솔에 출력
-   console.log("선택된 아바타:", sessionStorage.getItem('selectedAvatar'));
+  sessionStorage.setItem("selectedAvatar", avatarId);
 }
 
-// 버튼 클릭 이벤트 핸들러
-document.getElementById("toggleAvatarButton").addEventListener("click", function() {
+document.getElementById("toggleAvatarButton").addEventListener("click", function () {
   toggleAvatarSelection();
 });
 
-// 각 아바타 버튼에 클릭 이벤트 핸들러 추가
-document.getElementById("avatar1").addEventListener("click", function() {
-  handleAvatarSelection("avatar1"); // 아바타 1을 선택한 경우
+document.getElementById("avatar1").addEventListener("click", function () {
+  handleAvatarSelection("avatar1");
 });
 
-document.getElementById("avatar2").addEventListener("click", function() {
-  handleAvatarSelection("avatar2"); 
-});
-document.getElementById("avatar3").addEventListener("click", function() {
-  handleAvatarSelection("avatar3"); 
-});
-document.getElementById("avatar4").addEventListener("click", function() {
-  handleAvatarSelection("avatar4"); 
-});
-document.getElementById("avatar5").addEventListener("click", function() {
-  handleAvatarSelection("avatar5"); 
+document.getElementById("avatar2").addEventListener("click", function () {
+  handleAvatarSelection("avatar2");
 });
 
+document.getElementById("avatar3").addEventListener("click", function () {
+  handleAvatarSelection("avatar3");
+});
 
+document.getElementById("avatar4").addEventListener("click", function () {
+  handleAvatarSelection("avatar4");
+});
+
+document.getElementById("avatar5").addEventListener("click", function () {
+  handleAvatarSelection("avatar5");
+});

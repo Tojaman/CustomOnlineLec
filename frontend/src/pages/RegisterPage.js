@@ -128,13 +128,12 @@ export default function RegisterPage() {
       console.log("회원가입 요청 성공");
       showToast();
     } catch (error) {
-      console.error("회원가입 요청 실패", error.response.status); // 서버에서 전달한 에러 메시지 출력
+      console.error("회원가입 요청 실패", error.response.status);
       if (error.response.status === 500) {
         showToastError("입력값이 올바르지 않습니다.");
       } else if (error.response.status === 409) {
         showToastError("이미 존재하는 사용자 이름 또는 닉네임입니다.");
       } else {
-        // 기타 예외 처리
         showToastError("회원가입 중 오류가 발생했습니다.");
       }
     }

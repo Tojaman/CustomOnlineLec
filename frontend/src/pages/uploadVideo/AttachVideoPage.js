@@ -143,9 +143,9 @@ const Attach = () => {
 
     try {
       const data = await s3.upload(VideoNoteParams).promise();
-      console.log("Lecture note upload successful:", data.Location);
+      console.log("S3에 영상 업로드 성공");
     } catch (error) {
-      console.error("Error uploading lecture note:", error);
+      console.error("S3에 영상 업로드 실패 : ", error);
     }
 
     const token = sessionStorage.getItem("token");
@@ -173,14 +173,13 @@ const Attach = () => {
           },
         }
       );
-      console.log("API 응답:", response.data.video_id);
       sessionStorage.setItem("UploadVideoID", response.data.video_id);
-      console.log("요청 성공");
+      console.log("영상 링크 업로드 요청 성공");
     } catch (error) {
       if (error.response) {
-        console.error("요청 실패", error.response.status);
+        console.error("영상 링크 업로드 요청 실패 : ", error.response.status);
       } else {
-        console.error("요청 실패", error.message);
+        console.error("영상 링크 업로드 요청 실패 : ", error.message);
       }
     }
   };
