@@ -24,16 +24,24 @@ celery = Celery('FlaskAiModelServing', broker='redis://127.0.0.1:6379/0', backen
 
 
 @celery.task
-def process_uploaded_file(convert_video_dir, local_video_path, local_audio_path, RVC_model):
+def process_uploaded_file(convert_video_dir, local_video_path, local_audio_path, RVC_model, gender):
     
     try:
         result = []
 
         # s3 연결 및 객체 생성
         s3 = s3_connection()
+        
+        pitch = 0
+        if gender == "man" and (RVC_model == "karina" or RVC_model == "iu"):
+            pitch = 12
+        elif gender == "woman" and (RVC_model == "yoon" or RVC_model == "timcook"):
+            pitch = -12
+        else:
+            pitch = 0
 
         # RVC 변환(return 변환 음성 저장 경로)
-        # convert_voice_path = execute_voice_conversion(RVC_model, local_audio_path)
+        # convert_voice_path = execute_voice_conversion(RVC_model, local_audio_path, pitch)
         convert_voice_path = local_audio_path
 
 
@@ -109,14 +117,14 @@ def s3_put_object(s3, bucket, local_filepath, s3_filepath):
 
 
 @celery.task
-def execute_voice_conversion(model_name, local_file_dir):
+def execute_voice_conversion(model_name, local_file_dir, pitch):
     # 설정값을 사용하여 명령어 생성
     command = [
         "python3",
         "RVC_custom/src/main.py",
         "-i", local_file_dir,
         "-dir", model_name,
-        "-p", "0",
+        "-p", pitch,
         "-ir", "0.75",
         "-fr", "3",
         "-rms", "0.25",

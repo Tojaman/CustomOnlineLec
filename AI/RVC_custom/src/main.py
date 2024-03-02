@@ -161,7 +161,7 @@ def song_cover_pipeline(song_input, voice_model, pitch_change,
         # original 음악 파일 경로를 convert_to_stereo() 함수로
         orig_song_path = convert_to_stereo(song_input)
 
-        pitch_change = pitch_change * 12 + pitch_change_all
+        pitch_change = pitch_change + pitch_change_all
         # AI 보컬 파일 경로
         ai_vocals_path = os.path.join(song_dir, f'{os.path.splitext(os.path.basename(orig_song_path))[0]}_{voice_model}_p{pitch_change}_i{index_rate}_fr{filter_radius}_rms{rms_mix_rate}_pro{protect}_{f0_method}{"" if f0_method != "mangio-crepe" else f"_{crepe_hop_length}"}.wav')
 

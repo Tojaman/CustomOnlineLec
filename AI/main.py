@@ -48,6 +48,8 @@ class ConvertVoice(Resource):
         try:
             user_id = request.json['userId']
             original_video_s3_path = request.json['url']
+            # gender = request.json['gender']
+            gender = "woman"
             
             dir_path = "./files/"
 
@@ -71,18 +73,18 @@ class ConvertVoice(Resource):
             print("추출 음성 경로", local_audio_path)
 
             # 모델 목록
-            model_list = ["yoon", "jimin", "timcook", "karina"]
+            model_list = ["yoon", "iu", "timcook", "karina"]
             # model_list = ["yoon"]
             results = {}  # 각 모델의 결과를 저장할 딕셔너리
-            rvc_result = ""
-            stt_result = ""
+            rvc_result = 0
+            stt_result = 0
 
             # STT 실행(비동기)
             # subtitle = stt().delay(local_audio_path)
 
             # RVC 변환(비동기)
             for model in model_list:
-                results[model] = process_uploaded_file.delay(dir_path, local_video_path, local_audio_path, model)
+                results[model] = process_uploaded_file.delay(dir_path, local_video_path, local_audio_path, model, gender)
 
             # while not subtitle.ready() and not all(result.ready() for result in results.values()):
             while not all(result.ready() for result in results.values()):
@@ -92,9 +94,9 @@ class ConvertVoice(Resource):
             # subtitle = subtitle.get()
             # if subtitle['success']:
             #     subtitle_result = subtitle['data']
-            #     stt_result = "자막 추출 성공"
+            #     stt_result = 1
             # else :
-            #     stt_result = "자막 추출 실패"
+            #     stt_result = -1
 
             # 일단 하나라도 실패하면 False 반환
             # 작업이 완료되면 결과를 저장
@@ -103,10 +105,10 @@ class ConvertVoice(Resource):
                 # RVC 변환 성공
                 if actual_result['success']:
                     results[model] = actual_result['data']
-                    rvc_result = "음성 변환 완료"
+                    rvc_result = 1
                 # RVC 변환 실패
                 else:
-                    rvc_result = "음성 변환 실패"
+                    rvc_result = -1
 
             # DB 업로드
             connection = get_connection(DB)
@@ -119,7 +121,7 @@ class ConvertVoice(Resource):
             response_data = {
                 'video_id': video_id,
                 # 'stt_result': stt_result, # 자막 변환 성공 여부 반환
-                'rvc_result': rvc_result # RVC 실패한 모델 변환
+                'rvc_result': rvc_result # RVC 음성 변환 성공 여부(1 = 성공, -1 = 실패)
             }
 
             # HTTP 응답 생성
