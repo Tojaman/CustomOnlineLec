@@ -65,7 +65,8 @@ services:
       context: ./frontend
       dockerfile: dockerfile
     volumes:
-      - ./frontend:/frontend
+      - ./frontend/src:/frontend/src
+      - ./node_modules
     restart: always
     ports:
       - "3000:3000"
