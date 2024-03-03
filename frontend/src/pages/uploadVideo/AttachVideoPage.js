@@ -6,9 +6,9 @@ import Sidebar from "../../components/sidebar/Sidebar";
 import styled from "styled-components";
 import Navbar from "../../components/header/Navbar";
 import { GoArrowRight } from "react-icons/go";
-
 import { useDispatch } from "react-redux";
 import { videoData } from "../../redux/videoData";
+import { useToasts } from "react-toast-notifications";
 
 const Container = styled.div`
   display: flex;
@@ -83,6 +83,14 @@ const NextButton = styled(Link)`
   margin-top: 5px;
 `;
 
+const DisabledNextButton = styled(Link)`
+  text-decoration: none;
+  font-family: "Inter";
+  font-size: 18px;
+  color: black;
+  margin-top: 5px;
+`;
+
 const Attach = () => {
   const dispatch = useDispatch();
   const [file, setFile] = useState(null);
@@ -102,6 +110,7 @@ const Attach = () => {
   const [infoText, setInfoText] = useState("");
   const [videoWidth, setVideoWidth] = useState(0);
   const [videoHeight, setVideoHeight] = useState(0);
+  const { addToast } = useToasts();
 
   const updateVideo = async (event) => {
     URL.revokeObjectURL(videoRef.current.src);
@@ -128,9 +137,22 @@ const Attach = () => {
   const handleGenderChange = (event) => {
     genderRef.current = event.target.value;
     console.log("성별 선택 성공");
+    addToast("성별이 성공적으로 선택되었습니다.", { appearance: "success", autoDismiss: true, autoDismissTimeout: 5000 });
   };
 
   const handleSubmit = async () => {
+    if (!file) {
+      console.error("영상 파일 로드 실패");
+      addToast("영상 파일을 첨부해주세요.", { appearance: "warning", autoDismiss: true, autoDismissTimeout: 5000 });
+      return;
+    }
+
+    if (!genderRef.current) {
+      console.error("성별 선택 실패");
+      addToast("성별을 선택해주세요.", { appearance: "warning", autoDismiss: true, autoDismissTimeout: 5000 });
+      return;
+    }
+
     const gender = genderRef.current;
 
     const VideoFileName = file.name;
@@ -154,6 +176,7 @@ const Attach = () => {
       console.log("S3에 영상 업로드 성공");
     } catch (error) {
       console.error("S3에 영상 업로드 실패 : ", error);
+      addToast("영상 업로드를 실패했습니다.", { appearance: "error", autoDismiss: true, autoDismissTimeout: 5000 });
     }
 
     const token = sessionStorage.getItem("token");
@@ -184,11 +207,14 @@ const Attach = () => {
       );
       sessionStorage.setItem("UploadVideoID", response.data.video_id);
       console.log("영상 링크 업로드 요청 성공");
+      addToast("영상이 성공적으로 업로드되었습니다.", { appearance: "success", autoDismiss: true, autoDismissTimeout: 5000 });
     } catch (error) {
       if (error.response) {
         console.error("영상 링크 업로드 요청 실패 : ", error.response.status);
+        addToast("영상 업로드를 실패했습니다.", { appearance: "error", autoDismiss: true, autoDismissTimeout: 5000 });
       } else {
         console.error("영상 링크 업로드 요청 실패 : ", error.message);
+        addToast("영상 업로드를 실패했습니다.", { appearance: "error", autoDismiss: true, autoDismissTimeout: 5000 });
       }
     }
   };
@@ -331,19 +357,25 @@ const Attach = () => {
           <input type="number" id="heightInput" ref={heightInputRef} defaultValue="100" />
           <label>
             남성
-            <input type="radio" value="man" onChange={handleGenderChange} />
+            <input type="radio" name="gender" value="man" onChange={handleGenderChange} />
           </label>
           <label>
             여성
-            <input type="radio" value="woman" onChange={handleGenderChange} />
+            <input type="radio" name="gender" value="woman" onChange={handleGenderChange} />
           </label>
         </InputPointContainer>
 
         <InfoContainer>{infoText}</InfoContainer>
         <ButtonContainer>
-          <NextButton to="/modify" onClick={handleSubmit}>
-            다음 <GoArrowRight />
-          </NextButton>
+          {file && genderRef.current ? (
+            <NextButton to="/modify" onClick={handleSubmit}>
+              다음 <GoArrowRight />
+            </NextButton>
+          ) : (
+            <DisabledNextButton onClick={handleSubmit}>
+              다음 <GoArrowRight />
+            </DisabledNextButton>
+          )}
         </ButtonContainer>
       </AttachContainer>
     </Container>

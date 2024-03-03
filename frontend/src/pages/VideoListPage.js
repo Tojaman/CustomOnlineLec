@@ -120,6 +120,11 @@ const VideoList = () => {
   const token = sessionStorage.getItem("token");
 
   useEffect(() => {
+    sessionStorage.removeItem("selectedVideoId");
+    sessionStorage.removeItem("selectedVideoInfo");
+    sessionStorage.removeItem("selectedVoice");
+    sessionStorage.removeItem("selectedAvatar");
+    
     AWS.config.update({
       accessKeyId: process.env.REACT_APP_AWS_ACCESS_KEY_ID,
       secretAccessKey: process.env.REACT_APP_AWS_SECRET_ACCESS_KEY,
