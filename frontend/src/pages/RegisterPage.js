@@ -6,8 +6,6 @@ import Swal from "sweetalert2";
 
 import logo from "../assets/img/UUJJ.png";
 import Background from "../assets/img/Group.png";
-import GoogleLogin from "../assets/img/Googlelogin.png";
-import OR from "../assets/img/Or.png";
 
 const RegistContainer = styled.div`
   display: flex;
@@ -60,24 +58,6 @@ const ContentContainer = styled.div`
   width: 400px;
 `;
 
-const Google = styled.button`
-  width: 400px;
-  height: 57.55px;
-  background: url(${GoogleLogin});
-  border: none;
-  cursor: pointer;
-  background-size: contain;
-  background-repeat: no-repeat;
-`;
-
-const OrImg = styled.div`
-  width: 400px;
-  height: 30px;
-  background-image: url(${OR});
-  background-size: contain;
-  background-repeat: no-repeat;
-`;
-
 const TextInfo = styled.span`
   margin-top: 20px;
   align-self: flex-start;
@@ -93,6 +73,7 @@ const InfoInput = styled.input`
   border: 1px solid #b7b7b7;
   border-radius: 4px;
   outline: none;
+  margin-bottom: 30px;
 `;
 
 const GradientButton = styled.button`
@@ -106,7 +87,6 @@ const GradientButton = styled.button`
   line-height: 22px;
   border: none;
   cursor: pointer;
-  margin-top: 80px;
   box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.2);
   width: 400px;
 `;
@@ -124,7 +104,7 @@ export default function RegisterPage() {
         password,
         nickname,
       });
-  
+
       console.log("회원가입 요청 성공");
       showToast();
     } catch (error) {
@@ -138,7 +118,7 @@ export default function RegisterPage() {
       }
     }
   };
-  
+
   const showToastError = (message) => {
     Swal.fire({
       icon: "error",
@@ -154,7 +134,7 @@ export default function RegisterPage() {
   const showToast = () => {
     Swal.fire({
       icon: "success",
-      title: '회원가입 성공',
+      title: "회원가입 성공",
       toast: true,
       position: "center",
       showConfirmButton: false,
@@ -170,14 +150,11 @@ export default function RegisterPage() {
       <Link to="/">
         <LogoImage />
       </Link>
-      <form>
-        <BoxContainer>
-          <RegistText>회원가입</RegistText>
-          <ContentContainer>
-            <Google />
 
-            <OrImg />
-
+      <BoxContainer>
+        <RegistText>회원가입</RegistText>
+        <ContentContainer>
+          <form>
             <TextInfo>아이디</TextInfo>
             <InfoInput type="text" value={username} onChange={(e) => setUsername(e.target.value)} />
 
@@ -186,10 +163,10 @@ export default function RegisterPage() {
 
             <TextInfo>닉네임</TextInfo>
             <InfoInput type="text" value={nickname} onChange={(e) => setNickname(e.target.value)} />
+          </form>
+        </ContentContainer>
+      </BoxContainer>
 
-          </ContentContainer>
-        </BoxContainer>
-      </form>
       <GradientButton onClick={handleRegister}>회원가입</GradientButton>
     </RegistContainer>
   );

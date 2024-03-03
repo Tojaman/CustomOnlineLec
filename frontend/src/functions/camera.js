@@ -463,3 +463,19 @@ document.getElementById("avatar4").addEventListener("click", function () {
 document.getElementById("avatar5").addEventListener("click", function () {
   handleAvatarSelection("avatar5");
 });
+
+var buttonElement = document.getElementById("arrow");
+
+buttonElement.addEventListener("click", function () {
+  openDiv();
+});
+
+function openDiv() {
+  if (document.getElementById("inner").style.display === "none") {
+    document.getElementById("inner").style.display = "block";
+    document.getElementById("arrow").style.transform = "rotate(225deg)";
+  } else {
+    document.getElementById("inner").style.display = "none";
+    document.getElementById("arrow").style.transform = "rotate(135deg)";
+  }
+}

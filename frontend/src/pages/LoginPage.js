@@ -107,6 +107,7 @@ const InfoInput = styled.input`
   border: 1px solid #b7b7b7;
   border-radius: 4px;
   outline: none;
+  margin-bottom: 30px;
 `;
 
 const GradientButton = styled.button`
@@ -120,7 +121,6 @@ const GradientButton = styled.button`
   line-height: 22px;
   border: none;
   cursor: pointer;
-  margin-top: 80px;
   box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.2);
   width: 400px;
 `;
@@ -162,6 +162,10 @@ const LoginPage = () => {
     }
   };
 
+  const onGoogleLogin = () => {
+    window.location.href = "http://localhost:8080/oauth2/authorization/google";
+  };
+
   const showToast = () => {
     Swal.fire({
       icon: "success",
@@ -191,26 +195,26 @@ const LoginPage = () => {
         <LogoImage />
       </Link>
       <PageBackGround />
-      <form>
-        <BoxContainer>
-          <RegisterButton to="/register">
-            회원가입
-            <GoArrowRight />
-          </RegisterButton>
-          <LoginText>로그인</LoginText>
-          <ContentContainer>
-            <Google />
 
-            <OrImg />
+      <BoxContainer>
+        <RegisterButton to="/register">
+          회원가입
+          <GoArrowRight />
+        </RegisterButton>
+        <LoginText>로그인</LoginText>
+        <ContentContainer>
+          <Google onClick={onGoogleLogin}></Google>
 
+          <OrImg />
+          <form>
             <TextInfo>아이디</TextInfo>
             <InfoInput type="text" value={username} onChange={(e) => setUsername(e.target.value)} />
 
             <TextInfo>비밀번호</TextInfo>
             <InfoInput autoComplete="on" type="password" value={password} onChange={(e) => setPassword(e.target.value)} />
-          </ContentContainer>
-        </BoxContainer>
-      </form>
+          </form>
+        </ContentContainer>
+      </BoxContainer>
       <GradientButton onClick={handleLogin}>로그인</GradientButton>
     </LoginContainer>
   );
