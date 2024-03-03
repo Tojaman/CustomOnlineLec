@@ -148,14 +148,13 @@ const Select = () => {
 
   useEffect(() => {
     const selectedVideoId = sessionStorage.getItem("selectedVideoId");
-    console.log("selected Video:", sessionStorage.getItem("selectedVideoId"));
 
     if (selectedVideoId) {
       axios
         .post(
           `http://localhost:8080/videos/info`,
           {
-            videoid: selectedVideoId
+            videoid: selectedVideoId,
           },
           {
             headers: {
@@ -164,15 +163,14 @@ const Select = () => {
           }
         )
         .then((response) => {
-          console.log("요청 성공");
-  
+          console.log("영상 정보 요청 성공");
+
           sessionStorage.setItem("selectedVideoInfo", JSON.stringify(response.data));
           const selectedVideoInfoString = sessionStorage.getItem("selectedVideoInfo");
           const selectedVideoInfo = JSON.parse(selectedVideoInfoString);
-          console.log("Stored video info:", selectedVideoInfo);
-
+          console.log("영상 정보 : ", selectedVideoInfo);
         })
-        .catch((error) => console.error("Error:", error));
+        .catch((error) => console.error("영상 정보 요청 실패 : ", error));
     }
   }, [token]);
 
@@ -180,17 +178,15 @@ const Select = () => {
     setSelectedVoiceIndex(index);
     const selectedVoice = voices[index];
     sessionStorage.setItem("selectedVoice", selectedVoice.id);
-    console.log("Selected Voice:", sessionStorage.getItem("selectedVoice"));
+    console.log("선택한 음성 : ", sessionStorage.getItem("selectedVoice"));
   };
 
   const handleAvatarSelection = (index) => {
     setSelectedAvatarIndex(index);
     const selectedAvatar = avatars[index];
     sessionStorage.setItem("selectedAvatar", selectedAvatar.id);
-    console.log("Selected Avatar:", sessionStorage.getItem("selectedAvatar"));
+    console.log("선택한 아바타 : ", sessionStorage.getItem("selectedAvatar"));
   };
-
- 
 
   return (
     <SelectContainer>

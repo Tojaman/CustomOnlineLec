@@ -7,6 +7,7 @@ import Sidebar from "../../components/sidebar/Sidebar";
 import Navbar from "../../components/header/Navbar";
 
 import { useSelector } from "react-redux";
+import { useToasts } from "react-toast-notifications";
 
 const Container = styled.div`
   display: flex;
@@ -97,6 +98,16 @@ const SubmitButton = styled.button`
   margin-left: 85px;
 `;
 
+const DisabledSubmitButton = styled.button`
+  margin-top: 15px;
+  padding: 3px;
+  background-color: #000;
+  color: #fff;
+  cursor: pointer;
+  border-radius: 5px;
+  margin-left: 85px;
+`;
+
 const Image = styled.img`
   width: 200px;
   margin-top: 10px;
@@ -112,7 +123,7 @@ const VideoInfo = () => {
   const height = videoData ? videoData.height : "N/A";
   const videoWidth = videoData ? videoData.videoWidth : "N/A";
   const videoHeight = videoData ? videoData.videoHeight : "N/A";
-
+  const { addToast } = useToasts();
   const [formData, setFormData] = useState({
     title: "",
     description: "",
@@ -127,6 +138,24 @@ const VideoInfo = () => {
   };
 
   const handleSubmit = async () => {
+    if (formData.title === "" || formData.description === "" || formData.category === "") {
+      console.error("영상 정보 로드 실패");
+      addToast("모든 필수 항목을 입력해주세요.", { appearance: "warning", autoDismiss: true, autoDismissTimeout: 5000 });
+      return;
+    }
+
+    if (!formData.pdfFile) {
+      console.error("강의자료 파일 로드 실패");
+      addToast("강의자료 파일을 첨부해주세요.", { appearance: "warning", autoDismiss: true, autoDismissTimeout: 5000 });
+      return;
+    }
+
+    if (!formData.imageFile) {
+      console.error("썸네일 파일 로드 실패");
+      addToast("썸네일 파일을 첨부해주세요.", { appearance: "warning", autoDismiss: true, autoDismissTimeout: 5000 });
+      return;
+    }
+
     const token = sessionStorage.getItem("token");
     const id = sessionStorage.getItem("UploadVideoID");
     const title = formData.title;
@@ -198,9 +227,11 @@ const VideoInfo = () => {
       );
 
       console.log("영상 정보 업로드 요청 성공");
+      addToast("영상 정보가 성공적으로 업로드되었습니다.", { appearance: "success", autoDismiss: true, autoDismissTimeout: 5000 });
       sessionStorage.removeItem("UploadVideoID");
     } catch (error) {
       console.error("영상 정보 업로드 요청 실패 : ", error.response.status);
+      addToast("영상 정보 업로드를 실패했습니다.", { appearance: "error", autoDismiss: true, autoDismissTimeout: 5000 });
     }
 
     console.log("자막 : ", subtitle);
@@ -246,9 +277,13 @@ const VideoInfo = () => {
             <FileInput type="file" accept="image/*" onChange={(e) => handleFileChange(e, "imageFile")} />
             <Image src={formData.imageFile && URL.createObjectURL(formData.imageFile)} alt="Thumbnail Preview" />
           </SelectContainer>
-          <Link to="/">
-            <SubmitButton onClick={handleSubmit}>제출</SubmitButton>
-          </Link>
+          {formData.title && formData.description && formData.category && formData.pdfFile && formData.imageFile ? (
+            <Link to="/">
+              <SubmitButton onClick={handleSubmit}>제출</SubmitButton>
+            </Link>
+          ) : (
+            <DisabledSubmitButton onClick={handleSubmit}>제출</DisabledSubmitButton>
+          )}
         </FormContainer>
       </InfoContainer>
     </Container>

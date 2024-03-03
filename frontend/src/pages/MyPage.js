@@ -9,6 +9,7 @@ import Background from "../assets/img/Group.png";
 import Navbar from "../components/header/Navbar";
 import originProfileImage from "../assets/origin_profile.jpg";
 import Swal from "sweetalert2";
+import { useToasts } from "react-toast-notifications";
 
 const Container = styled.div`
   display: flex;
@@ -199,8 +200,8 @@ const MyPage = () => {
   const [isEditing, setIsEditing] = useState(false);
   const [editedNickname, setEditedNickname] = useState("");
   const [editedPassword, setEditedPassword] = useState("");
-
   const [videos, setVideos] = useState([]);
+  const { addToast } = useToasts();
 
   const token = sessionStorage.getItem("token");
   const username = sessionStorage.getItem("username");
@@ -234,9 +235,11 @@ const MyPage = () => {
       .then((response) => {
         console.log("회원 정보 수정 요청 성공");
         setIsEditing(false);
+        addToast("회원 정보가 성공적으로 수정되었습니다.", { appearance: "success", autoDismiss: true, autoDismissTimeout: 5000 });
       })
       .catch((error) => {
         console.error("회원 정보 수정 요청 실패 : ", error);
+        addToast("회원 정보 수정을 실패했습니다.", { appearance: "error", autoDismiss: true, autoDismissTimeout: 5000 });
       });
     sessionStorage.setItem("userNickname", editedNickname);
     setNickname(editedNickname);
@@ -272,7 +275,8 @@ const MyPage = () => {
 
     s3.upload(params, (err, data) => {
       if (err) {
-        console.log("S3에 프로필 사진 업로드 살패 : ", err);
+        console.log("S3에 프로필 사진 업로드 실패 : ", err);
+        addToast("S3에 업로드를 실패했습니다.", { appearance: "error", autoDismiss: true, autoDismissTimeout: 5000 });
       } else {
         console.log("S3에 프로필 사진 업로드 성공");
         sendS3UrlToServer(imageS3Path);
@@ -293,9 +297,11 @@ const MyPage = () => {
       )
       .then((response) => {
         console.log("프로필 사진 링크 업로드 요청 성공");
+        addToast("프로필이 성공적으로 변경되었습니다.", { appearance: "success", autoDismiss: true, autoDismissTimeout: 5000 });
       })
       .catch((error) => {
         console.error("프로필 사진 링크 업로드 요청 실패 : ", error);
+        addToast("프로필 변경을 실패했습니다.", { appearance: "error", autoDismiss: true, autoDismissTimeout: 5000 });
       });
   };
 
@@ -332,6 +338,7 @@ const MyPage = () => {
             (err, url) => {
               if (err) {
                 console.error("프로필 사진 출력 실패 : ", err);
+                addToast("프로필 출력을 실패했습니다.", { appearance: "error", autoDismiss: true, autoDismissTimeout: 5000 });
               } else {
                 console.log("프로필 사진 출력 성공");
                 setProfileImage(url);
@@ -342,8 +349,10 @@ const MyPage = () => {
       } catch (error) {
         if (error.response) {
           console.error("회원 정보 확인 요청 실패 : ", error.response.status);
+          addToast("회원 정보 확인을 실패했습니다.", { appearance: "error", autoDismiss: true, autoDismissTimeout: 5000 });
         } else {
           console.error("회원 정보 확인 요청 실패 : ", error.message);
+          addToast("회원 정보 확인을 실패했습니다.", { appearance: "error", autoDismiss: true, autoDismissTimeout: 5000 });
         }
       }
     }
@@ -389,8 +398,10 @@ const MyPage = () => {
       } catch (error) {
         if (error.response) {
           console.error("영상 목록 요청 실패 : ", error.response.status);
+          addToast("영상 목록 요청을 실패했습니다.", { appearance: "error", autoDismiss: true, autoDismissTimeout: 5000 });
         } else {
           console.error("영상 목록 요청 실패 : ", error.message);
+          addToast("영상 목록 요청을 실패했습니다.", { appearance: "error", autoDismiss: true, autoDismissTimeout: 5000 });
         }
       }
     }
@@ -416,11 +427,13 @@ const MyPage = () => {
           })
           .then((response) => {
             console.log("회원탈퇴 요청 성공");
+            addToast("회원탈퇴가 성공적으로 되었습니다.", { appearance: "success", autoDismiss: true, autoDismissTimeout: 5000 });
             sessionStorage.clear();
             navigate("/");
           })
           .catch((error) => {
             console.error("회원탈퇴 요청 실패 : ", error);
+            addToast("회원탈퇴 요청을 실패했습니다.", { appearance: "error", autoDismiss: true, autoDismissTimeout: 5000 });
           });
       }
     });
