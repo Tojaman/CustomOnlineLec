@@ -96,6 +96,7 @@ const Attach = () => {
     height: 100,
     isDragging: false,
   });
+  const genderRef = useRef("");
   const widthInputRef = useRef(null);
   const heightInputRef = useRef(null);
   const [infoText, setInfoText] = useState("");
@@ -124,7 +125,14 @@ const Attach = () => {
     canvas.height = video.offsetHeight;
   };
 
+  const handleGenderChange = (event) => {
+    genderRef.current = event.target.value;
+    console.log("성별 선택 성공");
+  };
+
   const handleSubmit = async () => {
+    const gender = genderRef.current;
+
     const VideoFileName = file.name;
     const url = `original_video/${VideoFileName}`;
 
@@ -166,6 +174,7 @@ const Attach = () => {
         "http://localhost:8080/videos/uploadVideo",
         {
           url,
+          gender,
         },
         {
           headers: {
@@ -320,6 +329,14 @@ const Attach = () => {
           <input type="number" id="widthInput" ref={widthInputRef} defaultValue="100" />
           <label htmlFor="heightInput">세로 :</label>
           <input type="number" id="heightInput" ref={heightInputRef} defaultValue="100" />
+          <label>
+            남성
+            <input type="radio" value="man" onChange={handleGenderChange} />
+          </label>
+          <label>
+            여성
+            <input type="radio" value="woman" onChange={handleGenderChange} />
+          </label>
         </InputPointContainer>
 
         <InfoContainer>{infoText}</InfoContainer>

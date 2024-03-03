@@ -161,6 +161,9 @@ document.addEventListener("DOMContentLoaded", function () {
       playPauseButton.textContent = "▶";
     }
   }
+  originVideo.addEventListener("ended", function () {
+    playPauseButton.textContent = "▶";
+  });
   function toggleMute() {
     originVideo.muted = !originVideo.muted;
     updatevolume();
