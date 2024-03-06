@@ -24,10 +24,9 @@ const LogoImage = styled.img.attrs({
 `;
 
 const PageBackGround = styled.div`
-  position: absolute;
+  position: fixed;
   width: 100vw;
   height: 100vh;
-  display: flex;
   align-items: center;
   justify-content: center;
   background-image: url(${Background});

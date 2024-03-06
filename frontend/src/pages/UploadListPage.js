@@ -12,8 +12,7 @@ const Container = styled.div`
 
 const PageBackGround = styled.div`
   position: fixed;
-  position: absolute;
-  width: 100vw;
+  width: 100%;
   height: 100vh;
   display: flex;
   align-items: center;
@@ -124,7 +123,7 @@ const UploadList = () => {
     sessionStorage.removeItem("selectedVideoInfo");
     sessionStorage.removeItem("selectedVoice");
     sessionStorage.removeItem("selectedAvatar");
-    
+
     AWS.config.update({
       accessKeyId: process.env.REACT_APP_AWS_ACCESS_KEY_ID,
       secretAccessKey: process.env.REACT_APP_AWS_SECRET_ACCESS_KEY,
@@ -185,7 +184,7 @@ const UploadList = () => {
                 ...video,
                 thumbnail: urls[index],
               }))
-              .reverse();;
+              .reverse();
             const userVideos = updatedVideoData.filter((video) => video.nickname === userNickname);
             setVideos(userVideos);
             console.log("썸네일 출력 성공");
