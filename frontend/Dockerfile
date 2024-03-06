@@ -7,10 +7,10 @@ COPY package.json .
 # 명령어 실행 (의존성 설치)
 RUN yarn install
 
-RUN npm install -g cross-env
+#RUN npm install -g cross-env
 
 # 필요한 패키지 설치
-RUN npm install -g parcel-bundler
+#RUN npm install -g parcel-bundler
 
 # ubuntu에서 사용할 코드
 # yarn install --production=false
