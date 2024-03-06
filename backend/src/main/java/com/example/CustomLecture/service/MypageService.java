@@ -2,7 +2,9 @@ package com.example.CustomLecture.service;
 
 import com.example.CustomLecture.dto.JoinDTO;
 import com.example.CustomLecture.entity.UserEntity;
+import com.example.CustomLecture.entity.Video;
 import com.example.CustomLecture.repository.UserRepository;
+import com.example.CustomLecture.repository.VideoRepository;
 import jakarta.persistence.EntityNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
@@ -10,6 +12,7 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
@@ -23,10 +26,14 @@ public class MypageService {
     @Autowired
     private final BCryptPasswordEncoder bCryptPasswordEncoder;
 
-    public MypageService(UserRepository userRepository, BCryptPasswordEncoder bCryptPasswordEncoder) {
+    @Autowired
+    private final VideoRepository videoRepository;
+
+    public MypageService(UserRepository userRepository, BCryptPasswordEncoder bCryptPasswordEncoder, VideoRepository videoRepository) {
 
         this.userRepository = userRepository;
         this.bCryptPasswordEncoder = bCryptPasswordEncoder;
+        this.videoRepository = videoRepository;
     }
 
     //회원 프로필 업데이트하기
@@ -91,8 +98,17 @@ public class MypageService {
         }
     }
 */
+
+    //탈퇴하는 회원 비디오 삭제
+    public void deleteVideosByUser(UserEntity user) {
+        List<Video> videos = videoRepository.findByMember(user);
+        for (Video video : videos) {
+            videoRepository.delete(video);
+        }
+    }
+
     //회원 탈퇴
-    public void deleteUserByNickname(String username) {
+    public void deleteUserByUsername(String username) {
         userRepository.deleteByUsername(username);
     }
 

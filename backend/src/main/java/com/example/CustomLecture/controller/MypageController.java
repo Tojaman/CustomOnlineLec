@@ -97,8 +97,18 @@ public class MypageController {
     })
     public ResponseEntity<String> deleteUser(@PathVariable String username) {
         try {
-            mypageService.deleteUserByNickname(username);
-            return new ResponseEntity<>("User deleted successfully", HttpStatus.OK);
+            UserEntity user = mypageService.getUserByUsername(username);
+            if (user != null) {
+                // 해당 유저의 모든 비디오 삭제
+                mypageService.deleteVideosByUser(user);
+
+                // 유저 탈퇴
+                mypageService.deleteUserByUsername(username);
+
+                return new ResponseEntity<>("User and associated videos deleted successfully", HttpStatus.OK);
+            } else {
+                return new ResponseEntity<>("User not found", HttpStatus.NOT_FOUND);
+            }
         } catch (EmptyResultDataAccessException e) {
             return new ResponseEntity<>("User not found", HttpStatus.NOT_FOUND);
         }
