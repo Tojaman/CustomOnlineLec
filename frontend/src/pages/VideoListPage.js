@@ -14,8 +14,7 @@ const ListContainer = styled.div`
 
 const PageBackGround = styled.div`
   position: fixed;
-  position: absolute;
-  width: 100vw;
+  width: 100%;
   height: 100vh;
   display: flex;
   align-items: center;
@@ -27,7 +26,7 @@ const PageBackGround = styled.div`
 `;
 
 const ContentContainer = styled.div`
-  width: 900px;
+  width: 850px;
   display: flex;
   flex-direction: column;
   justify-content: center;
@@ -124,7 +123,7 @@ const VideoList = () => {
     sessionStorage.removeItem("selectedVideoInfo");
     sessionStorage.removeItem("selectedVoice");
     sessionStorage.removeItem("selectedAvatar");
-    
+
     AWS.config.update({
       accessKeyId: process.env.REACT_APP_AWS_ACCESS_KEY_ID,
       secretAccessKey: process.env.REACT_APP_AWS_SECRET_ACCESS_KEY,

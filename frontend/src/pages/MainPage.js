@@ -15,7 +15,6 @@ const MainContainer = styled.div`
 
 const PageBackGround = styled.div`
   position: fixed;
-  position: absolute;
   width: 100vw;
   height: 100vh;
   display: flex;
@@ -162,7 +161,7 @@ export default function MainPage() {
             </GradientButton>
             <LectureLink to="/videoList" onClick={handleVideoListClick}>
               강의 시청하기
-              <FaRegCirclePlay/>
+              <FaRegCirclePlay />
             </LectureLink>
           </LinkContainer>
         </LeftContainer>
