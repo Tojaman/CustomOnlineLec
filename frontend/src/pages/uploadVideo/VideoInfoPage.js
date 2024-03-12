@@ -277,7 +277,12 @@ const VideoInfo = () => {
             <FileInput type="file" accept="image/*" onChange={(e) => handleFileChange(e, "imageFile")} />
             <Image src={formData.imageFile && URL.createObjectURL(formData.imageFile)} alt="Thumbnail Preview" />
           </SelectContainer>
-          {formData.title && formData.description && formData.category && formData.pdfFile && formData.imageFile ? (
+          {formData.title &&
+          formData.description &&
+          formData.category &&
+          formData.pdfFile &&
+          formData.imageFile &&
+          sessionStorage.getItem("UploadVideoID") ? (
             <Link to="/">
               <SubmitButton onClick={handleSubmit}>제출</SubmitButton>
             </Link>
