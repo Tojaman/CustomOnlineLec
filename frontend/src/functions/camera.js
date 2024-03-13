@@ -5,7 +5,6 @@ import * as tf from "@tensorflow/tfjs";
 import * as paper from "paper";
 import "@tensorflow-models/face-detection";
 import "babel-polyfill";
-import AWS from "aws-sdk";
 import { SVGUtils } from "./utils/svgUtils";
 import { PoseIllustration } from "./utils/illustration";
 import { Skeleton } from "./utils/skeleton";
@@ -16,6 +15,7 @@ import * as test2SVG from "./resources/illustration/test2.svg";
 import * as test3SVG from "./resources/illustration/윤석열.svg";
 import * as test4SVG from "./resources/illustration/트럼프.svg";
 import * as test5SVG from "./resources/illustration/키키.svg";
+import * as test6SVG from "./resources/illustration/뽀로로.svg";
 
 let camera;
 let illustration = null;
@@ -253,6 +253,10 @@ async function loadSelectedAvatar() {
       case "avatar5":
         selectedAvatarSVG = test5SVG.default;
         break;
+      case "avatar5":
+        selectedAvatarSVG = test6SVG.default;
+        break;
+
       default:
         return null;
     }
@@ -346,7 +350,9 @@ document.getElementById("avatar4").addEventListener("click", function () {
 document.getElementById("avatar5").addEventListener("click", function () {
   handleAvatarSelection("avatar5");
 });
-
+document.getElementById("avatar6").addEventListener("click", function () {
+  handleAvatarSelection("avatar6");
+});
 var buttonElement = document.getElementById("arrow");
 
 buttonElement.addEventListener("click", function () {
