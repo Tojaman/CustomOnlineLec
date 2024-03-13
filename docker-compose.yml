@@ -11,7 +11,7 @@ services:
       - CELERY_RESULT_BACKEND=redis://redis:6379/0
     build:
       context: ./AI
-      dockerfile: dockerfile
+      dockerfile: Dockerfile
     volumes:
       - ./AI:/AI
     command: sh -c "python main.py && gunicorn", "main:app", "-b", "0.0.0.0:5000"
@@ -33,7 +33,7 @@ services:
       - CELERY_RESULT_BACKEND=redis://redis:6379/0
     build:
       context: AI
-      dockerfile: dockerfile
+      dockerfile: Dockerfile
     command: sh -c "celery -A tasks worker -l info"
     volumes:
       - ./AI:/AI
@@ -50,7 +50,7 @@ services:
     # Spring Boot 서버 설정
     build:
       context: ./backend
-      dockerfile: dockerfile
+      dockerfile: Dockerfile
     volumes:
       - ./backend:/backend
     ports:
@@ -63,10 +63,10 @@ services:
     # Spring Boot 서버 설정
     build:
       context: ./frontend
-      dockerfile: dockerfile
+      dockerfile: Dockerfile
     volumes:
       - ./frontend/src:/frontend/src
-      - ./node_modules
+      - ./frontend/node_modules:/frontend/node_modules
     restart: always
     ports:
       - "3000:3000"
