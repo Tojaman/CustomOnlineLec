@@ -9,7 +9,10 @@ import com.example.CustomLecture.repository.ConvertVideoRepository;
 import com.example.CustomLecture.repository.UserRepository;
 import com.example.CustomLecture.repository.VideoDataRepository;
 import com.example.CustomLecture.repository.VideoRepository;
+import com.example.CustomLecture.repository.ConvertVideoRepository;
 import com.google.gson.Gson;
+
+import jakarta.persistence.Convert;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
@@ -32,6 +35,7 @@ public class VideoService {
 
     private final UserRepository userRepository;
     private final VideoRepository videoRepository;
+    private final ConvertVideoRepository convertVideoRepository;
     private final VideoDataRepository videoDataRepository;
     private final RestTemplate restTemplate;
     private final JWTUtil jwtUtil;
@@ -197,7 +201,8 @@ public class VideoService {
                 .orElseThrow(() -> new NoSuchElementException("video가 존재하지 않습니다."));
 
         videoRepository.delete(video);
-
+        convertVideoRepository.delete(video.getConvertVideos());
+        videoDataRepository.delete(video.getVideoData());
     }
 }
 
