@@ -8,7 +8,7 @@ import "babel-polyfill";
 import { SVGUtils } from "./utils/svgUtils";
 import { PoseIllustration } from "./utils/illustration";
 import { Skeleton } from "./utils/skeleton";
-import { displayPreviousSessionInfo, downloadPDFFromS3, openDiv } from './extra.js';
+import { displayPreviousSessionInfo, downloadPDFFromS3, openDiv } from "./extra.js";
 
 import * as test1SVG from "./resources/illustration/test1.svg";
 import * as test2SVG from "./resources/illustration/test2.svg";
@@ -69,6 +69,7 @@ class Context {
     this.canvas = document.querySelector(".illustrationCanvas");
   }
 }
+
 function setupCanvas() {
   canvasScope = paper.default;
   canvasScope.setup(camera.canvas);
@@ -90,7 +91,7 @@ function setStatusText(text) {
   resultElement.innerText = text;
 }
 
-function drawVideoToCanvas() {
+async function drawVideoToCanvas() {
   camera.originVideo.width = originWidth;
   camera.originVideo.height = originHeight;
 
@@ -109,48 +110,61 @@ function drawVideoToCanvas() {
   camera.mergedCanvas.width = originWidth;
   camera.mergedCanvas.height = originHeight;
 
-  camera.copyctx.clearRect(0, 0, camera.copyCanvas.width, camera.copyCanvas.height);
-  camera.copyctx.save();
-  camera.copyctx.drawImage(camera.originVideo, 0, 0, camera.copyCanvas.width, camera.copyCanvas.height);
-  camera.copyctx.restore();
+  while (true) {
+    if (camera.originVideo.paused || camera.originVideo.ended) {
+      break;
+    }
 
-  camera.camctx.clearRect(0, 0, sw, sh);
-  camera.camctx.save();
-  camera.camctx.drawImage(camera.copyCanvas, sx, sy, sw, sh, 0, 0, sw, sh);
-  camera.camctx.restore();
+    camera.copyctx.clearRect(0, 0, camera.copyCanvas.width, camera.copyCanvas.height);
+    camera.copyctx.save();
+    camera.copyctx.drawImage(camera.originVideo, 0, 0, camera.copyCanvas.width, camera.copyCanvas.height);
+    camera.copyctx.restore();
 
-  camera.flipedctx.clearRect(0, 0, sw, sh);
-  camera.flipedctx.save();
-  camera.flipedctx.scale(-1, 1);
-  camera.flipedctx.drawImage(camera.camCanvas, 0, 0, sw, sh, -sw, 0, sw, sh);
-  camera.flipedctx.restore();
+    camera.camctx.clearRect(0, 0, sw, sh);
+    camera.camctx.save();
+    camera.camctx.drawImage(camera.copyCanvas, sx, sy, sw, sh, 0, 0, sw, sh);
+    camera.camctx.restore();
 
-  camera.mergedctx.clearRect(0, 0, camera.copyCanvas.width, camera.copyCanvas.height);
-  camera.mergedctx.save();
-  camera.mergedctx.drawImage(camera.copyCanvas, 0, 0, camera.copyCanvas.width, camera.copyCanvas.height);
-  camera.mergedctx.fillStyle = "white";
-  camera.mergedctx.fillRect(sx, sy, sw, sh);
-  camera.mergedctx.strokeStyle = "black";
-  camera.mergedctx.lineWidth = 1;
-  camera.mergedctx.strokeRect(sx, sy, sw, sh + 5);
-  camera.mergedctx.drawImage(camera.canvas, sx, sy, sw, sh);
-  camera.mergedctx.restore();
+    camera.flipedctx.clearRect(0, 0, sw, sh);
+    camera.flipedctx.save();
+    camera.flipedctx.scale(-1, 1);
+    camera.flipedctx.drawImage(camera.camCanvas, 0, 0, sw, sh, -sw, 0, sw, sh);
+    camera.flipedctx.restore();
 
-  requestAnimationFrame(drawVideoToCanvas);
+    camera.mergedctx.clearRect(0, 0, camera.copyCanvas.width, camera.copyCanvas.height);
+    camera.mergedctx.save();
+    camera.mergedctx.drawImage(camera.copyCanvas, 0, 0, camera.copyCanvas.width, camera.copyCanvas.height);
+    camera.mergedctx.fillStyle = "white";
+    camera.mergedctx.fillRect(sx, sy, sw, sh);
+    camera.mergedctx.strokeStyle = "black";
+    camera.mergedctx.lineWidth = 1;
+    camera.mergedctx.strokeRect(sx, sy, sw, sh + 5);
+    camera.mergedctx.drawImage(camera.canvas, sx, sy, sw, sh);
+    camera.mergedctx.restore();
+
+    await new Promise((resolve) => requestAnimationFrame(resolve));
+  }
 }
 
 function detectPose() {
   let pauseFlag = false;
 
-  camera.originVideo.addEventListener("play", function () {
+  camera.originVideo.addEventListener("play", async function () {
+    if (resultVideo.srcObject) {
+      resultVideo.srcObject.getTracks().forEach((track) => {
+        track.stop();
+      });
+    }
+
+    drawVideoToCanvas();
     var canvasStream = camera.mergedCanvas.captureStream();
     resultVideo.srcObject = canvasStream;
     resultVideo.play();
-    drawVideoToCanvas();
     pauseFlag = false;
   });
 
   camera.originVideo.addEventListener("pause", function () {
+    resultVideo.pause();
     pauseFlag = true;
   });
 
@@ -159,8 +173,6 @@ function detectPose() {
       requestAnimationFrame(poseDetectionFrame);
       return;
     }
-
-    let poses = [];
 
     const input = tf.browser.fromPixels(camera.camCanvas);
     const selectedAvatarSVG = await loadSelectedAvatar();
@@ -181,30 +193,31 @@ function detectPose() {
       predictIrises: true,
     });
 
-    poses = poses.concat(poseDetection);
     input.dispose();
 
     canvasScope.project.clear();
 
-    if (poses.length >= 1 && illustration) {
-      Skeleton.flipPose(poses[0]);
+    if (poseDetection.length >= 1 && illustration) {
+      const pose = poseDetection[0];
+      Skeleton.flipPose(pose);
 
+      let face = null;
       if (faceDetection && faceDetection.length > 0) {
-        let face = Skeleton.toFaceFrame(faceDetection[0]);
-        illustration.updateSkeleton(poses[0], face);
-        eyesDetection.forEach((eyesDetection) => {
-          const rightEAR = getEAR(eyesDetection.annotations.rightEyeLower0, eyesDetection.annotations.rightEyeUpper0);
-          const leftEAR = getEAR(eyesDetection.annotations.leftEyeLower0, eyesDetection.annotations.leftEyeUpper0);
-          let blinked = leftEAR <= EAR_THRESHOLD && rightEAR <= EAR_THRESHOLD;
-          if (blinked) {
-            parseSVG(selectedAvatarSVG, blinked);
-          } else {
-            parseSVG(selectedAvatarSVG, blinked);
-          }
-        });
-      } else {
-        illustration.updateSkeleton(poses[0], null);
+        face = Skeleton.toFaceFrame(faceDetection[0]);
       }
+      illustration.updateSkeleton(pose, face);
+
+      eyesDetection.forEach((eyesDetection) => {
+        const rightEAR = getEAR(eyesDetection.annotations.rightEyeLower0, eyesDetection.annotations.rightEyeUpper0);
+        const leftEAR = getEAR(eyesDetection.annotations.leftEyeLower0, eyesDetection.annotations.leftEyeUpper0);
+        let blinked = leftEAR <= EAR_THRESHOLD && rightEAR <= EAR_THRESHOLD;
+        if (blinked) {
+          parseSVG(selectedAvatarSVG, blinked);
+        } else {
+          parseSVG(selectedAvatarSVG, blinked);
+        }
+      });
+
       illustration.draw(canvasScope, sw, sh);
     }
 
@@ -350,9 +363,11 @@ document.getElementById("avatar4").addEventListener("click", function () {
 document.getElementById("avatar5").addEventListener("click", function () {
   handleAvatarSelection("avatar5");
 });
+
 document.getElementById("avatar6").addEventListener("click", function () {
   handleAvatarSelection("avatar6");
 });
+
 var buttonElement = document.getElementById("arrow");
 
 buttonElement.addEventListener("click", function () {

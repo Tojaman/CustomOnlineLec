@@ -116,7 +116,6 @@ export function displayPreviousSessionInfo() {
       }
     });
   }
-
   
   export function openDiv() {
     if (document.getElementById("inner").style.display === "none") {
