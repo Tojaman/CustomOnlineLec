@@ -253,7 +253,7 @@ async function loadSelectedAvatar() {
       case "avatar5":
         selectedAvatarSVG = test5SVG.default;
         break;
-      case "avatar5":
+      case "avatar6":
         selectedAvatarSVG = test6SVG.default;
         break;
 
