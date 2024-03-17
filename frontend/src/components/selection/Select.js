@@ -12,6 +12,7 @@ import avatarImg2 from "../../assets/avatarImg/기본아바타남1.jpg";
 import avatarImg3 from "../../assets/avatarImg/윤석열.jpg";
 import avatarImg4 from "../../assets/avatarImg/트럼프.jpg";
 import avatarImg5 from "../../assets/avatarImg/키키.jpg";
+import avatarImg6 from "../../assets/avatarImg/뽀로로.jpg";
 
 import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
@@ -23,9 +24,8 @@ const SelectContainer = styled.div`
 `;
 
 const PageBackGround = styled.div`
-  display: flex;
-  position: absolute;
-  width: 100vw;
+  position: fixed;
+  width: 100%;
   height: 100vh;
   align-items: center;
   justify-content: center;
@@ -136,6 +136,7 @@ const avatars = [
   { id: "avatar3", name: "윤석열", img: avatarImg3 },
   { id: "avatar4", name: "트럼프", img: avatarImg4 },
   { id: "avatar5", name: "키키", img: avatarImg5 },
+  { id: "avatar6", name: "뽀로로", img: avatarImg6  }
 ];
 
 const Select = () => {

@@ -17,8 +17,7 @@ const Container = styled.div`
 
 const PageBackGround = styled.div`
   position: fixed;
-  position: absolute;
-  width: 100vw;
+  width: 100%;
   height: 100vh;
   display: flex;
   align-items: center;
@@ -254,13 +253,13 @@ const MyPage = () => {
   const handleImageChange = (e) => {
     const file = e.target.files[0];
     if (file) {
-    const reader = new FileReader();
+      const reader = new FileReader();
       reader.onload = () => {
-      uploadFileToS3(file);
-      setProfileImage(reader.result);
-    };
-    reader.readAsDataURL(file);
-  }
+        uploadFileToS3(file);
+        setProfileImage(reader.result);
+      };
+      reader.readAsDataURL(file);
+    }
   };
 
   const uploadFileToS3 = (file) => {

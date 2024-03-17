@@ -5,17 +5,17 @@ import * as tf from "@tensorflow/tfjs";
 import * as paper from "paper";
 import "@tensorflow-models/face-detection";
 import "babel-polyfill";
-import AWS from "aws-sdk";
 import { SVGUtils } from "./utils/svgUtils";
 import { PoseIllustration } from "./utils/illustration";
 import { Skeleton } from "./utils/skeleton";
+import { displayPreviousSessionInfo, downloadPDFFromS3, openDiv } from "./extra.js";
 
-import * as girlSVG from "./resources/illustration/girl.svg";
 import * as test1SVG from "./resources/illustration/test1.svg";
 import * as test2SVG from "./resources/illustration/test2.svg";
 import * as test3SVG from "./resources/illustration/윤석열.svg";
 import * as test4SVG from "./resources/illustration/트럼프.svg";
 import * as test5SVG from "./resources/illustration/키키.svg";
+import * as test6SVG from "./resources/illustration/뽀로로.svg";
 
 let camera;
 let illustration = null;
@@ -69,6 +69,7 @@ class Context {
     this.canvas = document.querySelector(".illustrationCanvas");
   }
 }
+
 function setupCanvas() {
   canvasScope = paper.default;
   canvasScope.setup(camera.canvas);
@@ -90,7 +91,7 @@ function setStatusText(text) {
   resultElement.innerText = text;
 }
 
-function drawVideoToCanvas() {
+async function drawVideoToCanvas() {
   camera.originVideo.width = originWidth;
   camera.originVideo.height = originHeight;
 
@@ -109,48 +110,61 @@ function drawVideoToCanvas() {
   camera.mergedCanvas.width = originWidth;
   camera.mergedCanvas.height = originHeight;
 
-  camera.copyctx.clearRect(0, 0, camera.copyCanvas.width, camera.copyCanvas.height);
-  camera.copyctx.save();
-  camera.copyctx.drawImage(camera.originVideo, 0, 0, camera.copyCanvas.width, camera.copyCanvas.height);
-  camera.copyctx.restore();
+  while (true) {
+    if (camera.originVideo.paused || camera.originVideo.ended) {
+      break;
+    }
 
-  camera.camctx.clearRect(0, 0, sw, sh);
-  camera.camctx.save();
-  camera.camctx.drawImage(camera.copyCanvas, sx, sy, sw, sh, 0, 0, sw, sh);
-  camera.camctx.restore();
+    camera.copyctx.clearRect(0, 0, camera.copyCanvas.width, camera.copyCanvas.height);
+    camera.copyctx.save();
+    camera.copyctx.drawImage(camera.originVideo, 0, 0, camera.copyCanvas.width, camera.copyCanvas.height);
+    camera.copyctx.restore();
 
-  camera.flipedctx.clearRect(0, 0, sw, sh);
-  camera.flipedctx.save();
-  camera.flipedctx.scale(-1, 1);
-  camera.flipedctx.drawImage(camera.camCanvas, 0, 0, sw, sh, -sw, 0, sw, sh);
-  camera.flipedctx.restore();
+    camera.camctx.clearRect(0, 0, sw, sh);
+    camera.camctx.save();
+    camera.camctx.drawImage(camera.copyCanvas, sx, sy, sw, sh, 0, 0, sw, sh);
+    camera.camctx.restore();
 
-  camera.mergedctx.clearRect(0, 0, camera.copyCanvas.width, camera.copyCanvas.height);
-  camera.mergedctx.save();
-  camera.mergedctx.drawImage(camera.copyCanvas, 0, 0, camera.copyCanvas.width, camera.copyCanvas.height);
-  camera.mergedctx.fillStyle = "white";
-  camera.mergedctx.fillRect(sx, sy, sw, sh);
-  camera.mergedctx.strokeStyle = "black";
-  camera.mergedctx.lineWidth = 1;
-  camera.mergedctx.strokeRect(sx, sy, sw, sh + 5);
-  camera.mergedctx.drawImage(camera.canvas, sx, sy, sw, sh);
-  camera.mergedctx.restore();
+    camera.flipedctx.clearRect(0, 0, sw, sh);
+    camera.flipedctx.save();
+    camera.flipedctx.scale(-1, 1);
+    camera.flipedctx.drawImage(camera.camCanvas, 0, 0, sw, sh, -sw, 0, sw, sh);
+    camera.flipedctx.restore();
 
-  requestAnimationFrame(drawVideoToCanvas);
+    camera.mergedctx.clearRect(0, 0, camera.copyCanvas.width, camera.copyCanvas.height);
+    camera.mergedctx.save();
+    camera.mergedctx.drawImage(camera.copyCanvas, 0, 0, camera.copyCanvas.width, camera.copyCanvas.height);
+    camera.mergedctx.fillStyle = "white";
+    camera.mergedctx.fillRect(sx, sy, sw, sh);
+    camera.mergedctx.strokeStyle = "black";
+    camera.mergedctx.lineWidth = 1;
+    camera.mergedctx.strokeRect(sx, sy, sw, sh + 5);
+    camera.mergedctx.drawImage(camera.canvas, sx, sy, sw, sh);
+    camera.mergedctx.restore();
+
+    await new Promise((resolve) => requestAnimationFrame(resolve));
+  }
 }
 
 function detectPose() {
   let pauseFlag = false;
 
-  camera.originVideo.addEventListener("play", function () {
+  camera.originVideo.addEventListener("play", async function () {
+    if (resultVideo.srcObject) {
+      resultVideo.srcObject.getTracks().forEach((track) => {
+        track.stop();
+      });
+    }
+
+    drawVideoToCanvas();
     var canvasStream = camera.mergedCanvas.captureStream();
     resultVideo.srcObject = canvasStream;
     resultVideo.play();
-    drawVideoToCanvas();
     pauseFlag = false;
   });
 
   camera.originVideo.addEventListener("pause", function () {
+    resultVideo.pause();
     pauseFlag = true;
   });
 
@@ -159,8 +173,6 @@ function detectPose() {
       requestAnimationFrame(poseDetectionFrame);
       return;
     }
-
-    let poses = [];
 
     const input = tf.browser.fromPixels(camera.camCanvas);
     const selectedAvatarSVG = await loadSelectedAvatar();
@@ -181,30 +193,31 @@ function detectPose() {
       predictIrises: true,
     });
 
-    poses = poses.concat(poseDetection);
     input.dispose();
 
     canvasScope.project.clear();
 
-    if (poses.length >= 1 && illustration) {
-      Skeleton.flipPose(poses[0]);
+    if (poseDetection.length >= 1 && illustration) {
+      const pose = poseDetection[0];
+      Skeleton.flipPose(pose);
 
+      let face = null;
       if (faceDetection && faceDetection.length > 0) {
-        let face = Skeleton.toFaceFrame(faceDetection[0]);
-        illustration.updateSkeleton(poses[0], face);
-        eyesDetection.forEach((eyesDetection) => {
-          const rightEAR = getEAR(eyesDetection.annotations.rightEyeLower0, eyesDetection.annotations.rightEyeUpper0);
-          const leftEAR = getEAR(eyesDetection.annotations.leftEyeLower0, eyesDetection.annotations.leftEyeUpper0);
-          let blinked = leftEAR <= EAR_THRESHOLD && rightEAR <= EAR_THRESHOLD;
-          if (blinked) {
-            parseSVG(selectedAvatarSVG, blinked);
-          } else {
-            parseSVG(selectedAvatarSVG, blinked);
-          }
-        });
-      } else {
-        illustration.updateSkeleton(poses[0], null);
+        face = Skeleton.toFaceFrame(faceDetection[0]);
       }
+      illustration.updateSkeleton(pose, face);
+
+      eyesDetection.forEach((eyesDetection) => {
+        const rightEAR = getEAR(eyesDetection.annotations.rightEyeLower0, eyesDetection.annotations.rightEyeUpper0);
+        const leftEAR = getEAR(eyesDetection.annotations.leftEyeLower0, eyesDetection.annotations.leftEyeUpper0);
+        let blinked = leftEAR <= EAR_THRESHOLD && rightEAR <= EAR_THRESHOLD;
+        if (blinked) {
+          parseSVG(selectedAvatarSVG, blinked);
+        } else {
+          parseSVG(selectedAvatarSVG, blinked);
+        }
+      });
+
       illustration.draw(canvasScope, sw, sh);
     }
 
@@ -253,6 +266,10 @@ async function loadSelectedAvatar() {
       case "avatar5":
         selectedAvatarSVG = test5SVG.default;
         break;
+      case "avatar6":
+        selectedAvatarSVG = test6SVG.default;
+        break;
+
       default:
         return null;
     }
@@ -285,85 +302,6 @@ async function loadModels() {
   await parseSVG(selectedAvatarSVG, true);
 }
 
-function displayPreviousSessionInfo() {
-  const selectedVoice = sessionStorage.getItem("selectedVoice");
-  const selectedVideoInfoString = sessionStorage.getItem("selectedVideoInfo");
-  const selectedVideoInfo = JSON.parse(selectedVideoInfoString);
-
-  let selectedS3Path;
-
-  switch (selectedVoice) {
-    case "karina":
-      selectedS3Path = selectedVideoInfo.karina;
-      break;
-    case "Jimin700":
-      selectedS3Path = selectedVideoInfo.Jimin700;
-      break;
-    case "yoon":
-      selectedS3Path = selectedVideoInfo.yoon;
-      break;
-    case "Timcook":
-      selectedS3Path = selectedVideoInfo.Timcook;
-      break;
-    default:
-  }
-
-  if (selectedVideoInfo) {
-    document.getElementById("title").textContent = selectedVideoInfo.title;
-    document.getElementById("instructor").textContent = selectedVideoInfo.nickname;
-    document.getElementById("description").textContent = selectedVideoInfo.content;
-    document.getElementById("date").textContent = selectedVideoInfo.date;
-
-    const s3 = new AWS.S3({
-      accessKeyId: process.env.REACT_APP_AWS_ACCESS_KEY_ID,
-      secretAccessKey: process.env.REACT_APP_AWS_SECRET_ACCESS_KEY,
-      region: process.env.REACT_APP_AWS_DEFAULT_REGION,
-    });
-
-    const params = {
-      Bucket: process.env.REACT_APP_S3_BUCKET,
-      Key: selectedS3Path,
-    };
-
-    s3.getObject(params, (err, data) => {
-      if (err) {
-        console.error("S3 동영상 객체 가져오기 오류:", err);
-      } else {
-        console.log("S3 동영상 객체 가져옴:", data);
-
-        const videoBlob = new Blob([data.Body], { type: data.ContentType });
-        const videoUrl = URL.createObjectURL(videoBlob);
-
-        const videoElement = document.getElementById("originVideo");
-        videoElement.src = videoUrl;
-      }
-    });
-
-    const profileS3Path = selectedVideoInfo.profileS3Path;
-
-    if (profileS3Path !== null) {
-      const profileImageParams = {
-        Bucket: process.env.REACT_APP_S3_BUCKET,
-        Key: profileS3Path,
-      };
-
-      s3.getObject(profileImageParams, (profileErr, profileData) => {
-        if (profileErr) {
-          console.error("프로필 이미지 가져오기 오류:", profileErr);
-        } else {
-          console.log("프로필 이미지 객체 가져옴:", profileData);
-
-          const profileBlob = new Blob([profileData.Body], { type: profileData.ContentType });
-          const profileImageUrl = URL.createObjectURL(profileBlob);
-
-          const profileElement = document.getElementById("profile");
-          profileElement.src = profileImageUrl;
-        }
-      });
-    }
-  }
-}
-
 export async function run() {
   displayPreviousSessionInfo();
 
@@ -387,44 +325,6 @@ run();
 document.addEventListener("DOMContentLoaded", function () {
   var downloadButton = document.getElementById("downloadButton");
   downloadButton.addEventListener("click", downloadPDFFromS3);
-
-  function downloadPDFFromS3() {
-    const selectedVideoInfoString = sessionStorage.getItem("selectedVideoInfo");
-    const selectedVideoInfo = JSON.parse(selectedVideoInfoString);
-
-    if (!selectedVideoInfo) {
-      console.log("이전에 저장된 세션 정보가 없습니다.");
-      return;
-    }
-
-    const s3 = new AWS.S3({
-      accessKeyId: process.env.REACT_APP_AWS_ACCESS_KEY_ID,
-      secretAccessKey: process.env.REACT_APP_AWS_SECRET_ACCESS_KEY,
-      region: process.env.REACT_APP_AWS_DEFAULT_REGION,
-    });
-
-    const params2 = {
-      Bucket: process.env.REACT_APP_S3_BUCKET,
-      Key: selectedVideoInfo.lecturenote,
-    };
-
-    s3.getObject(params2, (err, data) => {
-      if (err) {
-        console.error("S3 강의 자료 객체 가져오기 오류:", err);
-      } else {
-        console.log("S3 강의 자료 객체 가져옴:", data);
-
-        const pdfBlob = new Blob([data.Body], { type: data.ContentType });
-        const pdfUrl = URL.createObjectURL(pdfBlob);
-
-        const link = document.createElement("a");
-        link.href = pdfUrl;
-        const fileName = selectedVideoInfo.lecturenote.split("/").pop();
-        link.download = fileName;
-        link.click();
-      }
-    });
-  }
 });
 
 document.getElementById("goBackButton").addEventListener("click", function () {
@@ -464,18 +364,12 @@ document.getElementById("avatar5").addEventListener("click", function () {
   handleAvatarSelection("avatar5");
 });
 
+document.getElementById("avatar6").addEventListener("click", function () {
+  handleAvatarSelection("avatar6");
+});
+
 var buttonElement = document.getElementById("arrow");
 
 buttonElement.addEventListener("click", function () {
   openDiv();
 });
-
-function openDiv() {
-  if (document.getElementById("inner").style.display === "none") {
-    document.getElementById("inner").style.display = "block";
-    document.getElementById("arrow").style.transform = "rotate(225deg)";
-  } else {
-    document.getElementById("inner").style.display = "none";
-    document.getElementById("arrow").style.transform = "rotate(135deg)";
-  }
-}

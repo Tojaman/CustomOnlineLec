@@ -2,4 +2,7 @@
 venv/
 .env
 .idea/
+# files
 __pycache__/
+DB/__pycache__/
+dao/__pycache__/
