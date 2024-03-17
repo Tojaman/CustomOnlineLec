@@ -4,6 +4,7 @@ import { Link, NavLink, useNavigate } from "react-router-dom";
 import styled from "styled-components";
 import { TfiMenu } from "react-icons/tfi";
 import Swal from "sweetalert2";
+import { useToasts } from "react-toast-notifications";
 
 const NavContainer = styled.div`
   width: 100%;
@@ -89,6 +90,7 @@ const RegisterButton = styled.button`
 
 const Navbar = () => {
   const navigate = useNavigate();
+  const { addToast } = useToasts();
 
   const token = sessionStorage.getItem("token");
 
@@ -104,7 +106,7 @@ const Navbar = () => {
       });
     }
   };
-  
+
   const handleVideoListClick = () => {
     if (!token) {
       Swal.fire({
@@ -121,6 +123,7 @@ const Navbar = () => {
   const handleLogout = () => {
     sessionStorage.clear();
     navigate("/");
+    addToast("성공적으로 로그아웃되었습니다.", { appearance: "success", autoDismiss: true, autoDismissTimeout: 5000 });
   };
 
   return (
@@ -163,6 +166,15 @@ const Navbar = () => {
             마이페이지
           </NavItem>
         ) : null}
+        <NavItem
+          to="/manage"
+          style={{
+            color: location.pathname === "/manage" ? "#499be9" : "",
+            fontWeight: location.pathname === "/manage" ? "bold" : "normal",
+          }}
+        >
+          대시보드
+        </NavItem>
       </NavElement>
       {!token && (
         <BeforeLogin>
