@@ -9,10 +9,7 @@ import com.example.CustomLecture.repository.ConvertVideoRepository;
 import com.example.CustomLecture.repository.UserRepository;
 import com.example.CustomLecture.repository.VideoDataRepository;
 import com.example.CustomLecture.repository.VideoRepository;
-import com.example.CustomLecture.repository.ConvertVideoRepository;
 import com.google.gson.Gson;
-
-import jakarta.persistence.Convert;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
@@ -139,15 +136,15 @@ public class VideoService {
     public List<String> getAllVideoTitles() {
         List<Video> videoTitles = videoRepository.findAll();
         return videoTitles.stream()
-                .map(video -> video.getTitle() != null ? video.getTitle() : " ") // null 값 대체
+                .map(Video::getTitle)
                 .collect(Collectors.toList());
     }
 
     //모든 영상 썸네일 불러오기
-    public List<String> getAllVideoThumbnails(){
-        List<Video> videoThumbnails = videoRepository.findAll();
-        return videoThumbnails.stream()
-                .map(video -> video.getThumbnailS3Path() != null ? video.getThumbnailS3Path() : " ") // null 값 대체
+    public List<String> getAllVideoThumbnails() {
+        List<Video> videos = videoRepository.findAll();
+        return videos.stream()
+                .map(Video::getThumbnailS3Path)
                 .collect(Collectors.toList());
     }
 
@@ -162,11 +159,11 @@ public class VideoService {
                 .collect(Collectors.toList());
     }
 
-    //모든 영상 주제 불러오기
-    public List<String> getAllSubject(){
-        List<Video> subject = videoRepository.findAll();
-        return subject.stream()
-                .map(video -> video.getSubject() != null ? video.getSubject() : " ") // null 값 대체
+    // 모든 영상 주제 불러오기
+    public List<String> getAllSubject() {
+        List<Video> subjects = videoRepository.findAll();
+        return subjects.stream()
+                .map(Video::getSubject)
                 .collect(Collectors.toList());
     }
 
@@ -204,5 +201,7 @@ public class VideoService {
         convertVideoRepository.delete(video.getConvertVideos());
         videoDataRepository.delete(video.getVideoData());
     }
+
+
 }
 
