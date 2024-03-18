@@ -50,5 +50,20 @@ public class AdminController {
         return new ResponseEntity<>(result, HttpStatus.OK);
     }
 
+    @DeleteMapping("/{videoid}")
+    @Operation(summary = "강의 삭제", description = "영상 업로드 도중 취소하면 관련 정보 삭제")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "OK"),
+            @ApiResponse(responseCode = "500", description = "Server Error")
+    })
+    public ResponseEntity<String> deleteVideo(@PathVariable Long videoid) {
+
+        try {
+            adminService.deleteVideo(videoid);
+            return ResponseEntity.status(HttpStatus.OK).body("게시물 삭제 성공");
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("삭제 실패");
+        }
+    }
 
 }
