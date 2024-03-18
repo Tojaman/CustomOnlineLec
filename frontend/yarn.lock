@@ -10641,11 +10641,6 @@ raw-body@2.5.1:
     iconv-lite "0.4.24"
     unpipe "1.0.0"
 
-reac@^0.0.0:
-  version "0.0.0"
-  resolved "https://registry.yarnpkg.com/reac/-/reac-0.0.0.tgz#5b8461c365578763af6ee41a69e1fde4e49c390a"
-  integrity sha512-ZTUwef1ifvoGaGs2wZzQf3WkDAsiVsGGjPTUNJouYDAgS7j1A9xlXb4K2Vv4IY6hw41YqYIc7A1gFDkWG9F9sA==
-
 react-app-polyfill@^3.0.0:
   version "3.0.0"
   resolved "https://registry.npmjs.org/react-app-polyfill/-/react-app-polyfill-3.0.0.tgz"

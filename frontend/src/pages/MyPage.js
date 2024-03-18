@@ -427,7 +427,7 @@ const MyPage = () => {
           })
           .then((response) => {
             console.log("회원탈퇴 요청 성공");
-            addToast("회원탈퇴가 성공적으로 되었습니다.", { appearance: "success", autoDismiss: true, autoDismissTimeout: 5000 });
+            addToast("성공적으로 회원탈퇴되었습니다.", { appearance: "success", autoDismiss: true, autoDismissTimeout: 5000 });
             sessionStorage.clear();
             navigate("/");
           })
