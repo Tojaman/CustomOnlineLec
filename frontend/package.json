@@ -24,7 +24,6 @@
     "jwt-decode": "^4.0.0",
     "paper": "^0.12.17",
     "parcel-bundler": "^1.12.5",
-    "reac": "^0.0.0",
     "react": "^18.2.0",
     "react-chartjs-2": "^5.2.0",
     "react-dom": "^18.2.0",

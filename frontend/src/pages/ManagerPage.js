@@ -9,6 +9,8 @@ import Navbar from "../components/header/Navbar";
 import Background from "../assets/img/Group.png";
 import axios from "axios";
 import AWS from "aws-sdk";
+import Swal from "sweetalert2";
+import { useToasts } from "react-toast-notifications";
 
 import avatarImg1 from "../assets/avatarImg/기본아바타여1.jpg";
 import avatarImg2 from "../assets/avatarImg/기본아바타남1.jpg";
@@ -82,7 +84,6 @@ const VideoItems = styled.div`
   margin-right: 10px;
   margin-bottom: 10px;
   height: 400px;
-  width: 94%;
   overflow-y: auto;
 `;
 
@@ -91,49 +92,61 @@ const VideoListContainer = styled.div`
   width: 99%;
   display: flex;
   flex-direction: row;
-  border: 1px solid #000;
+  justify-content: space-between;
+  margin-bottom: 2px;
+  align-items: center;
 `;
 
 const PlainLink = styled(Link)`
   text-decoration: none;
   color: inherit;
-  width: 100%;
-`;
-
-const VideoContainer = styled.div`
-  display: flex;
-  flex-direction: row;
-  cursor: pointer;
+  height: 30px;
 `;
 
 const Thumbnail = styled.img`
   max-width: 100%;
-  max-height: 50px;
+  max-height: 45px;
+`;
+
+const TextThumbnail = styled.div`
+  width: 80px;
+  height: 30px;
 `;
 
 const TextTitle = styled.div`
-  margin-top: 9px;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-  padding: 2px;
-  width: 60%;
-`;
-
-const DeleteButton = styled.div`
-  padding: 8px;
-  padding-top: 15px;
-  margin-left: auto;
+  width: 150px;
+  height: 30px;
   cursor: pointer;
 `;
 
 const TextNickname = styled.div`
-  margin-top: 9px;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-  padding: 2px;
-  width: 30%;
+  width: 100px;
+  height: 30px;
+`;
+
+const DeleteButton = styled.div`
+  padding-top: 5px;
+  cursor: pointer;
+  width: 17px;
+  height: 25px;
+`;
+
+const TextDelete = styled.div`
+  width: 17px;
+  height: 25px;
+`;
+
+const DivideLine = styled.hr`
+  border: none;
+  height: 1px;
+  background-color: #ccc;
+  margin: 2px 0;
 `;
 
 const Image = styled.img`
@@ -163,13 +176,14 @@ const Manage = () => {
     etc: 0,
   });
   const [dateStats, setDateStats] = useState([]);
+  const { addToast } = useToasts();
 
   const today = new Date();
   const pastWeek = new Array(7)
     .fill()
     .map((_, index) => {
       const date = new Date(today);
-      date.setDate(today.getDate() - index);
+      date.setDate(today.getDate() - index + 1);
       return date.toISOString().split("T")[0];
     })
     .reverse();
@@ -224,6 +238,15 @@ const Manage = () => {
   const token = sessionStorage.getItem("token");
 
   useEffect(() => {
+    fetchUserData();
+    fetchVideoData();
+  }, []);
+
+  const fetchUserData = () => {
+    
+  };
+
+  const fetchVideoData = () => {
     sessionStorage.removeItem("selectedVideoId");
     sessionStorage.removeItem("selectedVideoInfo");
     sessionStorage.removeItem("selectedVoice");
@@ -306,14 +329,38 @@ const Manage = () => {
           .catch((error) => console.error("썸네일 출력 실패 : ", error));
       })
       .catch((error) => console.error("영상 목록 요청 실패 : ", error));
-  }, [token]);
+  };
 
   const handleVideoClick = (videoId) => {
     sessionStorage.setItem("selectedVideoId", videoId);
   };
 
   const handleDeleteButtonClick = (videoId) => {
-    console.log(videoId);
+    Swal.fire({
+      title: "정말로 삭제하시겠습니까?",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonText: "예",
+      cancelButtonText: "아니요",
+    }).then((result) => {
+      if (result.isConfirmed) {
+        axios
+          .delete(`http://localhost:8080/videos/${videoId}`, {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          })
+          .then((response) => {
+            console.log("영상 삭제 성공");
+            addToast("성공적으로 영상이 삭제되었습니다.", { appearance: "success", autoDismiss: true, autoDismissTimeout: 5000 });
+            fetchVideoData();
+          })
+          .catch((error) => {
+            console.error("영상 삭제 요청 실패 : ", error);
+            addToast("영상 삭제 요청을 실패했습니다.", { appearance: "error", autoDismiss: true, autoDismissTimeout: 5000 });
+          });
+      }
+    });
   };
 
   return (
@@ -339,19 +386,28 @@ const Manage = () => {
           <DashContainer>
             <Sub>영상 목록</Sub>
             <VideoItems>
+              <br></br>
+              <VideoListContainer>
+                <TextThumbnail>썸네일</TextThumbnail>
+                <TextTitle>제목</TextTitle>
+                <TextNickname>닉네임</TextNickname>
+                <TextDelete></TextDelete>
+              </VideoListContainer>
+              <DivideLine></DivideLine>
               {videos.map((video) => (
-                <VideoListContainer key={video.id}>
-                  <PlainLink to="/select" onClick={() => handleVideoClick(video.id)}>
-                    <VideoContainer>
-                      <Thumbnail src={video.thumbnail} alt="썸네일" />
+                <div key={video.id}>
+                  <VideoListContainer>
+                    <Thumbnail src={video.thumbnail} alt="썸네일" />
+                    <PlainLink to="/select" onClick={() => handleVideoClick(video.id)}>
                       <TextTitle>{video.title} </TextTitle>
-                      <TextNickname>{video.nickname}</TextNickname>
-                    </VideoContainer>{" "}
-                  </PlainLink>{" "}
-                  <DeleteButton onClick={() => handleDeleteButtonClick(video.id)}>
-                    <BsTrash />
-                  </DeleteButton>
-                </VideoListContainer>
+                    </PlainLink>
+                    <TextNickname>{video.nickname}</TextNickname>
+                    <DeleteButton onClick={() => handleDeleteButtonClick(video.id)}>
+                      <BsTrash />
+                    </DeleteButton>
+                  </VideoListContainer>
+                  <DivideLine></DivideLine>
+                </div>
               ))}
             </VideoItems>
           </DashContainer>
