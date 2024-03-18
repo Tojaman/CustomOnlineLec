@@ -1,11 +1,14 @@
 package com.example.CustomLecture.repository;
 
 import com.example.CustomLecture.entity.UserEntity;
+import com.example.CustomLecture.entity.Video;
 import org.apache.catalina.User;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
 import java.util.Optional;
 
 @Repository
@@ -23,7 +26,13 @@ public interface UserRepository extends JpaRepository<UserEntity, Long> {
 
     Optional<UserEntity> findById(Long id);
 
+
+
+
+    List<UserEntity> findAll();
+
     void deleteByUsername(String username);
+
 
     UserEntity findByGoogleId(String googleId);
 }
