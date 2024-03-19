@@ -22,8 +22,11 @@ public class AdminService {
 
     @Autowired
     private UserRepository userRepository;
+    @Autowired
     private VideoRepository videoRepository;
+    @Autowired
     private ConvertVideoRepository convertVideoRepository;
+    @Autowired
     private VideoDataRepository videoDataRepository;
 
 
@@ -54,7 +57,6 @@ public class AdminService {
     }
 
     public void deleteVideo(Long videoid) {
-
         Video video = videoRepository.findById(videoid).orElse(null);
 
         if (video == null) {
