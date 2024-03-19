@@ -4,6 +4,7 @@ import Main from "./pages/MainPage";
 import Login from "./pages/LoginPage";
 import Register from "./pages/RegisterPage";
 import MyPage from "./pages/MyPage";
+import Manage from "./pages/ManagerPage";
 import UploadList from "./pages/UploadListPage";
 import Attach from "./pages/uploadVideo/AttachVideoPage";
 import Modify from "./pages/uploadVideo/ModifySubtitlePage";
@@ -19,6 +20,7 @@ function App() {
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
         <Route path="/mypage" element={<MyPage />} />
+        <Route path="/manage" element={<Manage />} />
         <Route path="/uploadList" element={<UploadList />} />
         <Route path="/attach" element={<Attach />} />
         <Route path="/modify" element={<Modify />} />

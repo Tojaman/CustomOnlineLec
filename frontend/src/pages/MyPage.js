@@ -99,6 +99,7 @@ const Input = styled.input`
   width: 100%;
   border-radius: 10px;
   margin-bottom: 20px;
+  font-size: 16px;
 `;
 
 const ChangeButton = styled.button`
@@ -426,7 +427,7 @@ const MyPage = () => {
           })
           .then((response) => {
             console.log("회원탈퇴 요청 성공");
-            addToast("회원탈퇴가 성공적으로 되었습니다.", { appearance: "success", autoDismiss: true, autoDismissTimeout: 5000 });
+            addToast("성공적으로 회원탈퇴되었습니다.", { appearance: "success", autoDismiss: true, autoDismissTimeout: 5000 });
             sessionStorage.clear();
             navigate("/");
           })
@@ -454,12 +455,15 @@ const MyPage = () => {
           </ProfileImageContainer>
 
           <InfoContainer>
-            <InfoText>닉네임</InfoText>
 
             {isEditing ? (
-              <Input value={editedNickname} onChange={(e) => setEditedNickname(e.target.value)} />
+              <InfoEditContainer>
+              <InfoText>변경할 닉네임</InfoText>
+              <Input value={editedNickname} onChange={(e) => setEditedNickname(e.target.value)} /></InfoEditContainer>
             ) : (
-              <Input value={nickname} readOnly />
+                <InfoEditContainer>
+                <InfoText>닉네임</InfoText>
+              <Input value={nickname} readOnly /></InfoEditContainer>
             )}
 
             {isEditing && (
@@ -490,7 +494,7 @@ const MyPage = () => {
           )}
         </ProfileContainer>
 
-        <SubTitle>업로드 영상 목록</SubTitle>
+        <SubTitle>Upload List</SubTitle>
         <UploadListContainer>
           {videos.slice(0, 3).map((video) => (
             <VideoContainer key={video.id}>

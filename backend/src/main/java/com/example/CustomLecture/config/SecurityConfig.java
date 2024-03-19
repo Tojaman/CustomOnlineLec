@@ -15,7 +15,11 @@ import org.springframework.security.config.annotation.authentication.configurati
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
+import org.springframework.security.core.userdetails.User;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.provisioning.InMemoryUserDetailsManager;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.web.cors.CorsConfiguration;
@@ -110,7 +114,8 @@ public class SecurityConfig {
                     // 아래 경로에 대해서 모든 권한 허용 -> 이걸 밑밑으로 옮기면 로그인 한 사용자만 접근할 수 있도록 변경
                     .requestMatchers("/login", "/", "/join", "/v3/**", "/swagger-ui/**").permitAll()
                     // admin 경로는 admin이라는 권한 가진 사용자만 접근
-                    .requestMatchers("/admin").hasRole("ADMIN")
+                    .requestMatchers("/admin/**").hasRole("ADMIN")
+
                     // 그 외 다른 요청은 로그인한 사용자만 접근가능
                     .anyRequest().authenticated());
 
@@ -131,5 +136,7 @@ public class SecurityConfig {
 
 
         return http.build();
+
     }
+
 }

@@ -23,6 +23,11 @@ public class JoinDTO {
         this.nickname = nickname;
     }
 
+    public JoinDTO(String username, String nickname){
+        this.username = username;
+        this.nickname=nickname;
+    }
+
 
 
 
