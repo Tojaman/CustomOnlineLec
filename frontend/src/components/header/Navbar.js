@@ -92,6 +92,8 @@ const Navbar = () => {
   const navigate = useNavigate();
   const { addToast } = useToasts();
 
+  const role = sessionStorage.getItem("role");
+
   const token = sessionStorage.getItem("token");
 
   const handleUploadClick = () => {
@@ -166,15 +168,17 @@ const Navbar = () => {
             마이페이지
           </NavItem>
         ) : null}
-        <NavItem
-          to="/manage"
-          style={{
-            color: location.pathname === "/manage" ? "#499be9" : "",
-            fontWeight: location.pathname === "/manage" ? "bold" : "normal",
-          }}
-        >
-          대시보드
-        </NavItem>
+        {role === "ROLE_ADMIN" && (
+          <NavItem
+            to="/manage"
+            style={{
+              color: location.pathname === "/manage" ? "#499be9" : "",
+              fontWeight: location.pathname === "/manage" ? "bold" : "normal",
+            }}
+          >
+            대시보드
+          </NavItem>
+        )}
       </NavElement>
       {!token && (
         <BeforeLogin>
