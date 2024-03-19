@@ -18,6 +18,7 @@ import avatarImg3 from "../assets/avatarImg/윤석열.jpg";
 import avatarImg4 from "../assets/avatarImg/트럼프.jpg";
 import avatarImg5 from "../assets/avatarImg/키키.jpg";
 import avatarImg6 from "../assets/avatarImg/뽀로로.jpg";
+import originProfileImage from "../assets/origin_profile.jpg";
 
 const avatarImages = [avatarImg1, avatarImg2, avatarImg3, avatarImg4, avatarImg5, avatarImg6];
 const audioImages = [avatarImg1, avatarImg2, avatarImg3, avatarImg4, avatarImg5, avatarImg6];
@@ -79,6 +80,50 @@ const Sub = styled.span`
   margin-left: 8px;
 `;
 
+const UserItems = styled.div`
+  margin-left: 10px;
+  margin-right: 10px;
+  margin-bottom: 10px;
+  height: 400px;
+  overflow-y: auto;
+`;
+
+const UserListContainer = styled.div`
+  background-color: #fff;
+  width: 99%;
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  margin-bottom: 2px;
+  align-items: center;
+`;
+
+const ProfileContainer = styled.div`
+  width: 60px;
+  height: 60px;
+  display: flex;
+  align-items: center;
+`;
+
+const Profile = styled.img`
+  max-width: 60px;
+  max-height: 60px;
+  object-fit: cover;
+`;
+
+const TextProfile = styled.div`
+  width: 60px;
+  height: 30px;
+`;
+
+const TextUsername = styled.div`
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  width: 150px;
+  height: 30px;
+`;
+
 const VideoItems = styled.div`
   margin-left: 10px;
   margin-right: 10px;
@@ -103,13 +148,21 @@ const PlainLink = styled(Link)`
   height: 30px;
 `;
 
+const ThumbnailContainer = styled.div`
+  width: 120px;
+  height: 60px;
+  display: flex;
+  align-items: center;
+`;
+
 const Thumbnail = styled.img`
-  max-width: 100%;
-  max-height: 45px;
+  max-width: 120px;
+  max-height: 60px;
+  object-fit: cover;
 `;
 
 const TextThumbnail = styled.div`
-  width: 80px;
+  width: 120px;
   height: 30px;
 `;
 
@@ -165,6 +218,7 @@ const ImageContainer = styled.div`
 
 const Manage = () => {
   const [videos, setVideos] = useState([]);
+  const [users, setUsers] = useState([]);
   const [categoryStats, setCategoryStats] = useState({
     C: 0,
     Python: 0,
@@ -243,7 +297,55 @@ const Manage = () => {
   }, []);
 
   const fetchUserData = () => {
-    
+    AWS.config.update({
+      accessKeyId: process.env.REACT_APP_AWS_ACCESS_KEY_ID,
+      secretAccessKey: process.env.REACT_APP_AWS_SECRET_ACCESS_KEY,
+      region: process.env.REACT_APP_AWS_DEFAULT_REGION,
+    });
+
+    const s3 = new AWS.S3();
+
+    axios
+      .get("http://localhost:8080/admin/user/list", {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      })
+      .then((response) => {
+        const userData = response.data
+          .map((user) => ({
+            nickname: user.nickname,
+            profileS3Path: user.profileS3Path,
+            username: user.username,
+          }))
+          .slice(1)
+          .reverse();
+        console.log("사용자 목록 요청 성공");
+
+        const getProfiles = userData.map((user) => {
+          return user.profileS3Path
+            ? s3.getSignedUrlPromise("getObject", {
+                Bucket: process.env.REACT_APP_S3_BUCKET,
+                Key: user.profileS3Path,
+                Expires: 300,
+              })
+            : Promise.resolve(null);
+        });
+
+        Promise.all(getProfiles)
+          .then((urls) => {
+            const modifiedUserData = userData
+              .map((user, index) => ({
+                ...user,
+                profileS3Path: urls[index] ? urls[index] : originProfileImage, // Use originProfileImage if url is null
+              }))
+              .reverse();
+            setUsers(modifiedUserData);
+            console.log("프로필 출력 성공");
+          })
+          .catch((error) => console.error("프로필 출력 실패 : ", error));
+      })
+      .catch((error) => console.error("사용자 목록 요청 실패 : ", error));
   };
 
   const fetchVideoData = () => {
@@ -335,7 +437,7 @@ const Manage = () => {
     sessionStorage.setItem("selectedVideoId", videoId);
   };
 
-  const handleDeleteButtonClick = (videoId) => {
+  const handleDeleteUserButtonClick = (username) => {
     Swal.fire({
       title: "정말로 삭제하시겠습니까?",
       icon: "warning",
@@ -345,7 +447,35 @@ const Manage = () => {
     }).then((result) => {
       if (result.isConfirmed) {
         axios
-          .delete(`http://localhost:8080/videos/${videoId}`, {
+          .delete(`http://localhost:8080/mypage/delete/${username}`, {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          })
+          .then((response) => {
+            console.log("회원 삭제 요청 성공");
+            addToast("성공적으로 회원이 삭제되었습니다.", { appearance: "success", autoDismiss: true, autoDismissTimeout: 5000 });
+            fetchUserData();
+          })
+          .catch((error) => {
+            console.error("회원 삭제 요청 실패 : ", error);
+            addToast("회원 삭제 요청을 실패했습니다.", { appearance: "error", autoDismiss: true, autoDismissTimeout: 5000 });
+          });
+      }
+    });
+  };
+
+  const handleDeleteVideoButtonClick = (videoId) => {
+    Swal.fire({
+      title: "정말로 삭제하시겠습니까?",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonText: "예",
+      cancelButtonText: "아니요",
+    }).then((result) => {
+      if (result.isConfirmed) {
+        axios
+          .delete(`http://localhost:8080/admin/videos/${videoId}`, {
             headers: {
               Authorization: `Bearer ${token}`,
             },
@@ -382,11 +512,36 @@ const Manage = () => {
         <Container>
           <DashContainer>
             <Sub>사용자 목록</Sub>
+            <br></br>
+            <UserItems>
+              <UserListContainer>
+                <TextProfile>프로필</TextProfile>
+                <TextUsername>아이디</TextUsername>
+                <TextNickname>닉네임</TextNickname>
+                <TextDelete></TextDelete>
+              </UserListContainer>
+              <DivideLine></DivideLine>
+              {users.map((user) => (
+                <div key={user.username}>
+                  <UserListContainer>
+                    <ProfileContainer>
+                      <Profile src={user.profileS3Path} alt="프로필" />
+                    </ProfileContainer>
+                    <TextUsername>{user.username} </TextUsername>
+                    <TextNickname>{user.nickname}</TextNickname>
+                    <DeleteButton onClick={() => handleDeleteUserButtonClick(user.username)}>
+                      <BsTrash />
+                    </DeleteButton>
+                  </UserListContainer>
+                  <DivideLine></DivideLine>
+                </div>
+              ))}
+            </UserItems>
           </DashContainer>
           <DashContainer>
             <Sub>영상 목록</Sub>
+            <br></br>
             <VideoItems>
-              <br></br>
               <VideoListContainer>
                 <TextThumbnail>썸네일</TextThumbnail>
                 <TextTitle>제목</TextTitle>
@@ -397,12 +552,14 @@ const Manage = () => {
               {videos.map((video) => (
                 <div key={video.id}>
                   <VideoListContainer>
-                    <Thumbnail src={video.thumbnail} alt="썸네일" />
+                    <ThumbnailContainer>
+                      <Thumbnail src={video.thumbnail} alt="썸네일" />
+                    </ThumbnailContainer>
                     <PlainLink to="/select" onClick={() => handleVideoClick(video.id)}>
                       <TextTitle>{video.title} </TextTitle>
                     </PlainLink>
                     <TextNickname>{video.nickname}</TextNickname>
-                    <DeleteButton onClick={() => handleDeleteButtonClick(video.id)}>
+                    <DeleteButton onClick={() => handleDeleteVideoButtonClick(video.id)}>
                       <BsTrash />
                     </DeleteButton>
                   </VideoListContainer>
