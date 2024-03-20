@@ -49,7 +49,6 @@ class ConvertVoice(Resource):
             user_id = request.json['userId']
             original_video_s3_path = request.json['url']
             gender = request.json['gender']
-            # gender = "woman"
             
             dir_path = "./files/"
 
@@ -90,6 +89,7 @@ class ConvertVoice(Resource):
             while not all(result.ready() for result in results.values()):
                 print("변환중...")
                 time.sleep(1)
+            print("변환 완료")
             
             # subtitle = subtitle.get()
             # if subtitle['success']:
@@ -112,6 +112,7 @@ class ConvertVoice(Resource):
 
             # DB 업로드
             connection = get_connection(DB)
+            print("DB 연결")
             video_id = video_dao.upload_convert_s3_path(connection, user_id, original_video_s3_path, results)
             connection.close()
             
@@ -167,21 +168,26 @@ def s3_connection():
         raise
 
 def extract_audio(dir_path, file_path):
+    print("음성 추출 시작")
     # 동영상 파일 로드
     video_clip = VideoFileClip(file_path)
 
+    print("오디오 추출")
     # 오디오 추출
     audio_clip = video_clip.audio
 
+    print("파일명 추출")
     # 파일명 추출
     file_name = os.path.splitext(os.path.basename(file_path))[0] # splitext : 파일의 확장자를 분리해서 저장하기 위함
 
     # 오피오 파일 경로 설정
     output_audio_path = os.path.join(dir_path, f'{file_name}_extract_audio.wav')
-
+    print(output_audio_path)
+    
+    print("저장 전")
     # 오디오를 WAV 파일로 저장
     audio_clip.write_audiofile(output_audio_path, codec='pcm_s16le', fps=audio_clip.fps)
-
+    print("저장 후")
     # 메모리에서 오디오 클립 제거
     audio_clip.close()
 

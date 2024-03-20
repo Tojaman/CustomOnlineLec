@@ -56,20 +56,20 @@ services:
     ports:
       - "8080:8080"
 
-  react:
-    container_name: react
-    env_file:
-      - ./frontend/.env
-    # Spring Boot 서버 설정
-    build:
-      context: ./frontend
-      dockerfile: Dockerfile
-    volumes:
-      - ./frontend/src:/frontend/src
-      - ./frontend/node_modules:/frontend/node_modules
-    restart: always
-    ports:
-      - "3000:3000"
-    depends_on:
-      - springboot
-      - flask
+  # react:
+  #   container_name: react
+  #   env_file:
+  #     - ./frontend/.env
+  #   # Spring Boot 서버 설정
+  #   build:
+  #     context: ./frontend
+  #     dockerfile: Dockerfile
+  #   volumes:
+  #     - ./frontend/src:/frontend/src
+  #     - ./frontend/node_modules:/frontend/node_modules
+  #   restart: always
+  #   ports:
+  #     - "3000:3000"
+  #   depends_on:
+  #     - springboot
+  #     - flask
