@@ -48,8 +48,8 @@ class ConvertVoice(Resource):
         try:
             user_id = request.json['userId']
             original_video_s3_path = request.json['url']
-            # gender = request.json['gender']
-            gender = "woman"
+            gender = request.json['gender']
+            # gender = "woman"
             
             dir_path = "./files/"
 
