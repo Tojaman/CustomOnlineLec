@@ -14,6 +14,11 @@ import avatarImg4 from "../../assets/avatarImg/트럼프.jpg";
 import avatarImg5 from "../../assets/avatarImg/키키.jpg";
 import avatarImg6 from "../../assets/avatarImg/뽀로로.jpg";
 
+import voiceImg1 from "../../assets/avatarImg/문재인.jpg";
+import voiceImg2 from "../../assets/avatarImg/지민.jpg";
+import voiceImg3 from "../../assets/avatarImg/윈터.jpg";
+import voiceImg4 from "../../assets/avatarImg/카리나.jpg";
+
 import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
 
@@ -57,7 +62,7 @@ const SelectText = styled.p`
 
 const CustomSlider = styled(Slider)`
   width: 800px;
-
+  
   .slick-list {
     height: 160px;
     width: 100%;
@@ -65,12 +70,10 @@ const CustomSlider = styled(Slider)`
 
   .slick-slide {
     margin: 0 10px;
-    border: 1px solid #e1dddd;
-    background-color: white;
 
     &:hover {
       height: 150px;
-      border: 1px solid #ffeb0b;
+
     }
   }
   .slick-track {
@@ -89,10 +92,12 @@ const CustomSlider = styled(Slider)`
 `;
 
 const Img = styled.img`
-  border: 1px solid #e9ecef;
+  border: none;
   max-width: 100%;
   max-height: 125px;
-  margin-bottom: 5px;
+  margin: 0 auto 5px;
+  display: block; 
+  border-radius: 50%;
 `;
 
 const Name = styled.div`
@@ -101,6 +106,7 @@ const Name = styled.div`
   font-size: 18px;
   line-height: 15px;
   margin: 2px;
+  text-align: center;
 `;
 
 const NextButton = styled(Link)`
@@ -124,10 +130,10 @@ const settings = {
 };
 
 const voices = [
-  { id: "yoon", name: "윤석열", img: "https://via.placeholder.com/150" },
-  { id: "Jimin700", name: "BTS 지민", img: "https://via.placeholder.com/150" },
-  { id: "Timcook", name: "Timcook", img: "https://via.placeholder.com/150" },
-  { id: "karina", name: "에스파 카리나", img: "https://via.placeholder.com/150" },
+  { id: "moon", name: "문재인", img: voiceImg1 },
+  { id: "jimin", name: "BTS 지민", img: voiceImg2},
+  { id: "winter", name: "에스파 윈터", img: voiceImg3 },
+  { id: "karina", name: "에스파 카리나", img: voiceImg4 },
 ];
 
 const avatars = [
