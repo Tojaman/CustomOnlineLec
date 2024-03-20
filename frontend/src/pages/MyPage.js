@@ -373,7 +373,15 @@ const MyPage = () => {
             thumbnail: video.thumbnail,
             nickname: video.nickname,
           }))
-          .filter((video) => video.title !== null && video.thumbnail !== null && video.nickname !== null);
+          .filter(
+            (video) =>
+              video.title !== null &&
+              video.thumbnail !== null &&
+              video.nickname !== null &&
+              video.title !== "" &&
+              video.thumbnail !== "" &&
+              video.nickname !== ""
+          );
 
         const getThumbnails = videoData.map((video) => {
           return s3.getSignedUrlPromise("getObject", {

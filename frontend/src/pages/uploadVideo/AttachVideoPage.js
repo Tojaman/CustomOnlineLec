@@ -7,6 +7,7 @@ import styled from "styled-components";
 import Navbar from "../../components/header/Navbar";
 import { GoArrowRight } from "react-icons/go";
 import { useDispatch } from "react-redux";
+import { subtitle } from "../../redux/subtitle";
 import { videoData } from "../../redux/videoData";
 import { useToasts } from "react-toast-notifications";
 
@@ -208,12 +209,25 @@ const Attach = () => {
       sessionStorage.setItem("UploadVideoID", response.data.video_id);
       console.log("영상 링크 업로드 요청 성공");
 
-      if (response.data.stt_result == 1)
+      const subtitleResponse = {
+        subtitleList: [
+          { end: 16.0, text: " 학습 목표는 변수와 성수를 정의하고 사용할 수 있다. 주석의 개념을 이해한다.", start: 10.0 },
+          { end: 22.0, text: " 산술 연산자와 할당 연산자에 대하여 이해한다. 연산자의 우선순위 개념을 이해한다.", start: 16.0 },
+          { end: 27.0, text: " 사용자로부터 입력을 받고 출력을 하는 프로그램을 작성할 수 있다.", start: 22.0 },
+          { end: 35.0, text: " 문자열의 기초연산을 이해한다.", start: 27.0 },
+          { end: 44.0, text: " 변수는 컴퓨터 메모리 공간에 이름을 붙이는 것으로 우리는 여기에 값을 저장할 수 있습니다.", start: 35.0 },
+        ],
+      };
+
+      dispatch(subtitle(subtitleResponse));
+
+      if (response.data.stt_result == 1) {
         setTimeout(
           () => addToast("자막이 성공적으로 추출되었습니다.", { appearance: "success", autoDismiss: true, autoDismissTimeout: 5000 }),
           0
         );
-      else if (response.data.stt_result == -1)
+        // dispatch(subtitle(subtitleResponse));
+      } else if (response.data.stt_result == -1 || response.data.stt_result == 0)
         setTimeout(() => addToast("자막 추출을 실패했습니다.", { appearance: "error", autoDismiss: true, autoDismissTimeout: 5000 }), 0);
 
       if (response.data.rvc_result == 1)
@@ -221,7 +235,7 @@ const Attach = () => {
           () => addToast("음성이 성공적으로 변환되었습니다.", { appearance: "success", autoDismiss: true, autoDismissTimeout: 5000 }),
           3000
         );
-      else if (response.data.rvc_result == -1)
+      else if (response.data.rvc_result == -1 || response.data.rvc_result == 0)
         setTimeout(() => addToast("음성 변환을 실패했습니다.", { appearance: "error", autoDismiss: true, autoDismissTimeout: 5000 }), 3000);
 
       setTimeout(
@@ -392,7 +406,7 @@ const Attach = () => {
               다음 <GoArrowRight />
             </NextButton>
           ) : (
-            <DisabledNextButton onClick={handleSubmit}>
+            <DisabledNextButton>
               다음 <GoArrowRight />
             </DisabledNextButton>
           )}

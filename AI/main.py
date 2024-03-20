@@ -48,8 +48,8 @@ class ConvertVoice(Resource):
         try:
             user_id = request.json['userId']
             original_video_s3_path = request.json['url']
-            gender = request.json['gender']
-            # gender = "woman"
+            # gender = request.json['gender']
+            gender = "woman"
             
             dir_path = "./files/"
 
@@ -120,7 +120,7 @@ class ConvertVoice(Resource):
             # JSON 형식 자막, s3 경로 저장한 테이블 기본키 HTTP body에 넣어서 프론트에 return
             response_data = {
                 'video_id': video_id,
-                # 'stt_result': stt_result, # 자막 변환 성공 여부 반환
+                'stt_result': stt_result, # 자막 변환 성공 여부 반환
                 'rvc_result': rvc_result # RVC 음성 변환 성공 여부(1 = 성공, -1 = 실패)
             }
 

@@ -237,7 +237,7 @@ const Manage = () => {
     .fill()
     .map((_, index) => {
       const date = new Date(today);
-      date.setDate(today.getDate() - index + 1);
+      date.setDate(today.getDate() - index);
       return date.toISOString().split("T")[0];
     })
     .reverse();
@@ -369,16 +369,14 @@ const Manage = () => {
         },
       })
       .then((response) => {
-        const videoData = response.data
-          .map((video) => ({
-            id: video.id,
-            title: video.title,
-            thumbnail: video.thumbnail,
-            nickname: video.nickname,
-            date: video.date,
-            subject: video.subject,
-          }))
-          .filter((video) => video.title !== null && video.thumbnail !== null && video.nickname !== null);
+        const videoData = response.data.map((video) => ({
+          id: video.id || "",
+          title: video.title || "",
+          thumbnail: video.thumbnail || "",
+          nickname: video.nickname || "",
+          date: video.date || "",
+          subject: video.subject || "",
+        }));
         console.log("영상 목록 요청 성공");
 
         const pastWeekCount = pastWeek.reduce((acc, dateString) => {
@@ -410,11 +408,15 @@ const Manage = () => {
         setCategoryStats(categoryCount);
 
         const getThumbnails = videoData.map((video) => {
-          return s3.getSignedUrlPromise("getObject", {
-            Bucket: process.env.REACT_APP_S3_BUCKET,
-            Key: video.thumbnail,
-            Expires: 300,
-          });
+          if (video.thumbnail) {
+            return s3.getSignedUrlPromise("getObject", {
+              Bucket: process.env.REACT_APP_S3_BUCKET,
+              Key: video.thumbnail,
+              Expires: 300,
+            });
+          } else {
+            return Promise.resolve("");
+          }
         });
 
         Promise.all(getThumbnails)
@@ -422,7 +424,7 @@ const Manage = () => {
             const updatedVideoData = videoData
               .map((video, index) => ({
                 ...video,
-                thumbnail: urls[index],
+                thumbnail: urls[index] ? urls[index] : "",
               }))
               .reverse();
             setVideos(updatedVideoData);
@@ -555,9 +557,18 @@ const Manage = () => {
                     <ThumbnailContainer>
                       <Thumbnail src={video.thumbnail} alt="썸네일" />
                     </ThumbnailContainer>
-                    <PlainLink to="/select" onClick={() => handleVideoClick(video.id)}>
-                      <TextTitle>{video.title} </TextTitle>
-                    </PlainLink>
+                    {video.id !== "" &&
+                    video.title !== "" &&
+                    video.thumbnail !== "" &&
+                    video.nickname !== "" &&
+                    video.date !== "" &&
+                    video.subject !== "" ? (
+                      <PlainLink to="/select" onClick={() => handleVideoClick(video.id)}>
+                        <TextTitle>{video.title} </TextTitle>
+                      </PlainLink>
+                    ) : (
+                      <TextTitle>Error</TextTitle>
+                    )}
                     <TextNickname>{video.nickname}</TextNickname>
                     <DeleteButton onClick={() => handleDeleteVideoButtonClick(video.id)}>
                       <BsTrash />
