@@ -46,6 +46,8 @@ public class Video {
 
     private String subject;
 
+    private String subtitle;
+
     @Column(unique = true)
     private String originalS3Path;
 
@@ -57,12 +59,13 @@ public class Video {
     private String lectureNoteS3Path;
 
 
-    public Video(final Long id, final UserEntity member, final String title, final String content, final String subject, final String thumbnailS3Path, final String lectureMaterialsS3Path) {
+    public Video(final Long id, final UserEntity member, final String title, final String content, final String subject, final String subtitle, final String thumbnailS3Path, final String lectureMaterialsS3Path) {
         this.id = id;
         this.member = member;
         this.title = title;
         this.content = content;
         this.subject = subject;
+        this.subtitle = subtitle;
         this.thumbnailS3Path = thumbnailS3Path;
         this.lectureNoteS3Path = lectureMaterialsS3Path;
 
@@ -73,10 +76,10 @@ public class Video {
         this.setTitle(videoSaveRequestDTO.getTitle());
         this.setContent(videoSaveRequestDTO.getContent());
         this.setSubject(videoSaveRequestDTO.getSubject());
+        this.setSubtitle(videoSaveRequestDTO.getSubtitle());
         this.setThumbnailS3Path(videoSaveRequestDTO.getThumbnailS3Path());
         this.setLectureNoteS3Path(videoSaveRequestDTO.getLectureNoteS3Path());
         this.setDate(LocalDateTime.now());
-
     }
 
     public String getFormattedDate() {

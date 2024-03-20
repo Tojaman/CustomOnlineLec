@@ -29,4 +29,7 @@ public class VideoSaveRequestDTO {
     private Integer height;
     private Integer videoWidth;
     private Integer videoHeight;
+
+    // 자막
+    private String subtitle;
 }
