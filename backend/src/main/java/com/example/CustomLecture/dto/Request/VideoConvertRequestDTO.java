@@ -9,4 +9,5 @@ import lombok.*;
 @ToString
 public class VideoConvertRequestDTO {
     private String url;
+    private String gender;
 }

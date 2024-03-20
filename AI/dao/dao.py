@@ -6,7 +6,7 @@ class VideoDao:
         cursor = connection.cursor()
         cursor.execute('INSERT INTO videos (userId, originalS3Path) VALUES (%s, %s)', (userId, originalS3Path))
         video_id = cursor.lastrowid  # 기본 키 값을 반환
-        cursor.execute('INSERT INTO convertVideos (yoon, iu, timcook, karina) VALUES (%s, %s, %s, %s)', (convert_s3_path["yoon"], convert_s3_path["iu"], convert_s3_path["timcook"], convert_s3_path["karina"]))
+        cursor.execute('INSERT INTO convertVideos (jimin, moon, winter, karina) VALUES (%s, %s, %s, %s)', (convert_s3_path["jimin"], convert_s3_path["moon"], convert_s3_path["winter"], convert_s3_path["karina"]))
         convert_video_id = cursor.lastrowid  # 기본 키 값을 반환
         cursor.execute('UPDATE videos SET convertVideosId=%s where id=%s', (convert_video_id, video_id))
 
