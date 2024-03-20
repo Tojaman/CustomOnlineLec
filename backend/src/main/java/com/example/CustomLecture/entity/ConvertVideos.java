@@ -19,13 +19,13 @@ public class ConvertVideos {
 //    private Video video;
 
     @Column(unique = true)
-    private String yoon;
-
-    @Column(unique = true)
     private String jimin;
 
     @Column(unique = true)
-    private String timcook;
+    private String moon;
+
+    @Column(unique = true)
+    private String winter;
 
     @Column(unique = true)
     private String karina;
