@@ -4,7 +4,8 @@ export const subtitleSlice = createSlice({
   name: "subtitle",
   initialState: {
     value: {
-      saves: [],
+      subtitleList: [],
+      subtitleEdit: [],
     },
   },
   reducers: {

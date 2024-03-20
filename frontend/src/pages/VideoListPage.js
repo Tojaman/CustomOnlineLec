@@ -148,7 +148,19 @@ const VideoList = () => {
             date: video.date,
             subject: video.subject,
           }))
-          .filter((video) => video.title !== null && video.thumbnail !== null && video.nickname !== null);
+          .filter(
+            (video) =>
+              video.title !== null &&
+              video.thumbnail !== null &&
+              video.nickname !== null &&
+              video.date !== null &&
+              video.subject !== null &&
+              video.title !== "" &&
+              video.thumbnail !== "" &&
+              video.nickname !== "" &&
+              video.date !== "" &&
+              video.subject !== ""
+          );
         console.log("영상 목록 요청 성공");
 
         const getThumbnails = videoData.map((video) => {
