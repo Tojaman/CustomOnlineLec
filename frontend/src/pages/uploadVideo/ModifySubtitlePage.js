@@ -79,6 +79,7 @@ const Modify = () => {
   const transSubtitle = useSelector((state) => state.subtitle.value);
   const jsonData = transSubtitle.subtitleList;
   const [isLoading, setLoading] = useState(true);
+  const [isSubtitleModified, setIsSubtitleModified] = useState(false);
 
   const [texts, setTexts] = useState([]);
   const [timeRanges, setTimeRanges] = useState([]);
@@ -112,6 +113,8 @@ const Modify = () => {
     }));
     const subtitleResponse = { subtitleEdit: newData };
 
+    setIsSubtitleModified(true);
+
     dispatch(subtitle(subtitleResponse));
   };
 
@@ -121,7 +124,9 @@ const Modify = () => {
     setModifiedContents(updatedContents);
   };
 
-  const handleNextClick = () => {};
+  const handleNextClick = () => {
+    addToast("자막을 저장하세요.", { appearance: "warning", autoDismiss: true, autoDismissTimeout: 5000 });
+  };
 
   return (
     <Container>
@@ -160,9 +165,15 @@ const Modify = () => {
           </SubtitleContainer>
           <ButtonContainer>
             <SaveButton onClick={handleSaveAllClick}>저장</SaveButton>
-            <NextButton to="/inform" onClick={handleNextClick}>
-              다음 <GoArrowRight />
-            </NextButton>
+            {isSubtitleModified ? (
+              <NextButton to="/inform">
+                다음 <GoArrowRight />
+              </NextButton>
+            ) : (
+              <NextButton onClick={handleNextClick}>
+                다음 <GoArrowRight />
+              </NextButton>
+            )}
           </ButtonContainer>
         </ModifyContainer>
       )}
