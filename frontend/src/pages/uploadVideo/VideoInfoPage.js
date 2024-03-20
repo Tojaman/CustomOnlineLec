@@ -115,6 +115,8 @@ const Image = styled.img`
 
 const VideoInfo = () => {
   const videoData = useSelector((state) => state.videoData.value);
+  const subtitle = useSelector((state) => state.subtitle.value);
+  const subtitleResult = subtitle.subtitleEdit;
   const x = videoData ? videoData.x : "N/A";
   const y = videoData ? videoData.y : "N/A";
   const width = videoData ? videoData.width : "N/A";
@@ -137,9 +139,8 @@ const VideoInfo = () => {
   };
 
   const handleSubmit = async () => {
-    const subtitle = useSelector((state) => state.subtitle.value);
-    const subtitleResult = subtitle.subtitleEdit;
-
+    const subtitle = subtitle.subtitleEdit;
+    console.log(subtitleResult);
     if (formData.title === "" || formData.description === "" || formData.category === "") {
       console.error("영상 정보 로드 실패");
       addToast("모든 필수 항목을 입력해주세요.", { appearance: "warning", autoDismiss: true, autoDismissTimeout: 5000 });
@@ -220,6 +221,7 @@ const VideoInfo = () => {
           height,
           videoWidth,
           videoHeight,
+          subtitle,
         },
         {
           headers: {
