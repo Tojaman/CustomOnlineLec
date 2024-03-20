@@ -8,6 +8,8 @@ import { useDispatch } from "react-redux";
 import { useSelector } from "react-redux";
 import { subtitle } from "../../redux/subtitle";
 import { SyncLoader } from "react-spinners";
+import { useToasts } from "react-toast-notifications";
+const { addToast } = useToasts();
 
 const Container = styled.div`
   display: flex;
@@ -101,6 +103,8 @@ const Modify = () => {
   }, [jsonData, isLoading]);
 
   const handleSaveAllClick = () => {
+    addToast("자막이 성공적으로 저장되었습니다.", { appearance: "success", autoDismiss: true, autoDismissTimeout: 5000 });
+
     const newData = modifiedContents.map((content, index) => ({
       text: content,
       start: timeRanges[index].start,
@@ -115,6 +119,10 @@ const Modify = () => {
     const updatedContents = [...modifiedContents];
     updatedContents[index] = newValue;
     setModifiedContents(updatedContents);
+  };
+
+  const handleNextClick = () => {
+
   };
 
   return (
@@ -154,7 +162,7 @@ const Modify = () => {
           </SubtitleContainer>
           <ButtonContainer>
             <SaveButton onClick={handleSaveAllClick}>저장</SaveButton>
-            <NextButton to="/inform">
+            <NextButton to="/inform" onClick={handleNextClick}>
               다음 <GoArrowRight />
             </NextButton>
           </ButtonContainer>

@@ -62,8 +62,8 @@ public class VideoService {
         System.out.println(updatedRequestBody);
 
         // 플라스크 서버 URL
-        String flaskUrl = "http://flask:5000/convert";
-        // String flaskUrl = "http://localhost:5000/convert";
+        // String flaskUrl = "http://flask:5000/convert";
+        String flaskUrl = "http://localhost:5000/convert";
         System.out.println(flaskUrl);
 
         // HTTP 요청 헤더 설정(Flask에 JSON 형식이란 것을 알기리 위해 header에 포함)
