@@ -73,7 +73,7 @@ class ConvertVoice(Resource):
             print("추출 음성 경로", local_audio_path)
 
             # 모델 목록
-            model_list = ["yoon", "iu", "timcook", "karina"]
+            model_list = ["jimin", "moon", "winter", "karina"]
             # model_list = ["yoon"]
             results = {}  # 각 모델의 결과를 저장할 딕셔너리
             rvc_result = 0
