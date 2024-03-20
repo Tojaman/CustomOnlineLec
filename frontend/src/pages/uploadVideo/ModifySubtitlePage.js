@@ -9,7 +9,6 @@ import { useSelector } from "react-redux";
 import { subtitle } from "../../redux/subtitle";
 import { SyncLoader } from "react-spinners";
 import { useToasts } from "react-toast-notifications";
-const { addToast } = useToasts();
 
 const Container = styled.div`
   display: flex;
@@ -76,6 +75,7 @@ const LoadingContainer = styled.div`
 
 const Modify = () => {
   const dispatch = useDispatch();
+  const { addToast } = useToasts();
   const transSubtitle = useSelector((state) => state.subtitle.value);
   const jsonData = transSubtitle.subtitleList;
   const [isLoading, setLoading] = useState(true);
@@ -121,9 +121,7 @@ const Modify = () => {
     setModifiedContents(updatedContents);
   };
 
-  const handleNextClick = () => {
-
-  };
+  const handleNextClick = () => {};
 
   return (
     <Container>
