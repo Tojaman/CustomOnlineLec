@@ -80,7 +80,6 @@ public class Video {
         this.setThumbnailS3Path(videoSaveRequestDTO.getThumbnailS3Path());
         this.setLectureNoteS3Path(videoSaveRequestDTO.getLectureNoteS3Path());
         this.setDate(LocalDateTime.now());
-
     }
 
     public String getFormattedDate() {
