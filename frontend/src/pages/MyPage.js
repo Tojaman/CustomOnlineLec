@@ -173,7 +173,7 @@ const ButtonContainer = styled.div`
   margin-bottom: 40px;
 `;
 
-const WithdrawalButton = styled.span`
+const FunctionButton = styled.span`
   cursor: pointer;
   font-size: 15px;
   display: block;
@@ -192,6 +192,7 @@ const InfoEditContainer = styled.div`
 `;
 
 const MyPage = () => {
+  const [role, setRole] = useState(sessionStorage.getItem("role"));
   const [profileImage, setProfileImage] = useState(originProfileImage);
   const [currentPassword, setCurrentPassword] = useState("");
   const [newPassword, setNewPassword] = useState("");
@@ -463,15 +464,16 @@ const MyPage = () => {
           </ProfileImageContainer>
 
           <InfoContainer>
-
             {isEditing ? (
               <InfoEditContainer>
-              <InfoText>변경할 닉네임</InfoText>
-              <Input value={editedNickname} onChange={(e) => setEditedNickname(e.target.value)} /></InfoEditContainer>
+                <InfoText>변경할 닉네임</InfoText>
+                <Input value={editedNickname} onChange={(e) => setEditedNickname(e.target.value)} />
+              </InfoEditContainer>
             ) : (
-                <InfoEditContainer>
+              <InfoEditContainer>
                 <InfoText>닉네임</InfoText>
-              <Input value={nickname} readOnly /></InfoEditContainer>
+                <Input value={nickname} readOnly />
+              </InfoEditContainer>
             )}
 
             {isEditing && (
@@ -518,12 +520,19 @@ const MyPage = () => {
             </ListLink>
           </MoreButton>
         </UploadListContainer>
-        <ButtonContainer>
-          <WithdrawalButton onClick={handleWithdrawalClick}>
-            탈퇴하기
-            <IoIosArrowForward />
-          </WithdrawalButton>
-        </ButtonContainer>
+        {role !== "ROLE_ADMIN" && (
+          <ButtonContainer>
+            <FunctionButton>
+              문의하기
+              <IoIosArrowForward />
+            </FunctionButton>
+            <br></br>
+            <FunctionButton onClick={handleWithdrawalClick}>
+              탈퇴하기
+              <IoIosArrowForward />
+            </FunctionButton>
+          </ButtonContainer>
+        )}
       </ContentContainer>
     </Container>
   );

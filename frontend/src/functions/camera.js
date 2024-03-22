@@ -31,7 +31,7 @@ let poseDetection = null;
 let canvasScope;
 
 let showSubtitle = false;
-let subtitles;;
+let subtitles;
 
 const selectedVideoInfoString = sessionStorage.getItem("selectedVideoInfo");
 const selectedVideoInfo = JSON.parse(selectedVideoInfoString);
@@ -358,6 +358,11 @@ export async function run() {
   toggleLoadingUI(false);
 
   detectPose(posenet);
+
+  const role = sessionStorage.getItem("role");
+  if (role === "ROLE_ADMIN") {
+    document.getElementById("toggleContent").style.display = "block";
+  }
 }
 
 run();
