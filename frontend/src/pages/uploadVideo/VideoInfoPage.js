@@ -139,8 +139,8 @@ const VideoInfo = () => {
   };
 
   const handleSubmit = async () => {
-    const subtitle = subtitle.subtitleEdit;
-    console.log(subtitleResult);
+    const subtitle = JSON.stringify(subtitleResult);
+    console.log(subtitle);
     if (formData.title === "" || formData.description === "" || formData.category === "") {
       console.error("영상 정보 로드 실패");
       addToast("모든 필수 항목을 입력해주세요.", { appearance: "warning", autoDismiss: true, autoDismissTimeout: 5000 });
@@ -237,8 +237,6 @@ const VideoInfo = () => {
       console.error("영상 정보 업로드 요청 실패 : ", error.response.status);
       addToast("영상 정보 업로드를 실패했습니다.", { appearance: "error", autoDismiss: true, autoDismissTimeout: 5000 });
     }
-
-    console.log("자막 : ", subtitle);
   };
 
   return (

@@ -399,8 +399,16 @@ const Manage = () => {
           if (video.date.substring(0, 10) in pastWeekCount) {
             pastWeekCount[video.date.substring(0, 10)]++;
           }
-          if (video.subject in categoryCount) {
-            categoryCount[video.subject]++;
+          if (
+            video.title.trim() !== "" &&
+            video.thumbnail.trim() !== "" &&
+            video.nickname.trim() !== "" &&
+            video.date.trim() !== "" &&
+            video.subject.trim() !== ""
+          ) {
+            if (video.subject in categoryCount) {
+              categoryCount[video.subject]++;
+            }
           }
         });
 
