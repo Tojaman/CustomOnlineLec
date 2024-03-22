@@ -12,16 +12,22 @@ import AWS from "aws-sdk";
 import Swal from "sweetalert2";
 import { useToasts } from "react-toast-notifications";
 
+import originProfileImage from "../assets/origin_profile.jpg";
+
 import avatarImg1 from "../assets/avatarImg/기본아바타여1.jpg";
 import avatarImg2 from "../assets/avatarImg/기본아바타남1.jpg";
 import avatarImg3 from "../assets/avatarImg/윤석열.jpg";
 import avatarImg4 from "../assets/avatarImg/트럼프.jpg";
 import avatarImg5 from "../assets/avatarImg/키키.jpg";
 import avatarImg6 from "../assets/avatarImg/뽀로로.jpg";
-import originProfileImage from "../assets/origin_profile.jpg";
+
+import voiceImg1 from "../assets/avatarImg/문재인.jpg";
+import voiceImg2 from "../assets/avatarImg/지민.jpg";
+import voiceImg3 from "../assets/avatarImg/윈터.jpg";
+import voiceImg4 from "../assets/avatarImg/카리나.jpg";
 
 const avatarImages = [avatarImg1, avatarImg2, avatarImg3, avatarImg4, avatarImg5, avatarImg6];
-const audioImages = [avatarImg1, avatarImg2, avatarImg3, avatarImg4, avatarImg5, avatarImg6];
+const audioImages = [voiceImg1, voiceImg2, voiceImg3, voiceImg4];
 
 const ListContainer = styled.div`
   display: flex;
@@ -207,6 +213,7 @@ const Image = styled.img`
   height: 120px;
   border: 1px solid #000;
   margin: 5px;
+  border-radius: 50%;
 `;
 
 const ImageContainer = styled.div`
