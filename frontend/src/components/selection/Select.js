@@ -62,7 +62,7 @@ const SelectText = styled.p`
 
 const CustomSlider = styled(Slider)`
   width: 800px;
-  
+
   .slick-list {
     height: 160px;
     width: 100%;
@@ -73,7 +73,6 @@ const CustomSlider = styled(Slider)`
 
     &:hover {
       height: 150px;
-
     }
   }
   .slick-track {
@@ -96,7 +95,7 @@ const Img = styled.img`
   max-width: 100%;
   max-height: 125px;
   margin: 0 auto 5px;
-  display: block; 
+  display: block;
   border-radius: 50%;
 `;
 
@@ -131,7 +130,7 @@ const settings = {
 
 const voices = [
   { id: "moon", name: "문재인", img: voiceImg1 },
-  { id: "jimin", name: "BTS 지민", img: voiceImg2},
+  { id: "jimin", name: "BTS 지민", img: voiceImg2 },
   { id: "winter", name: "에스파 윈터", img: voiceImg3 },
   { id: "karina", name: "에스파 카리나", img: voiceImg4 },
 ];
@@ -142,7 +141,7 @@ const avatars = [
   { id: "avatar3", name: "윤석열", img: avatarImg3 },
   { id: "avatar4", name: "트럼프", img: avatarImg4 },
   { id: "avatar5", name: "키키", img: avatarImg5 },
-  { id: "avatar6", name: "뽀로로", img: avatarImg6  }
+  { id: "avatar6", name: "뽀로로", img: avatarImg6 },
 ];
 
 const Select = () => {
@@ -171,11 +170,7 @@ const Select = () => {
         )
         .then((response) => {
           console.log("영상 정보 요청 성공");
-
           sessionStorage.setItem("selectedVideoInfo", JSON.stringify(response.data));
-          const selectedVideoInfoString = sessionStorage.getItem("selectedVideoInfo");
-          const selectedVideoInfo = JSON.parse(selectedVideoInfoString);
-          console.log("영상 정보 : ", selectedVideoInfo);
         })
         .catch((error) => console.error("영상 정보 요청 실패 : ", error));
     }

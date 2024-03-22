@@ -42,9 +42,9 @@ export function displayPreviousSessionInfo() {
   
       s3.getObject(params, (err, data) => {
         if (err) {
-          console.error("S3 동영상 객체 가져오기 오류:", err);
+          console.error("S3에서 동영상 로드 실패 : ", err);
         } else {
-          console.log("S3 동영상 객체 가져옴:", data);
+          console.log("S3에서 동영상 로드 성공");
   
           const videoBlob = new Blob([data.Body], { type: data.ContentType });
           const videoUrl = URL.createObjectURL(videoBlob);
@@ -62,15 +62,15 @@ export function displayPreviousSessionInfo() {
           Key: profileS3Path,
         };
   
-        s3.getObject(profileImageParams, (profileErr, profileData) => {
-          if (profileErr) {
-            console.error("프로필 이미지 가져오기 오류:", profileErr);
+        s3.getObject(profileImageParams, (err, profileData) => {
+          if (err) {
+            console.error("프로필 이미지 출력 실패 : ", err);
           } else {
-            console.log("프로필 이미지 객체 가져옴:", profileData);
-  
+            console.log("프로필 이미지 출력 성공");
+
             const profileBlob = new Blob([profileData.Body], { type: profileData.ContentType });
             const profileImageUrl = URL.createObjectURL(profileBlob);
-  
+
             const profileElement = document.getElementById("profile");
             profileElement.src = profileImageUrl;
           }
@@ -82,11 +82,6 @@ export function displayPreviousSessionInfo() {
  export function downloadPDFFromS3() {
     const selectedVideoInfoString = sessionStorage.getItem("selectedVideoInfo");
     const selectedVideoInfo = JSON.parse(selectedVideoInfoString);
-
-    if (!selectedVideoInfo) {
-      console.log("이전에 저장된 세션 정보가 없습니다.");
-      return;
-    }
 
     const s3 = new AWS.S3({
       accessKeyId: process.env.REACT_APP_AWS_ACCESS_KEY_ID,
@@ -101,9 +96,9 @@ export function displayPreviousSessionInfo() {
 
     s3.getObject(params2, (err, data) => {
       if (err) {
-        console.error("S3 강의 자료 객체 가져오기 오류:", err);
+        console.error("S3에서 강의 자료 로드 실패 : ", err);
       } else {
-        console.log("S3 강의 자료 객체 가져옴:", data);
+        console.log("S3에서 강의 자료 로드 성공");
 
         const pdfBlob = new Blob([data.Body], { type: data.ContentType });
         const pdfUrl = URL.createObjectURL(pdfBlob);

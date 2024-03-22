@@ -30,8 +30,14 @@ let poseDetection = null;
 
 let canvasScope;
 
+let showSubtitle = false;
+let subtitles;;
+
 const selectedVideoInfoString = sessionStorage.getItem("selectedVideoInfo");
 const selectedVideoInfo = JSON.parse(selectedVideoInfoString);
+if (selectedVideoInfo.subtitle) {
+  subtitles = JSON.parse(selectedVideoInfo.subtitle);
+}
 
 let originWidth = selectedVideoInfo.videoWidth;
 let originHeight = selectedVideoInfo.videoHeight;
@@ -140,6 +146,40 @@ async function drawVideoToCanvas() {
     camera.mergedctx.lineWidth = 1;
     camera.mergedctx.strokeRect(sx, sy, sw, sh + 5);
     camera.mergedctx.drawImage(camera.canvas, sx, sy, sw, sh);
+
+    if (subtitles) {
+      if (showSubtitle) {
+        camera.mergedctx.fillStyle = "rgba(255, 255, 255, 0.8)";
+        camera.mergedctx.fillRect(10, camera.mergedCanvas.height - 50, camera.mergedCanvas.width - 20, 40);
+
+        const currentTime = camera.originVideo.currentTime;
+        let currentSubtitle = subtitles.find((subtitle) => currentTime >= subtitle.start && currentTime <= subtitle.end);
+        if (currentSubtitle) {
+          const maxSubtitleLength = 40;
+
+          if (currentSubtitle.text.length > maxSubtitleLength) {
+            const midpoint = Math.ceil(currentSubtitle.text.length / 2);
+
+            const firstHalfText = currentSubtitle.text.substr(0, midpoint);
+            const secondHalfText = currentSubtitle.text.substr(midpoint);
+            if (currentSubtitle.start + (currentSubtitle.end - currentSubtitle.start) / 2 >= currentTime) {
+              camera.mergedctx.fillStyle = "black";
+              camera.mergedctx.font = "25px Arial";
+              camera.mergedctx.fillText(firstHalfText, 20, camera.mergedCanvas.height - 20);
+            } else {
+              camera.mergedctx.fillStyle = "black";
+              camera.mergedctx.font = "25px Arial";
+              camera.mergedctx.fillText(secondHalfText, 20, camera.mergedCanvas.height - 20);
+            }
+          } else {
+            camera.mergedctx.fillStyle = "black";
+            camera.mergedctx.font = "25px Arial";
+            camera.mergedctx.fillText(currentSubtitle.text, 20, camera.mergedCanvas.height - 20);
+          }
+        }
+      }
+    }
+
     camera.mergedctx.restore();
 
     await new Promise((resolve) => requestAnimationFrame(resolve));
@@ -275,7 +315,7 @@ async function loadSelectedAvatar() {
     }
     return selectedAvatarSVG;
   } else {
-    console.log("No selected avatar ID found in session storage.");
+    console.log("아바타 선택 오류");
     return null;
   }
 }
@@ -373,3 +413,9 @@ var buttonElement = document.getElementById("arrow");
 buttonElement.addEventListener("click", function () {
   openDiv();
 });
+
+document.getElementById("subtitle").addEventListener("click", toggleSubtitle);
+
+function toggleSubtitle() {
+  showSubtitle = !showSubtitle;
+}
