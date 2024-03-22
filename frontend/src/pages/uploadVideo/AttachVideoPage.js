@@ -111,6 +111,7 @@ const Attach = () => {
   const [infoText, setInfoText] = useState("");
   const [videoWidth, setVideoWidth] = useState(0);
   const [videoHeight, setVideoHeight] = useState(0);
+  const [isPlayed, setIsPlayed] = useState(false);
   const { addToast } = useToasts();
 
   const updateVideo = async (event) => {
@@ -135,122 +136,14 @@ const Attach = () => {
     canvas.height = video.offsetHeight;
   };
 
+  const handleVideoPlay = () => {
+    setIsPlayed(true);
+  };
+
   const handleGenderChange = (event) => {
     genderRef.current = event.target.value;
     console.log("성별 선택 성공");
     addToast("성별이 성공적으로 선택되었습니다.", { appearance: "success", autoDismiss: true, autoDismissTimeout: 5000 });
-  };
-
-  const handleSubmit = async () => {
-    if (!file) {
-      console.error("영상 파일 로드 실패");
-      addToast("영상 파일을 첨부해주세요.", { appearance: "warning", autoDismiss: true, autoDismissTimeout: 5000 });
-      return;
-    }
-
-    if (!genderRef.current) {
-      console.error("성별 선택 실패");
-      addToast("성별을 선택해주세요.", { appearance: "warning", autoDismiss: true, autoDismissTimeout: 5000 });
-      return;
-    }
-
-    const gender = genderRef.current;
-
-    const VideoFileName = file.name;
-    const url = `original_video/${VideoFileName}`;
-
-    AWS.config.update({
-      accessKeyId: process.env.REACT_APP_AWS_ACCESS_KEY_ID,
-      secretAccessKey: process.env.REACT_APP_AWS_SECRET_ACCESS_KEY,
-      region: process.env.REACT_APP_AWS_DEFAULT_REGION,
-    });
-
-    const s3 = new AWS.S3();
-    const VideoNoteParams = {
-      Bucket: process.env.REACT_APP_S3_BUCKET,
-      Key: url,
-      Body: file,
-    };
-
-    try {
-      const data = await s3.upload(VideoNoteParams).promise();
-      console.log("S3에 영상 업로드 성공");
-    } catch (error) {
-      console.error("S3에 영상 업로드 실패 : ", error);
-      addToast("영상 업로드를 실패했습니다.", { appearance: "error", autoDismiss: true, autoDismissTimeout: 5000 });
-    }
-
-    const token = sessionStorage.getItem("token");
-    const rect = rectRef.current;
-
-    const videoInfo = {
-      x: rect.x,
-      y: rect.y,
-      width: rect.width,
-      height: rect.height,
-      videoWidth,
-      videoHeight,
-    };
-    dispatch(videoData(videoInfo));
-
-    try {
-      const response = await axios.post(
-        "http://localhost:8080/videos/uploadVideo",
-        {
-          url,
-          gender,
-        },
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
-      sessionStorage.setItem("UploadVideoID", response.data.video_id);
-      console.log("영상 링크 업로드 요청 성공");
-
-      const subtitleResponse = {
-        subtitleList: [
-          { end: 16.0, text: " 학습 목표는 변수와 성수를 정의하고 사용할 수 있다. 주석의 개념을 이해한다.", start: 10.0 },
-          { end: 22.0, text: " 산술 연산자와 할당 연산자에 대하여 이해한다. 연산자의 우선순위 개념을 이해한다.", start: 16.0 },
-          { end: 27.0, text: " 사용자로부터 입력을 받고 출력을 하는 프로그램을 작성할 수 있다.", start: 22.0 },
-          { end: 35.0, text: " 문자열의 기초연산을 이해한다.", start: 27.0 },
-          { end: 44.0, text: " 변수는 컴퓨터 메모리 공간에 이름을 붙이는 것으로 우리는 여기에 값을 저장할 수 있습니다.", start: 35.0 },
-        ],
-      };
-
-      dispatch(subtitle(subtitleResponse));
-
-      if (response.data.stt_result == 1) {
-        setTimeout(
-          () => addToast("자막이 성공적으로 추출되었습니다.", { appearance: "success", autoDismiss: true, autoDismissTimeout: 5000 }),
-          0
-        );
-        // dispatch(subtitle(subtitleResponse));
-      } else if (response.data.stt_result == -1 || response.data.stt_result == 0)
-        setTimeout(() => addToast("자막 추출을 실패했습니다.", { appearance: "error", autoDismiss: true, autoDismissTimeout: 5000 }), 0);
-
-      if (response.data.rvc_result == 1)
-        setTimeout(
-          () => addToast("음성이 성공적으로 변환되었습니다.", { appearance: "success", autoDismiss: true, autoDismissTimeout: 5000 }),
-          3000
-        );
-      else if (response.data.rvc_result == -1 || response.data.rvc_result == 0)
-        setTimeout(() => addToast("음성 변환을 실패했습니다.", { appearance: "error", autoDismiss: true, autoDismissTimeout: 5000 }), 3000);
-
-      setTimeout(
-        () => addToast("영상이 성공적으로 업로드되었습니다.", { appearance: "success", autoDismiss: true, autoDismissTimeout: 5000 }),
-        6000
-      );
-    } catch (error) {
-      if (error.response) {
-        console.error("영상 링크 업로드 요청 실패 : ", error.response.status);
-        addToast("영상 업로드를 실패했습니다.", { appearance: "error", autoDismiss: true, autoDismissTimeout: 5000 });
-      } else {
-        console.error("영상 링크 업로드 요청 실패 : ", error.message);
-        addToast("영상 업로드를 실패했습니다.", { appearance: "error", autoDismiss: true, autoDismissTimeout: 5000 });
-      }
-    }
   };
 
   useEffect(() => {
@@ -362,6 +255,125 @@ const Attach = () => {
     };
   }, []);
 
+  const handleSubmit = async () => {
+    const rect = rectRef.current;
+    const videoInfo = {
+      x: rect.x,
+      y: rect.y,
+      width: rect.width,
+      height: rect.height,
+      videoWidth,
+      videoHeight,
+    };
+
+    if (!file) {
+      console.error("영상 파일 로드 실패");
+      addToast("영상 파일을 첨부해주세요.", { appearance: "warning", autoDismiss: true, autoDismissTimeout: 5000 });
+      return;
+    }
+
+    if (!isPlayed) {
+      console.error("영상 파일 정보 로드 실패");
+      addToast("캠 위치를 지정해주세요.", { appearance: "warning", autoDismiss: true, autoDismissTimeout: 5000 });
+      return;
+    }
+
+    if (!genderRef.current) {
+      console.error("성별 선택 실패");
+      addToast("성별을 선택해주세요.", { appearance: "warning", autoDismiss: true, autoDismissTimeout: 5000 });
+      return;
+    }
+
+    const gender = genderRef.current;
+
+    const VideoFileName = file.name;
+    const url = `original_video/${VideoFileName}`;
+
+    AWS.config.update({
+      accessKeyId: process.env.REACT_APP_AWS_ACCESS_KEY_ID,
+      secretAccessKey: process.env.REACT_APP_AWS_SECRET_ACCESS_KEY,
+      region: process.env.REACT_APP_AWS_DEFAULT_REGION,
+    });
+
+    const s3 = new AWS.S3();
+    const VideoNoteParams = {
+      Bucket: process.env.REACT_APP_S3_BUCKET,
+      Key: url,
+      Body: file,
+    };
+
+    try {
+      const data = await s3.upload(VideoNoteParams).promise();
+      console.log("S3에 영상 업로드 성공");
+    } catch (error) {
+      console.error("S3에 영상 업로드 실패 : ", error);
+      addToast("영상 업로드를 실패했습니다.", { appearance: "error", autoDismiss: true, autoDismissTimeout: 5000 });
+    }
+
+    const token = sessionStorage.getItem("token");
+
+    dispatch(videoData(videoInfo));
+
+    try {
+      const response = await axios.post(
+        "http://localhost:8080/videos/uploadVideo",
+        {
+          url,
+          gender,
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+      sessionStorage.setItem("UploadVideoID", response.data.video_id);
+      console.log("영상 링크 업로드 요청 성공");
+
+      // 테스트 용
+      const subtitleResponse = {
+        subtitleList: [
+          { end: 16.0, text: " 학습 목표는 변수와 성수를 정의하고 사용할 수 있다. 주석의 개념을 이해한다.", start: 10.0 },
+          { end: 22.0, text: " 산술 연산자와 할당 연산자에 대하여 이해한다. 연산자의 우선순위 개념을 이해한다.", start: 16.0 },
+        ],
+      };
+
+      dispatch(subtitle(subtitleResponse));
+      //
+
+      if (response.data.stt_result == 1) {
+        setTimeout(
+          () => addToast("자막이 성공적으로 추출되었습니다.", { appearance: "success", autoDismiss: true, autoDismissTimeout: 5000 }),
+          0
+        );
+        const subtitleResponse = { subtitleList: JSON.parse(response.data.subtitle) };
+        dispatch(subtitle(subtitleResponse));
+      } else if (response.data.stt_result == -1 || response.data.stt_result == 0)
+        setTimeout(() => addToast("자막 추출을 실패했습니다.", { appearance: "error", autoDismiss: true, autoDismissTimeout: 5000 }), 0);
+
+      if (response.data.rvc_result == 1)
+        setTimeout(
+          () => addToast("음성이 성공적으로 변환되었습니다.", { appearance: "success", autoDismiss: true, autoDismissTimeout: 5000 }),
+          3000
+        );
+      else if (response.data.rvc_result == -1 || response.data.rvc_result == 0)
+        setTimeout(() => addToast("음성 변환을 실패했습니다.", { appearance: "error", autoDismiss: true, autoDismissTimeout: 5000 }), 3000);
+
+      setTimeout(
+        () => addToast("영상이 성공적으로 업로드되었습니다.", { appearance: "success", autoDismiss: true, autoDismissTimeout: 5000 }),
+        6000
+      );
+    } catch (error) {
+      if (error.response) {
+        console.error("영상 링크 업로드 요청 실패 : ", error.response.status);
+        addToast("영상 업로드를 실패했습니다.", { appearance: "error", autoDismiss: true, autoDismissTimeout: 5000 });
+      } else {
+        console.error("영상 링크 업로드 요청 실패 : ", error.message);
+        addToast("영상 업로드를 실패했습니다.", { appearance: "error", autoDismiss: true, autoDismissTimeout: 5000 });
+      }
+    }
+  };
+
   return (
     <Container>
       <Navbar />
@@ -375,7 +387,7 @@ const Attach = () => {
         </FileContainer>
 
         <VideoContainer>
-          <video id="video" width="640" controls ref={videoRef}>
+          <video id="video" width="640" controls ref={videoRef} onPlay={handleVideoPlay}>
             <source id="videoURL" src={videoURL} type="video/mp4" />
           </video>
         </VideoContainer>
@@ -401,12 +413,12 @@ const Attach = () => {
 
         <InfoContainer>{infoText}</InfoContainer>
         <ButtonContainer>
-          {file && genderRef.current ? (
+          {isPlayed && file && genderRef.current ? (
             <NextButton to="/modify" onClick={handleSubmit}>
               다음 <GoArrowRight />
             </NextButton>
           ) : (
-            <DisabledNextButton>
+            <DisabledNextButton onClick={handleSubmit}>
               다음 <GoArrowRight />
             </DisabledNextButton>
           )}
