@@ -167,4 +167,23 @@ public class VideoController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("삭제 실패");
         }
     }
+
+    @GetMapping("/subtitle/{id}")
+    @Operation(summary = "자막 조회", description = "최종 자막 조회")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "OK"),
+            @ApiResponse(responseCode = "500", description = "Server Error")
+    })
+    public ResponseEntity<String> getSubtitle(@PathVariable Long id ){
+
+        String subtitle = videoService.getSubtitle(id);
+        if (subtitle != null) {
+            return ResponseEntity.ok(subtitle);
+        } else {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("자막을 찾을 수 없습니다.");
+        }
+    }
+
+
+
 }
