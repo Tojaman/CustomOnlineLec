@@ -203,5 +203,8 @@ public class VideoService {
     }
 
 
+    public String getSubtitle(Long id) {
+        return videoRepository.findBySubtitle(id);
+    }
 }
 

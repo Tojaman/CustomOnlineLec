@@ -46,6 +46,10 @@ public class Video {
 
     private String subject;
 
+<<<<<<< Updated upstream
+=======
+    //자막
+>>>>>>> Stashed changes
     private String subtitle;
 
     @Column(unique = true)
