@@ -18,6 +18,8 @@ public class VideoInfoResponseDTO {
     private String lecturenote;
     private String date;
 
+    //자막 정보
+    private String subtitle;
     // 강사 정보
     private String nickname;
     private String profileS3Path;
