@@ -2,11 +2,16 @@
 
 spring:
   profiles:
+    active: local
     include: oauth
-    active: dev
+#    group:
+#      dev:
+#        - oauth
+
 
 ---
 
 spring:
-  profiles:
-    active: local
+  config:
+    activate:
+      profile: dev
