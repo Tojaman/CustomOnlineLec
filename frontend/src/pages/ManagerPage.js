@@ -492,7 +492,7 @@ const Manage = () => {
     }).then((result) => {
       if (result.isConfirmed) {
         axios
-          .delete(`http://localhost:8080/admin/videos/${videoId}`, {
+          .delete(`http://localhost:8080/admin/${videoId}`, {
             headers: {
               Authorization: `Bearer ${token}`,
             },

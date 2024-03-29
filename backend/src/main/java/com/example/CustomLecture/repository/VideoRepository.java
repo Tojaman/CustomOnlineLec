@@ -16,7 +16,4 @@ import java.util.Optional;
 public interface VideoRepository extends JpaRepository<Video, Long> {
 
     List<Video> findByMember(UserEntity user);
-
-    @Query("SELECT v.subtitle FROM Video v WHERE v.id = :id")
-    String findBySubtitle(@Param("id") Long id);
 }

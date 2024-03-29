@@ -151,39 +151,5 @@ public class VideoController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("서버 오류가 발생했습니다: " + e.getMessage());
         }
     }
-    @DeleteMapping("/{videoid}")
-    @Operation(summary = "강의 삭제", description = "영상 업로드 도중 취소하면 관련 정보 삭제")
-    @ApiResponses({
-            @ApiResponse(responseCode = "200", description = "OK"),
-            @ApiResponse(responseCode = "500", description = "Server Error")
-    })
-    public ResponseEntity<String> deleteVideo(@PathVariable Long videoid) {
-
-        try {
-
-            videoService.deleteVideo(videoid);
-            return ResponseEntity.status(HttpStatus.OK).body("게시물 삭제 성공");
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("삭제 실패");
-        }
-    }
-
-    @GetMapping("/subtitle/{id}")
-    @Operation(summary = "자막 조회", description = "최종 자막 조회")
-    @ApiResponses({
-            @ApiResponse(responseCode = "200", description = "OK"),
-            @ApiResponse(responseCode = "500", description = "Server Error")
-    })
-    public ResponseEntity<String> getSubtitle(@PathVariable Long id ){
-
-        String subtitle = videoService.getSubtitle(id);
-        if (subtitle != null) {
-            return ResponseEntity.ok(subtitle);
-        } else {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("자막을 찾을 수 없습니다.");
-        }
-    }
-
-
 
 }

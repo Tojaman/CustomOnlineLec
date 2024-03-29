@@ -50,7 +50,7 @@ public class AdminController {
         return new ResponseEntity<>(result, HttpStatus.OK);
     }
 
-    @DeleteMapping("/videos/{videoid}")
+    @DeleteMapping("/{videoid}")
     @Operation(summary = "강의 삭제", description = "영상 업로드 도중 취소하면 관련 정보 삭제")
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "OK"),
