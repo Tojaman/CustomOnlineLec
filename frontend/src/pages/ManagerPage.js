@@ -1,8 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import styled from "styled-components";
-import { registerables, CategoryScale, Chart } from "chart.js";
-Chart.register(CategoryScale, ...registerables);
 import { Line, Bar } from "react-chartjs-2";
 import { BsTrash } from "react-icons/bs";
 import Navbar from "../components/header/Navbar";
@@ -25,6 +23,9 @@ import voiceImg1 from "../assets/avatarImg/문재인.jpg";
 import voiceImg2 from "../assets/avatarImg/지민.jpg";
 import voiceImg3 from "../assets/avatarImg/윈터.jpg";
 import voiceImg4 from "../assets/avatarImg/카리나.jpg";
+
+import { registerables, CategoryScale, Chart } from "chart.js";
+Chart.register(CategoryScale, ...registerables);
 
 const avatarImages = [avatarImg1, avatarImg2, avatarImg3, avatarImg4, avatarImg5, avatarImg6];
 const audioImages = [voiceImg1, voiceImg2, voiceImg3, voiceImg4];
