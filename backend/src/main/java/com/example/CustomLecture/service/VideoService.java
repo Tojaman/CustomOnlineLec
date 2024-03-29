@@ -201,10 +201,5 @@ public class VideoService {
         convertVideoRepository.delete(video.getConvertVideos());
         videoDataRepository.delete(video.getVideoData());
     }
-
-
-    public String getSubtitle(Long id) {
-        return videoRepository.findBySubtitle(id);
-    }
 }
 
