@@ -155,7 +155,7 @@ async function drawVideoToCanvas() {
         const currentTime = camera.originVideo.currentTime;
         let currentSubtitle = subtitles.find((subtitle) => currentTime >= subtitle.start && currentTime <= subtitle.end);
         if (currentSubtitle) {
-          const maxSubtitleLength = 40;
+          const maxSubtitleLength = 80;
 
           if (currentSubtitle.text.length > maxSubtitleLength) {
             const midpoint = Math.ceil(currentSubtitle.text.length / 2);

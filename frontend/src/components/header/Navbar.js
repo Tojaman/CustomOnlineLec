@@ -1,6 +1,6 @@
 import React from "react";
 import logo from "../../assets/img/UUJJ.png";
-import { Link, NavLink, useNavigate } from "react-router-dom";
+import { Link, NavLink, useNavigate, useLocation } from "react-router-dom";
 import styled from "styled-components";
 import { TfiMenu } from "react-icons/tfi";
 import Swal from "sweetalert2";
@@ -91,9 +91,9 @@ const RegisterButton = styled.button`
 const Navbar = () => {
   const navigate = useNavigate();
   const { addToast } = useToasts();
+  const location = useLocation();
 
   const role = sessionStorage.getItem("role");
-
   const token = sessionStorage.getItem("token");
 
   const handleUploadClick = () => {
