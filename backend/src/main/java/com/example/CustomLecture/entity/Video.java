@@ -96,6 +96,9 @@ public class Video {
                 this.getLectureNoteS3Path(),
                 this.getFormattedDate(),
 
+                //자막 정보
+                this.getSubtitle(),
+
                 // 강사 정보
                 user.getNickname(),
                 user.getProfileS3Path(),
