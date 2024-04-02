@@ -1,6 +1,7 @@
 package com.example.CustomLecture.service;
 
 import com.example.CustomLecture.dto.Request.QnaUploadRequestDTO;
+import com.example.CustomLecture.dto.Response.QnaListResponseDTO;
 import com.example.CustomLecture.entity.Qna;
 import com.example.CustomLecture.entity.UserEntity;
 import com.example.CustomLecture.jwt.JWTUtil;
@@ -11,6 +12,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
 import java.util.NoSuchElementException;
 
 @Service
@@ -50,5 +54,23 @@ public class QnaService {
         Qna qna = qnaRepository.findById(qnaid)
                 .orElseThrow(() -> new NoSuchElementException("존재하지 않는 문의글입니다."));
         qnaRepository.deleteById(qnaid);
+    }
+
+    /**
+     * 문의글 목록 조회
+     */
+    public List<QnaListResponseDTO> getQnaList() {
+        List<Qna> qnaList = qnaRepository.findAll();
+        List<QnaListResponseDTO> qnaListResponseDTOS = new ArrayList<>();
+
+        for (Qna qna : qnaList) {
+            String nickname = qna.getUser().getNickname();
+
+            QnaListResponseDTO qnaListResponseDTO
+                    = new QnaListResponseDTO(qna.getTitle(), qna.getContent(), qna.getDate(), nickname);
+            qnaListResponseDTOS.add(qnaListResponseDTO);
+        }
+
+        return qnaListResponseDTOS;
     }
 }
