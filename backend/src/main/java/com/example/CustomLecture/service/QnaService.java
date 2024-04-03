@@ -67,7 +67,7 @@ public class QnaService {
             String nickname = qna.getUser().getNickname();
 
             QnaListResponseDTO qnaListResponseDTO
-                    = new QnaListResponseDTO(qna.getTitle(), qna.getContent(), qna.getDate(), nickname);
+                    = new QnaListResponseDTO(qna.getId(), qna.getTitle(), qna.getContent(), qna.getDate(), nickname);
             qnaListResponseDTOS.add(qnaListResponseDTO);
         }
 
