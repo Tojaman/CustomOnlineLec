@@ -15,6 +15,7 @@ import java.util.Date;
 @Getter
 public class QnaListResponseDTO {
 
+    private Long id;
     private String title;
     private String content;
 
