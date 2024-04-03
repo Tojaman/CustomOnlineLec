@@ -522,10 +522,10 @@ const MyPage = () => {
         </UploadListContainer>
         {role !== "ROLE_ADMIN" && (
           <ButtonContainer>
-            <FunctionButton>
+            <ListLink to="/inquiry">
               문의하기
               <IoIosArrowForward />
-            </FunctionButton>
+            </ListLink>
             <br></br>
             <FunctionButton onClick={handleWithdrawalClick}>
               탈퇴하기

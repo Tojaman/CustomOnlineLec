@@ -3,6 +3,7 @@ import { Link } from "react-router-dom";
 import styled from "styled-components";
 import { Line, Bar } from "react-chartjs-2";
 import { BsTrash } from "react-icons/bs";
+import { FcOk } from "react-icons/fc";
 import Navbar from "../components/header/Navbar";
 import Background from "../assets/img/Group.png";
 import axios from "axios";
@@ -192,6 +193,7 @@ const TextNickname = styled.div`
 
 const DeleteButton = styled.div`
   padding-top: 5px;
+  padding-right: 10px;
   cursor: pointer;
   width: 17px;
   height: 25px;
@@ -223,7 +225,36 @@ const ImageContainer = styled.div`
   margin-left: 12px;
   width: 90%;
 `;
+const QnaItems = styled.div`
+  margin-top: 40px;
+`;
 
+const QnaContainer = styled.div`
+  margin-left: 10px;
+  margin-right: 10px;
+  border-bottom: 1px solid  #e1dddd;
+  border-top: 1px solid  #e1dddd;
+`;
+const QnaContent = styled.div`
+  padding: 10px;
+`;
+const QnaTitle = styled.p`
+  margin: 0;
+  font-family: "Inter";
+  font-weight: 600;
+  font-size: 20px;
+`;
+const QnaDate = styled.p`
+  color: gray;
+  margin: 0;
+`;
+const QnaContainer2 = styled.div`
+  display: flex;
+  justify-content: space-between;
+`;
+const StyledFcOk = styled(FcOk)`
+  font-size: 25px;
+`;
 const Manage = () => {
   const [videos, setVideos] = useState([]);
   const [users, setUsers] = useState([]);
@@ -238,6 +269,7 @@ const Manage = () => {
     etc: 0,
   });
   const [dateStats, setDateStats] = useState([]);
+  const [qnaData, setQnaData] = useState([]);
   const { addToast } = useToasts();
 
   const today = new Date();
@@ -302,6 +334,7 @@ const Manage = () => {
   useEffect(() => {
     fetchUserData();
     fetchVideoData();
+    fetchQnaData();
   }, []);
 
   const fetchUserData = () => {
@@ -451,6 +484,21 @@ const Manage = () => {
       .catch((error) => console.error("영상 목록 요청 실패 : ", error));
   };
 
+  const fetchQnaData = () => {
+    axios
+      .get("http://localhost:8080/qna/list", {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      })
+      .then((response) => {
+         const qnaData = response.data;
+      console.log("Q&A 목록 요청 성공");
+      setQnaData(qnaData);
+      })
+      .catch((error) => console.error("Q&A 목록 요청 실패: ", error));
+  };
+  
   const handleVideoClick = (videoId) => {
     sessionStorage.setItem("selectedVideoId", videoId);
   };
@@ -510,7 +558,30 @@ const Manage = () => {
       }
     });
   };
-
+  const handleDeleteQnaButtonClick = (qnaId) => {
+    Swal.fire({
+      title: "문의 확인되었습니다.",
+      icon: "success",
+      showConfirmButton: false,
+      timer: 1500
+    }).then(() => {
+      axios
+        .delete(`http://localhost:8080/qna/${qnaId}`, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        })
+        .then((response) => {
+          console.log("문의 삭제 성공");
+          addToast("성공적으로 문의가 처리되었습니다.", { appearance: "success", autoDismiss: true, autoDismissTimeout: 5000 });
+          fetchQnaData();
+        })
+        .catch((error) => {
+          console.error("문의 삭제 요청 실패 : ", error);
+          addToast("문의 삭제 요청을 실패했습니다.", { appearance: "error", autoDismiss: true, autoDismissTimeout: 5000 });
+        });
+    });
+  };
   return (
     <ListContainer>
       <Navbar />
@@ -615,6 +686,24 @@ const Manage = () => {
           </DashContainer>
           <DashContainer>
             <Sub>문의 내역</Sub>
+            <QnaItems>
+        {qnaData.map((qna, index) => (
+          <QnaContainer key={qna.id || index}>
+            <QnaContent>
+              <QnaContainer2>
+                <QnaTitle>{qna.title}</QnaTitle>
+                <QnaDate>{qna.date}</QnaDate>
+              </QnaContainer2>
+              <QnaContainer2>
+                <p>{qna.content}</p>
+                <DeleteButton onClick={() => handleDeleteQnaButtonClick(qna.id)}>
+                 <StyledFcOk/>
+                </DeleteButton>
+              </QnaContainer2>
+            </QnaContent>
+          </QnaContainer>
+        ))}
+      </QnaItems>
           </DashContainer>
         </Container>
       </MainContainer>

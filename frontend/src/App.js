@@ -11,6 +11,7 @@ import Modify from "./pages/uploadVideo/ModifySubtitlePage";
 import VideoInfo from "./pages/uploadVideo/VideoInfoPage";
 import VideoList from "./pages/VideoListPage";
 import Select from "./components/selection/Select";
+import Inquiry from "./pages/InquiryPage";
 
 function App() {
   return (
@@ -27,6 +28,7 @@ function App() {
         <Route path="/inform" element={<VideoInfo />} />
         <Route path="/videoList" element={<VideoList />} />
         <Route path="/select" element={<Select />} />
+        <Route path="/inquiry" element={<Inquiry />} />
       </Routes>
     </BrowserRouter>
   );
