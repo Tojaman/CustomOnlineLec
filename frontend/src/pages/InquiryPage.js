@@ -1,9 +1,9 @@
-import React, { useState } from 'react';
+import React, { useState } from "react";
 import Background from "../assets/img/Group.png";
-import {useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import Navbar from "../components/header/Navbar";
-import styled from 'styled-components';
-import axios from 'axios';
+import styled from "styled-components";
+import axios from "axios";
 import Swal from "sweetalert2";
 
 const MainContainer = styled.div`
@@ -43,7 +43,7 @@ const Text2 = styled.div`
   font-weight: 600;
   font-size: 12px;
   line-height: 24px;
-  color:  rgba(54, 37, 66, 0.49);
+  color: rgba(54, 37, 66, 0.49);
   margin-left: 15px;
 `;
 const ContentContainer = styled.div`
@@ -53,8 +53,9 @@ const ContentContainer = styled.div`
   width: 700px;
   justify-content: center;
   flex-direction: column;
-  border: 1px solid  #e1dddd;
+  border: 1px solid #e1dddd;
   border-radius: 5px;
+  background-color: white;
 `;
 const InputRow = styled.div`
   display: flex;
@@ -111,32 +112,37 @@ const SubmitButton = styled.button`
   color: #ffffff;
   border-radius: 60px;
   border: 1px solid #ffffff;
+  cursor: pointer;
 `;
 
 const InquiryPage = () => {
-  const [title, setTitle] = useState('');
-  const [content, setContent] = useState('');
+  const [title, setTitle] = useState("");
+  const [content, setContent] = useState("");
   const navigate = useNavigate();
 
   const handleSubmit = async () => {
-      if (!title || !content) {
-          alert('제목과 내용을 모두 입력해주세요.');
-          return;
-      }
+    if (!title || !content) {
+      alert("제목과 내용을 모두 입력해주세요.");
+      return;
+    }
 
-      try {
-          const token = sessionStorage.getItem("token");
-          const response = await axios.post('http://localhost:8080/qna/upload', { title, content }, {
-              headers: {
-                  'Authorization': `Bearer ${token}` 
-              }
-          });
-          console.log('문의가 성공적으로 제출되었습니다:', response.data);
-          showToast('문의 제출 성공');
-      } catch (error) {
-          console.error('문의 제출에 실패했습니다:', error);
-          showToastError('문의 제출 실패');
-      }
+    try {
+      const token = sessionStorage.getItem("token");
+      const response = await axios.post(
+        "http://localhost:8080/qna/upload",
+        { title, content },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+      console.log("문의가 성공적으로 제출되었습니다:", response.data);
+      showToast("문의 제출 성공");
+    } catch (error) {
+      console.error("문의 제출에 실패했습니다:", error);
+      showToastError("문의 제출 실패");
+    }
   };
 
   const showToast = (message) => {
@@ -162,35 +168,35 @@ const InquiryPage = () => {
   };
 
   const handleTitleChange = (event) => {
-      setTitle(event.target.value);
+    setTitle(event.target.value);
   };
 
   const handleContentChange = (event) => {
-      setContent(event.target.value);
+    setContent(event.target.value);
   };
-    return (
-      <MainContainer>
-        <Navbar />
-        <PageBackGround />
-        <TitleContainer>
-          <Text1>문의/불편사항</Text1>
-          <Text2>사이트 이용 시 궁금한 점이나 불편한 사항을 해결할 수 있는 문의사항입니다.</Text2>
-        </TitleContainer>
-        <ContentContainer>
+  return (
+    <MainContainer>
+      <Navbar />
+      <PageBackGround />
+      <TitleContainer>
+        <Text1>문의/불편사항</Text1>
+        <Text2>사이트 이용 시 궁금한 점이나 불편한 사항을 해결할 수 있는 문의사항입니다.</Text2>
+      </TitleContainer>
+      <ContentContainer>
         <InputRow>
-                <InputLabel>제목</InputLabel>
-                <InputField type="text" placeholder="제목을 입력하세요" value={title} onChange={handleTitleChange} />
-            </InputRow>
-            <InputRow>
-                <InputLabel>내용</InputLabel>
-                <InputField2 type="text" placeholder="내용을 입력하세요" value={content} onChange={handleContentChange} />
-            </InputRow>
-        </ContentContainer>
-        <ButtonContainer>
+          <InputLabel>제목</InputLabel>
+          <InputField type="text" placeholder="제목을 입력하세요" value={title} onChange={handleTitleChange} />
+        </InputRow>
+        <InputRow>
+          <InputLabel>내용</InputLabel>
+          <InputField2 type="text" placeholder="내용을 입력하세요" value={content} onChange={handleContentChange} />
+        </InputRow>
+      </ContentContainer>
+      <ButtonContainer>
         <SubmitButton onClick={handleSubmit}>제출</SubmitButton>
-        </ButtonContainer>
-      </MainContainer>
-    );
-  }
-  
-  export default InquiryPage;
+      </ButtonContainer>
+    </MainContainer>
+  );
+};
+
+export default InquiryPage;

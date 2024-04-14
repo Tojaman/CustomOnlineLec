@@ -126,6 +126,7 @@ const UploadListContainer = styled.div`
 const ListLink = styled(Link)`
   text-decoration: none;
   color: #000;
+  font-size: 15px;
 `;
 
 const MoreButton = styled.span`
@@ -526,6 +527,7 @@ const MyPage = () => {
               문의하기
               <IoIosArrowForward />
             </ListLink>
+            <br></br>
             <br></br>
             <FunctionButton onClick={handleWithdrawalClick}>
               탈퇴하기

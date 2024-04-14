@@ -225,36 +225,43 @@ const ImageContainer = styled.div`
   margin-left: 12px;
   width: 90%;
 `;
+
 const QnaItems = styled.div`
-  margin-top: 40px;
+  margin-top: 15px;
 `;
 
 const QnaContainer = styled.div`
   margin-left: 10px;
   margin-right: 10px;
-  border-bottom: 1px solid  #e1dddd;
-  border-top: 1px solid  #e1dddd;
+  border-bottom: 1px solid #e1dddd;
+  border-top: 1px solid #e1dddd;
 `;
+
 const QnaContent = styled.div`
   padding: 10px;
 `;
+
 const QnaTitle = styled.p`
   margin: 0;
   font-family: "Inter";
   font-weight: 600;
   font-size: 20px;
 `;
+
 const QnaDate = styled.p`
   color: gray;
   margin: 0;
 `;
+
 const QnaContainer2 = styled.div`
   display: flex;
   justify-content: space-between;
 `;
+
 const StyledFcOk = styled(FcOk)`
   font-size: 25px;
 `;
+
 const Manage = () => {
   const [videos, setVideos] = useState([]);
   const [users, setUsers] = useState([]);
@@ -492,13 +499,13 @@ const Manage = () => {
         },
       })
       .then((response) => {
-         const qnaData = response.data;
-      console.log("Q&A 목록 요청 성공");
-      setQnaData(qnaData);
+        const qnaData = response.data;
+        console.log("Q&A 목록 요청 성공");
+        setQnaData(qnaData);
       })
       .catch((error) => console.error("Q&A 목록 요청 실패: ", error));
   };
-  
+
   const handleVideoClick = (videoId) => {
     sessionStorage.setItem("selectedVideoId", videoId);
   };
@@ -563,7 +570,7 @@ const Manage = () => {
       title: "문의 확인되었습니다.",
       icon: "success",
       showConfirmButton: false,
-      timer: 1500
+      timer: 1500,
     }).then(() => {
       axios
         .delete(`http://localhost:8080/qna/${qnaId}`, {
@@ -687,23 +694,23 @@ const Manage = () => {
           <DashContainer>
             <Sub>문의 내역</Sub>
             <QnaItems>
-        {qnaData.map((qna, index) => (
-          <QnaContainer key={qna.id || index}>
-            <QnaContent>
-              <QnaContainer2>
-                <QnaTitle>{qna.title}</QnaTitle>
-                <QnaDate>{qna.date}</QnaDate>
-              </QnaContainer2>
-              <QnaContainer2>
-                <p>{qna.content}</p>
-                <DeleteButton onClick={() => handleDeleteQnaButtonClick(qna.id)}>
-                 <StyledFcOk/>
-                </DeleteButton>
-              </QnaContainer2>
-            </QnaContent>
-          </QnaContainer>
-        ))}
-      </QnaItems>
+              {qnaData.map((qna, index) => (
+                <QnaContainer key={qna.id || index}>
+                  <QnaContent>
+                    <QnaContainer2>
+                      <QnaTitle>{qna.title}</QnaTitle>
+                      <QnaDate>{qna.date}</QnaDate>
+                    </QnaContainer2>
+                    <QnaContainer2>
+                      <span>{qna.content}</span>
+                      <DeleteButton onClick={() => handleDeleteQnaButtonClick(qna.id)}>
+                        <StyledFcOk />
+                      </DeleteButton>
+                    </QnaContainer2>
+                  </QnaContent>
+                </QnaContainer>
+              ))}
+            </QnaItems>
           </DashContainer>
         </Container>
       </MainContainer>
