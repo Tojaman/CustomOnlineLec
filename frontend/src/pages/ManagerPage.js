@@ -237,7 +237,7 @@ const QnaContainer = styled.div`
   border-top: 1px solid #e1dddd;
 `;
 
-const QnaContent = styled.div`
+const QnaBox = styled.div`
   padding: 10px;
 `;
 
@@ -253,6 +253,15 @@ const QnaDate = styled.p`
   margin: 0;
 `;
 
+const QnaContent = styled.p`
+  margin: 0;
+  font-family: "Inter";
+  font-color: gray;
+  font-weight: 400;
+  font-size: 16px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+`;
 const QnaContainer2 = styled.div`
   display: flex;
   justify-content: space-between;
@@ -385,7 +394,7 @@ const Manage = () => {
             const modifiedUserData = userData
               .map((user, index) => ({
                 ...user,
-                profileS3Path: urls[index] ? urls[index] : originProfileImage, // Use originProfileImage if url is null
+                profileS3Path: urls[index] ? urls[index] : originProfileImage,
               }))
               .reverse();
             setUsers(modifiedUserData);
@@ -494,12 +503,15 @@ const Manage = () => {
   const fetchQnaData = () => {
     axios
       .get("http://localhost:8080/qna/list", {
+        params: {
+          limit: 10 
+        },
         headers: {
           Authorization: `Bearer ${token}`,
         },
       })
       .then((response) => {
-        const qnaData = response.data;
+        const qnaData = response.data.slice(0, 10); 
         console.log("Q&A 목록 요청 성공");
         setQnaData(qnaData);
       })
@@ -696,18 +708,18 @@ const Manage = () => {
             <QnaItems>
               {qnaData.map((qna, index) => (
                 <QnaContainer key={qna.id || index}>
-                  <QnaContent>
+                  <QnaBox>
                     <QnaContainer2>
                       <QnaTitle>{qna.title}</QnaTitle>
                       <QnaDate>{qna.date}</QnaDate>
                     </QnaContainer2>
                     <QnaContainer2>
-                      <span>{qna.content}</span>
+                      <QnaContent>{qna.content}</QnaContent>
                       <DeleteButton onClick={() => handleDeleteQnaButtonClick(qna.id)}>
                         <StyledFcOk />
                       </DeleteButton>
                     </QnaContainer2>
-                  </QnaContent>
+                  </QnaBox>
                 </QnaContainer>
               ))}
             </QnaItems>
