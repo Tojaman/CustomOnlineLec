@@ -1,12 +1,8 @@
 package com.example.CustomLecture.config;
 
-import com.example.CustomLecture.dto.CustomOAuth2User;
-import com.example.CustomLecture.dto.GoogleResponse;
 import com.example.CustomLecture.jwt.JWTFilter;
 import com.example.CustomLecture.jwt.JWTUtil;
 import com.example.CustomLecture.jwt.LoginFilter;
-import com.example.CustomLecture.oauth2.CustomSuccessHandler;
-import com.example.CustomLecture.service.CustomOAuth2UserService;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -35,15 +31,9 @@ public class SecurityConfig {
     private final AuthenticationConfiguration authenticationConfiguration;
     private final JWTUtil jwtUtil;
 
-    // oauth2 google 로그인
-    private final CustomOAuth2UserService customOAuth2UserService;
-    private final CustomSuccessHandler customSuccessHandler;
-
-    public SecurityConfig(AuthenticationConfiguration authenticationConfiguration, JWTUtil jwtUtil, CustomOAuth2UserService customOAuth2UserService, CustomSuccessHandler customSuccessHandler) {
+    public SecurityConfig(AuthenticationConfiguration authenticationConfiguration, JWTUtil jwtUtil) {
         this.authenticationConfiguration = authenticationConfiguration;
         this.jwtUtil = jwtUtil;
-        this.customOAuth2UserService = customOAuth2UserService;
-        this.customSuccessHandler = customSuccessHandler;
     }
 
     //AuthenticationManager Bean 등록
@@ -101,12 +91,6 @@ public class SecurityConfig {
         //http basic 인증 방식 disable (JWT 방식 사용할꺼라 필요 없음)
         http
                 .httpBasic((auth) -> auth.disable());
-        //oauth2
-        http
-                .oauth2Login((oauth2) -> oauth2
-                        .userInfoEndpoint((userInfoEndpointConfig) -> userInfoEndpointConfig
-                                .userService(customOAuth2UserService))
-                        .successHandler(customSuccessHandler));
 
         // 경로별 인가 작업
         http
