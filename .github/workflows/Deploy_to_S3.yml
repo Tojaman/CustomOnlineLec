@@ -28,13 +28,16 @@ jobs:
       # 작업에서 액세스할 수 있도록 $GITHUB_WORKSPACE에서 저장소를 체크아웃합니다.
       - name: Checkout
         uses: actions/checkout@v3
+        
+      - name: Change directory
+        run: cd backend
 
       - name: Grant execute permission for gradlew
-        run: chmod +x ./backend/gradlew
+        run: chmod +x ./gradlew
         shell: bash
       
       - name: Build with Gradle
-        run: ./backend/gradlew build
+        run: ./gradlew build
         shell: bash
         
       - name: Make zip file
