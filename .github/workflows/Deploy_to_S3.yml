@@ -33,11 +33,11 @@ jobs:
         run: cd backend
 
       - name: Grant execute permission for gradlew
-        run: chmod +x ./gradlew
+        run: chmod +x ./backend/gradlew
         shell: bash
       
       - name: Build with Gradle
-        run: ./gradlew build
+        run: ./backend/gradlew build
         shell: bash
         
       - name: Make zip file
