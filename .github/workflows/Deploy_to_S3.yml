@@ -35,7 +35,7 @@ jobs:
           distribution: 'adopt'
 
       - run: touch ./backend/src/main/resources/application.yml
-      - run: echo ${{secrets.APPLICATION}} > ./backend/src/main/resources/application.yml
+      - run: echo "${{secrets.APPLICATION}}" > ./backend/src/main/resources/application.yml
       - uses: actions/upload-artifact@v2
         with:
           name: application.yml
