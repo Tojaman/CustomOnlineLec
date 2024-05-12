@@ -9,8 +9,6 @@ import { jwtDecode } from "jwt-decode";
 import Swal from "sweetalert2";
 import logo from "../assets/img/UUJJ.png";
 import Background from "../assets/img/Group.png";
-import GoogleLogin from "../assets/img/Googlelogin.png";
-import OR from "../assets/img/Or.png";
 
 const LoginContainer = styled.div`
   display: flex;
@@ -72,24 +70,6 @@ const ContentContainer = styled.div`
   align-items: center;
   padding: 5px;
   width: 400px;
-`;
-
-const Google = styled.button`
-  width: 400px;
-  height: 57.55px;
-  background: url(${GoogleLogin});
-  border: none;
-  cursor: pointer;
-  background-size: contain;
-  background-repeat: no-repeat;
-`;
-
-const OrImg = styled.div`
-  width: 400px;
-  height: 30px;
-  background-image: url(${OR});
-  background-size: contain;
-  background-repeat: no-repeat;
 `;
 
 const TextInfo = styled.span`
@@ -162,10 +142,6 @@ const LoginPage = () => {
     }
   };
 
-  const onGoogleLogin = () => {
-    window.location.href = "http://localhost:8080/oauth2/authorization/google";
-  };
-
   const showToast = () => {
     Swal.fire({
       icon: "success",
@@ -195,7 +171,6 @@ const LoginPage = () => {
         <LogoImage />
       </Link>
       <PageBackGround />
-
       <BoxContainer>
         <RegisterButton to="/register">
           회원가입
@@ -203,9 +178,6 @@ const LoginPage = () => {
         </RegisterButton>
         <LoginText>로그인</LoginText>
         <ContentContainer>
-          <Google onClick={onGoogleLogin}></Google>
-
-          <OrImg />
           <form>
             <TextInfo>아이디</TextInfo>
             <InfoInput type="text" value={username} onChange={(e) => setUsername(e.target.value)} />

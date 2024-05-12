@@ -78,6 +78,7 @@ const DashContainer = styled.div`
   width: 50%;
   background-color: #fff;
   margin: 8px;
+  border-radius: 10px;
 `;
 
 const Sub = styled.span`
@@ -228,13 +229,15 @@ const ImageContainer = styled.div`
 
 const QnaItems = styled.div`
   margin-top: 15px;
+  margin-left: 10px;
+  margin-right: 10px;
+  margin-bottom: 10px;
+  height: 450px;
+  overflow-y: auto;
 `;
 
 const QnaContainer = styled.div`
-  margin-left: 10px;
-  margin-right: 10px;
-  border-bottom: 1px solid #e1dddd;
-  border-top: 1px solid #e1dddd;
+  align-items: center;
 `;
 
 const QnaBox = styled.div`
@@ -503,9 +506,6 @@ const Manage = () => {
   const fetchQnaData = () => {
     axios
       .get("http://localhost:8080/qna/list", {
-        params: {
-          limit: 10 
-        },
         headers: {
           Authorization: `Bearer ${token}`,
         },
@@ -592,7 +592,6 @@ const Manage = () => {
         })
         .then((response) => {
           console.log("문의 삭제 성공");
-          addToast("성공적으로 문의가 처리되었습니다.", { appearance: "success", autoDismiss: true, autoDismissTimeout: 5000 });
           fetchQnaData();
         })
         .catch((error) => {
@@ -706,8 +705,9 @@ const Manage = () => {
           <DashContainer>
             <Sub>문의 내역</Sub>
             <QnaItems>
+              <DivideLine></DivideLine>
               {qnaData.map((qna, index) => (
-                <QnaContainer key={qna.id || index}>
+                <><QnaContainer key={qna.id || index}>
                   <QnaBox>
                     <QnaContainer2>
                       <QnaTitle>{qna.title}</QnaTitle>
@@ -720,7 +720,7 @@ const Manage = () => {
                       </DeleteButton>
                     </QnaContainer2>
                   </QnaBox>
-                </QnaContainer>
+                </QnaContainer><DivideLine></DivideLine></>
               ))}
             </QnaItems>
           </DashContainer>
