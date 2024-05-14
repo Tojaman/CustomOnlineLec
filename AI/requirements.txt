@@ -3,12 +3,14 @@ Flask
 redis
 celery
 boto3
-python-dotenv
+load_dotenv
 deemix
 jsonify
-mysql
+# mysql
 pymysql
 moviepy
 flask_restx
 ffmpeg-python
-ffmpeg
+
+# Whisper
+git+https://github.com/openai/whisper.git@248b6cb124225dd263bb9bd32d060b6517e067f8
