@@ -9,12 +9,10 @@ import subprocess
 from contextlib import suppress
 from urllib.parse import urlparse, parse_qs
 
-import gradio as gr
 import librosa
 import numpy as np
 import soundfile as sf
 import sox
-import yt_dlp
 from pedalboard import Pedalboard, Reverb, Compressor, HighpassFilter
 from pedalboard.io import AudioFile
 from pydub import AudioSegment
