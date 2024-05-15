@@ -79,7 +79,7 @@ class ConvertVoice(Resource):
             stt_result = 0
 
             # STT 실행(비동기)
-            # subtitle = stt.delay(local_audio_path)
+            subtitle = stt.delay(local_audio_path)
 
             # RVC 변환(비동기)
             for model in model_list:
@@ -91,12 +91,13 @@ class ConvertVoice(Resource):
                 time.sleep(1)
             print("변환 완료")
             
-            # subtitle = subtitle.get()
-            # if subtitle['success']:
-            #     subtitle_result = subtitle['data']
-            #     stt_result = 1
-            # else :
-            #     stt_result = -1
+            subtitle = subtitle.get()
+            if subtitle['success']:
+                subtitle_result = subtitle['data']
+                print(subtitle_result)
+                stt_result = 1
+            else :
+                stt_result = -1
 
             # 일단 하나라도 실패하면 False 반환
             # 작업이 완료되면 결과를 저장
@@ -113,7 +114,7 @@ class ConvertVoice(Resource):
             # DB 업로드
             connection = get_connection(DB)
             print("DB 연결")
-            video_id = video_dao.upload_convert_s3_path(connection, user_id, original_video_s3_path, results)
+            video_id = video_dao.upload_convert_s3_path(connection, user_id, original_video_s3_path, results, subtitle_result)
             connection.close()
             
             DeleteAllFiles(dir_path)
@@ -128,6 +129,8 @@ class ConvertVoice(Resource):
             # HTTP 응답 생성
             response = jsonify(response_data)
             response.status_code = 200  # 성공적인 요청을 나타내는 HTTP 상태 코드
+            
+            print(response_data)
 
             # 응답 반환
             return response
@@ -140,6 +143,7 @@ class ConvertVoice(Resource):
         except Exception as e:
             DeleteAllFiles(dir_path)
             # 서버에서 오류가 발생한 경우 HTTP 상태 코드 500과 오류 메시지 반환
+            print("에러 발섕 : ", e)
             return {'error': str(e)}, 500
 
 # S3에서 파일 다운로드
