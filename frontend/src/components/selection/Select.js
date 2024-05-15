@@ -130,8 +130,8 @@ const settings = {
 
 const voices = [
   { id: "moon", name: "문재인", img: voiceImg1 },
-  { id: "jimin", name: "일론머스크", img: voiceImg2 },
-  { id: "winter", name: "아이유", img: voiceImg3 },
+  { id: "elonmusk", name: "일론머스크", img: voiceImg2 },
+  { id: "iu", name: "아이유", img: voiceImg3 },
   { id: "karina", name: "에스파 카리나", img: voiceImg4 },
 ];
 

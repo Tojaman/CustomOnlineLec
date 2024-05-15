@@ -11,14 +11,14 @@ export function displayPreviousSessionInfo() {
     case "karina":
       selectedS3Path = selectedVideoInfo.karina;
       break;
-    case "jimin":
-      selectedS3Path = selectedVideoInfo.jimin;
+    case "elonmusk":
+      selectedS3Path = selectedVideoInfo.elonmusk;
       break;
     case "moon":
       selectedS3Path = selectedVideoInfo.moon;
       break;
-    case "winter":
-      selectedS3Path = selectedVideoInfo.winter;
+    case "iu":
+      selectedS3Path = selectedVideoInfo.iu;
       break;
     default:
   }
