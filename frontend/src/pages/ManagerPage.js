@@ -21,8 +21,8 @@ import avatarImg5 from "../assets/avatarImg/키키.jpg";
 import avatarImg6 from "../assets/avatarImg/뽀로로.jpg";
 
 import voiceImg1 from "../assets/avatarImg/문재인.jpg";
-import voiceImg2 from "../assets/avatarImg/지민.jpg";
-import voiceImg3 from "../assets/avatarImg/윈터.jpg";
+import voiceImg2 from "../assets/avatarImg/일론머스크.jpg";
+import voiceImg3 from "../assets/avatarImg/아이유.jpg";
 import voiceImg4 from "../assets/avatarImg/카리나.jpg";
 
 import { registerables, CategoryScale, Chart } from "chart.js";

@@ -15,8 +15,8 @@ import avatarImg5 from "../../assets/avatarImg/키키.jpg";
 import avatarImg6 from "../../assets/avatarImg/뽀로로.jpg";
 
 import voiceImg1 from "../../assets/avatarImg/문재인.jpg";
-import voiceImg2 from "../../assets/avatarImg/지민.jpg";
-import voiceImg3 from "../../assets/avatarImg/윈터.jpg";
+import voiceImg2 from "../../assets/avatarImg/일론머스크.jpg";
+import voiceImg3 from "../../assets/avatarImg/아이유.jpg";
 import voiceImg4 from "../../assets/avatarImg/카리나.jpg";
 
 import "slick-carousel/slick/slick.css";
@@ -130,8 +130,8 @@ const settings = {
 
 const voices = [
   { id: "moon", name: "문재인", img: voiceImg1 },
-  { id: "jimin", name: "BTS 지민", img: voiceImg2 },
-  { id: "winter", name: "에스파 윈터", img: voiceImg3 },
+  { id: "jimin", name: "BTS 일론머스크", img: voiceImg2 },
+  { id: "winter", name: "에스파 아이유", img: voiceImg3 },
   { id: "karina", name: "에스파 카리나", img: voiceImg4 },
 ];
 
