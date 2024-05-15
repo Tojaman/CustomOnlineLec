@@ -207,7 +207,7 @@ const VideoInfo = () => {
 
     try {
       const response = await axios.post(
-        "http://localhost:8080/videos/uploadInfo",
+        "http://43.201.10.158:8080/videos/uploadInfo",
         {
           id,
           title,

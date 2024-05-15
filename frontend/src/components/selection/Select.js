@@ -130,8 +130,8 @@ const settings = {
 
 const voices = [
   { id: "moon", name: "문재인", img: voiceImg1 },
-  { id: "jimin", name: "BTS 일론머스크", img: voiceImg2 },
-  { id: "winter", name: "에스파 아이유", img: voiceImg3 },
+  { id: "jimin", name: "일론머스크", img: voiceImg2 },
+  { id: "winter", name: "아이유", img: voiceImg3 },
   { id: "karina", name: "에스파 카리나", img: voiceImg4 },
 ];
 
@@ -158,7 +158,7 @@ const Select = () => {
     if (selectedVideoId) {
       axios
         .post(
-          `http://localhost:8080/videos/info`,
+          `http://43.201.10.158:8080/videos/info`,
           {
             videoid: selectedVideoId,
           },

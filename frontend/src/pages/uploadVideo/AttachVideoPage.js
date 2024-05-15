@@ -316,7 +316,7 @@ const Attach = () => {
 
     try {
       const response = await axios.post(
-        "http://localhost:8080/videos/uploadVideo",
+        "http://43.201.10.158:8080/videos/uploadVideo",
         {
           url,
           gender,
