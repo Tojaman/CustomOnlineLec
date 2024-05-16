@@ -154,7 +154,7 @@ const Select = () => {
 
   useEffect(() => {
     const selectedVideoId = sessionStorage.getItem("selectedVideoId");
-
+    console.log(selectedVideoId);
     if (selectedVideoId) {
       axios
         .post(
@@ -170,6 +170,7 @@ const Select = () => {
         )
         .then((response) => {
           console.log("영상 정보 요청 성공");
+          console.log(response.data);
           sessionStorage.setItem("selectedVideoInfo", JSON.stringify(response.data));
         })
         .catch((error) => console.error("영상 정보 요청 실패 : ", error));

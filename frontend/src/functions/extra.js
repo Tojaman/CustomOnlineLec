@@ -4,10 +4,11 @@ export function displayPreviousSessionInfo() {
   const selectedVoice = sessionStorage.getItem("selectedVoice");
   const selectedVideoInfoString = sessionStorage.getItem("selectedVideoInfo");
   const selectedVideoInfo = JSON.parse(selectedVideoInfoString);
-
+  
   let selectedS3Path;
 
   switch (selectedVoice) {
+    
     case "karina":
       selectedS3Path = selectedVideoInfo.karina;
       break;
