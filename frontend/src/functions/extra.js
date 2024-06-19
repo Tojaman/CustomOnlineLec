@@ -57,6 +57,8 @@ export function displayPreviousSessionInfo() {
 
     const profileS3Path = selectedVideoInfo.profileS3Path;
 
+    console.log(profileS3Path);
+
     if (profileS3Path !== null) {
       const profileImageParams = {
         Bucket: process.env.REACT_APP_S3_BUCKET,
