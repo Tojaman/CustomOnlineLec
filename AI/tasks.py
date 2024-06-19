@@ -35,7 +35,7 @@ def process_uploaded_file(convert_video_dir, local_video_path, local_audio_path,
         pitch = 0
         if gender == "man" and (RVC_model == "karina" or RVC_model == "iu"):
             pitch = 12
-        elif gender == "woman" and (RVC_model == "moon" or RVC_model == "elonmusk"):
+        elif gender == "woman" and (RVC_model == "jung" or RVC_model == "jimin"):
             pitch = -12
         else:
             pitch = 0

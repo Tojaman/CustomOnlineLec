@@ -74,7 +74,7 @@ class ConvertVoice(Resource):
             # -----------------------------------------------------------------------------------------------------------
             
             # 모델 목록
-            model_list = ["elonmusk", "moon", "iu", "karina"]
+            model_list = ["jimin", "jung", "iu", "karina"]
             # model_list = ["yoon"]
             results = {}  # 각 모델의 결과를 저장할 딕셔너리
             rvc_result = 0

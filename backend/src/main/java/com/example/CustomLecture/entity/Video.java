@@ -112,8 +112,8 @@ public class Video {
 		        videoData.getVideoHeight(),
 
                 s3Path.getJimin(),
-                s3Path.getMoon(),
-                s3Path.getWinter(),
+                s3Path.getJung(),
+                s3Path.getIu(),
                 s3Path.getKarina()
         );
     }

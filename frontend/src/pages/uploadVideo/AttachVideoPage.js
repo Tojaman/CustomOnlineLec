@@ -316,7 +316,7 @@ const Attach = () => {
 
     try {
       const response = await axios.post(
-        "http://43.201.10.158:8080/videos/uploadVideo",
+        "http://localhost:8080/videos/uploadVideo",
         {
           url,
           gender,
@@ -349,8 +349,8 @@ const Attach = () => {
           () => addToast("자막이 성공적으로 추출되었습니다.", { appearance: "success", autoDismiss: true, autoDismissTimeout: 5000 }),
           0
         );
-        const subtitleResponse = { subtitleList: JSON.parse(response.data.subtitle) };
-        dispatch(subtitle(subtitleResponse));
+        // const subtitleResponse = { subtitleList: response.data.subtitle };
+        // dispatch(subtitle(subtitleResponse));
       } else if (response.data.stt_result == -1 || response.data.stt_result == 0)
         setTimeout(() => addToast("자막 추출을 실패했습니다.", { appearance: "error", autoDismiss: true, autoDismissTimeout: 5000 }), 0);
 

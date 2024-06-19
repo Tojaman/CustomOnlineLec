@@ -35,7 +35,7 @@ public class VideoInfoResponseDTO {
     // 변환 영상 s3 경로
     //private String convertVideoS3Path;
     private String jimin;
-    private String moon;
-    private String winter;
+    private String jung;
+    private String iu;
     private String karina;
 }
