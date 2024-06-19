@@ -79,7 +79,7 @@ class ConvertVoice(Resource):
             # model_list = ["yoon"]
             results = {}  # 각 모델의 결과를 저장할 딕셔너리
             rvc_result = 0
-            stt_result = 0
+            stt_result = 1
 
             # STT 실행(비동기)
             # subtitle = stt.delay(local_audio_path)
