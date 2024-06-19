@@ -1,6 +1,9 @@
 import os
 from dotenv import load_dotenv
 
+# .env 파일 로드
+load_dotenv()
+
 DB = {
     'host': os.environ["DB_HOST"],
     'port': os.environ["DB_PORT"],
