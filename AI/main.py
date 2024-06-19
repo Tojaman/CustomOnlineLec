@@ -51,6 +51,7 @@ class ConvertVoice(Resource):
             gender = request.json['gender']
             
             dir_path = "./files/"
+            create_directory(dir_path)
 
             # s3 연결 및 객체 생성
             s3 = s3_connection()
@@ -89,7 +90,7 @@ class ConvertVoice(Resource):
             # dir_path: 변환 영상 저장 경로
             print("************************************************************")
             print(original_filename)
-            if (original_filename == "형준.mp4"):
+            if (original_filename == "형준.mp4" or original_filename == "형준1.mp4" or original_filename == "형준2.mp4"):
                 audio_dir_path = "./convert_audio/형준/"
                 for model in model_list:
                     convert_video_path = merge_video_audio(dir_path, local_video_path, model, audio_dir_path)
@@ -107,16 +108,17 @@ class ConvertVoice(Resource):
             else: # 세정
                 audio_dir_path = "./convert_audio/세정/"
                 for model in model_list:
-                    results[model] = merge_video_audio(dir_path, local_video_path, model, audio_dir_path)
+                    convert_video_path = merge_video_audio(dir_path, local_video_path, model, audio_dir_path)
                     # 최종 변환 파일 이름 추출
-                    convert_video_name_mp4 = os.path.basename(results[model])
+                    convert_video_name_mp4 = os.path.basename(convert_video_path)
                     # convert_video_name, convert_video_mp4 = os.path.splitext(convert_video_name_mp4)
                     # convert_video_name = convert_video_name + "_" + model + convert_video_mp4
                     print("*******************")
                     print(convert_video_name_mp4)
                     # s3 업로드
                     convert_video_path_s3 = "convert_video/" + convert_video_name_mp4  # 저장할 S3 경로
-                    if not s3_put_object(s3, S3_BUCKET, results[model], convert_video_path_s3):
+                    results[model] = convert_video_path_s3
+                    if not s3_put_object(s3, S3_BUCKET, convert_video_path, convert_video_path_s3):
                         print("파일 업로드 실패")
             
             # merge_video_audio(dir_path, local_video_path, audio_path) # audio_path: 변환 음성
@@ -303,6 +305,10 @@ def s3_put_object(s3, bucket, local_filepath, s3_filepath):
         print(e)
         return False
     return True
+
+def create_directory(directory_path):
+    if not os.path.exists(directory_path):
+        os.makedirs(directory_path)
 
 if __name__ == '__main__':
     app.run('0.0.0.0', port=5000, debug=True)

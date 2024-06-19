@@ -185,8 +185,12 @@ public class VideoService {
         // 빅데이터 같이 큰 데이터는 jackson 우위, 작은 데이터는 gson 우위 -> 여기선 gson 사용
         VideoInfoResponseDTO videoInfoResponseDTO = video.toVideoInfoResponseDTO(video.getMember(), video.getVideoData(), video.getConvertVideos());
 
+        
         // Gson 객체 생성
         Gson gson = new Gson();
+        System.out.println("*************");
+        System.out.println(gson.toJson(videoInfoResponseDTO));
+        
 
         // VideoInfoResponseDTO 객체를 JSON 문자열로 변환
         return gson.toJson(videoInfoResponseDTO);
