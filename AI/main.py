@@ -82,7 +82,7 @@ class ConvertVoice(Resource):
             stt_result = 1
 
             # STT 실행(비동기)
-            # subtitle = stt.delay(local_audio_path)
+            subtitle = stt.delay(local_audio_path)
             
             # 서버 사용X -> 변환 음성 파일과 원본 영상 합치는 코드 작성(Celery 사용X)
             
@@ -134,13 +134,13 @@ class ConvertVoice(Resource):
             # print("변환 완료")
             # -----------------------------------------------------------------------------------------------------------
             
-            # subtitle = subtitle.get()
-            # if subtitle['success']:
-            #     subtitle_result = subtitle['data']
-            #     print(subtitle_result)
-            #     stt_result = 1
-            # else :
-            #     stt_result = -1
+            subtitle = subtitle.get()
+            if subtitle['success']:
+                subtitle_result = subtitle['data']
+                print(subtitle_result)
+                stt_result = 1
+            else :
+                stt_result = -1
 
             # 서버 사용X -----------------------------------------------------------------------------------------------------------
             rvc_result = 1
