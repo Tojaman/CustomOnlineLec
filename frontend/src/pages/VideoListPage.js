@@ -133,7 +133,7 @@ const VideoList = () => {
     const s3 = new AWS.S3();
 
     axios
-      .get("http://localhost:8080/videos/list", {
+      .get("http://13.209.74.48:8080/videos/list", {
         headers: {
           Authorization: `Bearer ${token}`,
         },

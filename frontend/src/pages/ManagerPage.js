@@ -366,7 +366,7 @@ const Manage = () => {
     const s3 = new AWS.S3();
 
     axios
-      .get("http://localhost:8080/admin/user/list", {
+      .get("http://13.209.74.48:8080/admin/user/list", {
         headers: {
           Authorization: `Bearer ${token}`,
         },
@@ -423,7 +423,7 @@ const Manage = () => {
     const s3 = new AWS.S3();
 
     axios
-      .get("http://localhost:8080/videos/list", {
+      .get("http://13.209.74.48:8080/videos/list", {
         headers: {
           Authorization: `Bearer ${token}`,
         },
@@ -505,7 +505,7 @@ const Manage = () => {
 
   const fetchQnaData = () => {
     axios
-      .get("http://localhost:8080/qna/list", {
+      .get("http://13.209.74.48:8080/qna/list", {
         headers: {
           Authorization: `Bearer ${token}`,
         },
@@ -532,7 +532,7 @@ const Manage = () => {
     }).then((result) => {
       if (result.isConfirmed) {
         axios
-          .delete(`http://localhost:8080/mypage/delete/${username}`, {
+          .delete(`http://13.209.74.48:8080/mypage/delete/${username}`, {
             headers: {
               Authorization: `Bearer ${token}`,
             },
@@ -560,7 +560,7 @@ const Manage = () => {
     }).then((result) => {
       if (result.isConfirmed) {
         axios
-          .delete(`http://localhost:8080/admin/${videoId}`, {
+          .delete(`http://13.209.74.48:8080/admin/${videoId}`, {
             headers: {
               Authorization: `Bearer ${token}`,
             },
@@ -585,7 +585,7 @@ const Manage = () => {
       timer: 1500,
     }).then(() => {
       axios
-        .delete(`http://localhost:8080/qna/${qnaId}`, {
+        .delete(`http://13.209.74.48:8080/qna/${qnaId}`, {
           headers: {
             Authorization: `Bearer ${token}`,
           },

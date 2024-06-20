@@ -98,7 +98,7 @@ export default function RegisterPage() {
 
   const handleRegister = async () => {
     try {
-      const response = await axios.post("http://localhost:8080/join", {
+      const response = await axios.post("http://13.209.74.48:8080/join", {
         username,
         password,
         nickname,
