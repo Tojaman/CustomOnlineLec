@@ -160,7 +160,7 @@ const Select = () => {
     if (selectedVideoId) {
       axios
         .post(
-          `http://13.209.74.48:8080/videos/info`,
+          `http://localhost:8080/videos/info`,
           {
             videoid: selectedVideoId,
           },

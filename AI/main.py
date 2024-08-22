@@ -3,7 +3,7 @@ from flask import Flask, request, jsonify
 from DB.config import DB
 from DB.connection import get_connection
 from dao.dao import VideoDao
-import os, tempfile, boto3, shutil, time, tempfile
+import os, tempfile, boto3, shutil, time, tempfile, time
 from datetime import datetime
 from celery import group
 
@@ -46,9 +46,13 @@ class ConvertVoice(Resource):
         # 임시 폴더 생성
         # with tempfile.TemporaryDirectory() as temp_dir:
         try:
+            # 작업 시작 시간 기록
+            start_time = time.time()
+            
             user_id = request.json['userId']
             original_video_s3_path = request.json['url']
             gender = request.json['gender']
+            print(request)
             
             dir_path = "./files/"
             create_directory(dir_path)
@@ -82,10 +86,10 @@ class ConvertVoice(Resource):
             stt_result = 1
 
             # STT 실행(비동기)
-            subtitle = stt.delay(local_audio_path)
+            # subtitle = stt.delay(local_audio_path)
             
+            # ---------------------------------------------------------서버 사용X-----------------------------------------------------------------------
             # 서버 사용X -> 변환 음성 파일과 원본 영상 합치는 코드 작성(Celery 사용X)
-            
             # audio_dir_path: 변환 음성
             # dir_path: 변환 영상 저장 경로
             print("************************************************************")
@@ -96,8 +100,6 @@ class ConvertVoice(Resource):
                     convert_video_path = merge_video_audio(dir_path, local_video_path, model, audio_dir_path)
                     # 최종 변환 파일 이름 추출
                     convert_video_name_mp4 = os.path.basename(convert_video_path)
-                    # convert_video_name, convert_video_mp4 = os.path.splitext(convert_video_name_mp4)
-                    # convert_video_name = convert_video_name + "_" + model + convert_video_mp4
                     
                     # s3 업로드
                     convert_video_path_s3 = "convert_video/" + convert_video_name_mp4  # 저장할 S3 경로
@@ -111,15 +113,14 @@ class ConvertVoice(Resource):
                     convert_video_path = merge_video_audio(dir_path, local_video_path, model, audio_dir_path)
                     # 최종 변환 파일 이름 추출
                     convert_video_name_mp4 = os.path.basename(convert_video_path)
-                    # convert_video_name, convert_video_mp4 = os.path.splitext(convert_video_name_mp4)
-                    # convert_video_name = convert_video_name + "_" + model + convert_video_mp4
-                    print("*******************")
-                    print(convert_video_name_mp4)
+
                     # s3 업로드
                     convert_video_path_s3 = "convert_video/" + convert_video_name_mp4  # 저장할 S3 경로
                     results[model] = convert_video_path_s3
                     if not s3_put_object(s3, S3_BUCKET, convert_video_path, convert_video_path_s3):
                         print("파일 업로드 실패")
+            # ---------------------------------------------------------서버 사용X-----------------------------------------------------------------------
+            
             
             # merge_video_audio(dir_path, local_video_path, audio_path) # audio_path: 변환 음성
             # -----------------------------------------------------------------------------------------------------------
@@ -134,13 +135,13 @@ class ConvertVoice(Resource):
             # print("변환 완료")
             # -----------------------------------------------------------------------------------------------------------
             
-            subtitle = subtitle.get()
-            if subtitle['success']:
-                subtitle_result = subtitle['data']
-                print(subtitle_result)
-                stt_result = 1
-            else :
-                stt_result = -1
+            # subtitle = subtitle.get()
+            # if subtitle['success']:
+            #     subtitle_result = subtitle['data']
+            #     print(subtitle_result)
+            #     stt_result = 1
+            # else :
+            #     stt_result = -1
 
             # 서버 사용X -----------------------------------------------------------------------------------------------------------
             rvc_result = 1
@@ -158,10 +159,16 @@ class ConvertVoice(Resource):
             #         rvc_result = -1
             # -----------------------------------------------------------------------------------------------------------
             
+            # 작업 종료 시간 기록
+            end_time = time.time()
+            # 처리 시간 계산
+            processing_time = end_time - start_time
+            print(f"Processing time: {processing_time:.2f} seconds")
+
             # DB 업로드
             connection = get_connection(DB)
             print("DB 연결")
-            subtitle_result = "ABC"
+            subtitle_result = 1
             video_id = video_dao.upload_convert_s3_path(connection, user_id, original_video_s3_path, results, subtitle_result)
             connection.close()
             

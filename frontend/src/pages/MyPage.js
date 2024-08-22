@@ -222,7 +222,7 @@ const MyPage = () => {
   const handleSaveClick = () => {
     axios
       .patch(
-        `http://13.209.74.48:8080/mypage/update/${username}`,
+        `http://localhost:8080/mypage/update/${username}`,
         {
           newNickname: editedNickname,
           currentPassword: currentPassword,
@@ -289,7 +289,7 @@ const MyPage = () => {
   const sendS3UrlToServer = (s3Url) => {
     axios
       .patch(
-        `http://13.209.74.48:8080/mypage/update/profile/${username}`,
+        `http://localhost:8080/mypage/update/profile/${username}`,
         { ProfileS3Path: s3Url },
         {
           headers: {
@@ -318,7 +318,7 @@ const MyPage = () => {
 
     async function fetchProfileInfo() {
       try {
-        const response = await axios.get(`http://13.209.74.48:8080/mypage/${username}`, {
+        const response = await axios.get(`http://localhost:8080/mypage/${username}`, {
           headers: {
             Authorization: `Bearer ${token}`,
           },
@@ -361,7 +361,7 @@ const MyPage = () => {
 
     async function fetchVideos() {
       try {
-        const response = await axios.get("http://13.209.74.48:8080/videos/list", {
+        const response = await axios.get("http://localhost:8080/videos/list", {
           headers: {
             Authorization: `Bearer ${token}`,
           },
@@ -430,7 +430,7 @@ const MyPage = () => {
     }).then((result) => {
       if (result.isConfirmed) {
         axios
-          .delete(`http://13.209.74.48:8080/mypage/delete/${username}`, {
+          .delete(`http://localhost:8080/mypage/delete/${username}`, {
             headers: {
               Authorization: `Bearer ${token}`,
             },
