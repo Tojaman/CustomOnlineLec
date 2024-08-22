@@ -2,7 +2,7 @@ from celery import Celery
 import os, boto3, jsonify, subprocess, re
 from dotenv import load_dotenv
 from moviepy.editor import VideoFileClip, AudioFileClip
-# import whisper
+import whisper
 
 load_dotenv()
 
