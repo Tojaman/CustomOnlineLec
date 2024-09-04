@@ -1,6 +1,23 @@
-version: '3.9'
+# version: '3.9'
 
 services:
+  my_mysql:
+    image: mysql:8.0
+    restart: always
+    ports:
+      - 3306:3306
+    environment:
+      MYSQL_ROOT_PASSWORD: 0000
+      MYSQL_DATABASE: customdb
+      MYSQL_USER: user
+      MYSQL_PASSWORD: 0000
+      TZ: Asia/Seoul
+    volumes:
+      # - mysql_data:/var/lib/mysql
+      - ./db/mysql/data:/var/lib/mysql
+      - ./db/mysql/init:/docker-entrypoint-initdb.d
+    platform: linux/x86_64
+
   flask:
     container_name: flask
     # 환경 설정 부분
@@ -9,20 +26,28 @@ services:
     environment:
       - CELERY_BROKER_URL=redis://redis:6379/0
       - CELERY_RESULT_BACKEND=redis://redis:6379/0
+      - DATABASE_HOST=my_mysql
+      - DATABASE_USER=user
+      - DATABASE_PASSWORD=4886
+      - DATABASE_NAME=customdb
     build:
       context: ./AI
       dockerfile: Dockerfile
+    # deploy:
+    #   resources:
+    #     reservations:
+    #       devices:
+    #         - driver: nvidia
+    #           capabilities: [gpu]
     volumes:
       - ./AI:/AI
-    command: sh -c "python main.py && gunicorn", "main:app", "-b", "0.0.0.0:5000"
     restart: on-failure
     ports:
       - "5000:5000"
-    expose:
-      - 5000
     depends_on:
       - celery
       - redis
+      - my_mysql
 
   celery:
     container_name: celery_service
@@ -32,9 +57,15 @@ services:
       - CELERY_BROKER_URL=redis://redis:6379/0
       - CELERY_RESULT_BACKEND=redis://redis:6379/0
     build:
-      context: AI
+      context: ./AI/RVC_custom
       dockerfile: Dockerfile
-    command: sh -c "celery -A tasks worker -l info"
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              capabilities: [gpu]
+    # command: sh -c "celery -A tasks worker -l info"
     volumes:
       - ./AI:/AI
     depends_on:
@@ -47,6 +78,7 @@ services:
   
   springboot:
     container_name: springboot
+    # restart: always
     # Spring Boot 서버 설정
     build:
       context: ./backend
@@ -55,6 +87,14 @@ services:
       - ./backend:/backend
     ports:
       - "8080:8080"
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "user", "-p4886"]
+      interval: 10s
+      retries: 5
+      start_period: 30s
+      timeout: 5s
+    depends_on:
+      - my_mysql
 
   # react:
   #   container_name: react

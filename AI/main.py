@@ -1,5 +1,5 @@
 from flask import Flask, request, jsonify
-# from tasks import process_uploaded_file, stt
+from tasks import process_uploaded_file, stt
 from DB.config import DB
 from DB.connection import get_connection
 from dao.dao import VideoDao
