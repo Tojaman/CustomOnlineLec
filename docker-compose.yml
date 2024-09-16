@@ -78,7 +78,7 @@ services:
   
   springboot:
     container_name: springboot
-    # restart: always
+    restart: always
     # Spring Boot 서버 설정
     build:
       context: ./backend
