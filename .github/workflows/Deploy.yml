@@ -46,7 +46,7 @@ jobs:
         run: chmod +x ./gradlew
         shell: bash
         working-directory: ./backend
-      
+       
       # Springboot 빌드
       - name: Build with Gradle
         run: ./gradlew build -x test
