@@ -10,5 +10,6 @@ COPY ./build/libs/spring-base.jar spring-base.jar
 # 포트 노출 (필요시)
 # EXPOSE 9201
 
+
 # JAR 파일 실행
 ENTRYPOINT ["java", "-jar", "/./spring-base.jar", "--spring.profiles.active=dev"]
