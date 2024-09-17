@@ -77,8 +77,8 @@ jobs:
       - name: executing remote ssh commands using password
         uses: appleboy/ssh-action@v0.1.7
         with:
-          host: ${{ secrets.EC2HOST }}
-          username: ubuntu
+          host: ${{ secrets.EC2_HOST }}
+          username: ${{ secrets.EC2_USERNAME }}
           key: ${{ secrets.AWS_SSH_KEY }}
           script: |
             sh /home/ubuntu/CustomOnlineLec/deploy.sh
