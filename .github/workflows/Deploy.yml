@@ -64,7 +64,7 @@ jobs:
           key: ${{ secrets.AWS_SSH_KEY }}
           source: spring-base.jar
           target: /home/ubuntu/CustomOnlineLec/build/libs/
-
+ 
   deploy:
     needs: build
     name: CD
