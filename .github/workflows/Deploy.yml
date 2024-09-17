@@ -53,7 +53,7 @@ jobs:
         working-directory: ./backend
       
       - name: 빌드된 파일 이름 변경하기
-        run: mv ./backend/build/libs/*SNAPSHOT.jar ./project.jar
+        run: mv ./backend/build/libs/*SNAPSHOT.jar ./spring-base.jar
       
       - name: SCP로 EC2에 빌드된 파일 전송하기
         uses: appleboy/scp-action@v0.1.7
@@ -62,7 +62,7 @@ jobs:
           username: ${{ secrets.EC2_USERNAME }}
           key: ${{ secrets.AWS_SSH_KEY }}
           source: project.jar
-          target: /home/ubuntu/instagram-server/tobe
+          target: /home/ubuntu/CustomOnlineLec/build/libs/
 
   deploy:
     needs: build
