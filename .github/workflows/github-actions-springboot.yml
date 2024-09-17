@@ -3,7 +3,7 @@ name: Deploy To EC2
 on:
   push:
     branches:
-      - serverTest/#1
+      - main
 
 jobs:
   deploy:

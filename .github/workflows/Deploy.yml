@@ -5,7 +5,7 @@ name: Deploy
 on:
   # main branch에 대한 push를 트리거로 지정
   push:
-    branches: [ main ]
+    branches: [ serverTest/#1 ]
     paths:
       - 'backend/**'
       - 'AI/**'
