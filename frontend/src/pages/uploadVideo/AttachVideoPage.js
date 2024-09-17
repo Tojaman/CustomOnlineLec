@@ -1,6 +1,7 @@
 import React, { useState, useRef, useEffect } from "react";
 import { Link } from "react-router-dom";
 import axios from "axios";
+import config from '../../config';
 import AWS from "aws-sdk";
 import Sidebar from "../../components/sidebar/Sidebar";
 import styled from "styled-components";
@@ -10,6 +11,8 @@ import { useDispatch } from "react-redux";
 import { subtitle } from "../../redux/subtitle";
 import { videoData } from "../../redux/videoData";
 import { useToasts } from "react-toast-notifications";
+
+const apiUrl = config.apiUrl;
 
 const Container = styled.div`
   display: flex;
@@ -316,7 +319,7 @@ const Attach = () => {
 
     try {
       const response = await axios.post(
-        "http://localhost:8080/videos/uploadVideo",
+       `${apiUrl}/videos/uploadVideo`,
         {
           url,
           gender,

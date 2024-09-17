@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import styled from "styled-components";
 import axios from "axios";
+import config from '../config';
 import AWS from "aws-sdk";
 import { IoIosArrowForward } from "react-icons/io";
 import { FaPencilAlt } from "react-icons/fa";
@@ -10,6 +11,8 @@ import Navbar from "../components/header/Navbar";
 import originProfileImage from "../assets/origin_profile.jpg";
 import Swal from "sweetalert2";
 import { useToasts } from "react-toast-notifications";
+
+const apiUrl = config.apiUrl;
 
 const Container = styled.div`
   display: flex;
@@ -222,7 +225,7 @@ const MyPage = () => {
   const handleSaveClick = () => {
     axios
       .patch(
-        `http://localhost:8080/mypage/update/${username}`,
+        `${apiUrl}/mypage/update/${username}`,
         {
           newNickname: editedNickname,
           currentPassword: currentPassword,
@@ -289,7 +292,7 @@ const MyPage = () => {
   const sendS3UrlToServer = (s3Url) => {
     axios
       .patch(
-        `http://localhost:8080/mypage/update/profile/${username}`,
+        `${apiUrl}/mypage/update/profile/${username}`,
         { ProfileS3Path: s3Url },
         {
           headers: {
@@ -318,7 +321,7 @@ const MyPage = () => {
 
     async function fetchProfileInfo() {
       try {
-        const response = await axios.get(`http://localhost:8080/mypage/${username}`, {
+        const response = await axios.get(`${apiUrl}/mypage/${username}`, {
           headers: {
             Authorization: `Bearer ${token}`,
           },
@@ -361,7 +364,7 @@ const MyPage = () => {
 
     async function fetchVideos() {
       try {
-        const response = await axios.get("http://localhost:8080/videos/list", {
+        const response = await axios.get(`${apiUrl}/videos/list`, {
           headers: {
             Authorization: `Bearer ${token}`,
           },
@@ -430,7 +433,7 @@ const MyPage = () => {
     }).then((result) => {
       if (result.isConfirmed) {
         axios
-          .delete(`http://localhost:8080/mypage/delete/${username}`, {
+          .delete(`${apiUrl}/mypage/delete/${username}`, {
             headers: {
               Authorization: `Bearer ${token}`,
             },

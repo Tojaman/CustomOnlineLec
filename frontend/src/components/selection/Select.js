@@ -4,7 +4,7 @@ import styled from "styled-components";
 import { GoArrowRight } from "react-icons/go";
 import Slider from "react-slick";
 import axios from "axios";
-
+import config from '../../config';
 import Navbar from "../../components/header/Navbar";
 import Background from "../../assets/img/Group.png";
 import avatarImg1 from "../../assets/avatarImg/기본아바타여1.jpg";
@@ -21,6 +21,8 @@ import voiceImg4 from "../../assets/avatarImg/카리나.jpg";
 
 import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
+
+const apiUrl = config.apiUrl;
 
 const SelectContainer = styled.div`
   display: flex;
@@ -160,7 +162,7 @@ const Select = () => {
     if (selectedVideoId) {
       axios
         .post(
-          `http://localhost:8080/videos/info`,
+          `${apiUrl}/videos/info`,
           {
             videoid: selectedVideoId,
           },
