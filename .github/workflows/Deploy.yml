@@ -9,6 +9,7 @@ on:
     paths:
       - 'backend/**'
       - 'AI/**'
+      - '.github/workflows/**'
   # pull_request:
   #   branches: [ main ]
 
@@ -80,4 +81,4 @@ jobs:
           username: ubuntu
           key: ${{ secrets.AWS_SSH_KEY }}
           script: |
-            /home/ubuntu/deploy.sh
+            sh /home/ubuntu/CustomOnlineLec/deploy.sh
