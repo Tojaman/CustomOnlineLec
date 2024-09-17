@@ -1,0 +1,83 @@
+# workflow의 이름
+name: Deploy_docker
+
+# 해당 workflow가 언제 실행될 것인지에 대한 트리거를 지정
+on:
+  # main branch에 대한 push를 트리거로 지정
+  push:
+    branches: [ main ]
+    paths:
+      - 'backend/**'
+      - 'AI/**'
+  # pull_request:
+  #   branches: [ main ]
+
+  # 수동으로 해당 workflow 실행 지정
+  workflow_dispatch:
+
+# workflow는 한개 이상의 job을 가지며, 각 job은 여러 step에 따라 단계를 나눌 수 있습니다.
+jobs:
+  build:
+    name: CI
+    # 해당 workflow를 어떤 OS 환경에서 실행할 것인지 지정
+    runs-on: ubuntu-latest
+
+    # step은 작업의 일부로 실행될 일련의 작업을 나타냅니다.
+    steps:
+      # 작업에서 액세스할 수 있도록 $GITHUB_WORKSPACE에서 저장소를 체크아웃
+      - name: Checkout
+        uses: actions/checkout@v3
+      
+      # JAVA JDK 17 셋팅
+      - name: Set up JDK 17
+        uses: actions/setup-java@v3
+        with:
+          java-version: '17'
+          distribution: 'adopt'
+
+      # application-dev.yml 생성
+      - name: Create application-dev.yml
+        run: |
+          echo "${{secrets.APPLICATION_DEV}}" > ./backend/src/main/resources/application-dev.yml
+
+      # gradlew 권한 부여
+      - name: Grant execute permission for gradlew
+        run: chmod +x ./gradlew
+        shell: bash
+        working-directory: ./backend
+      
+      # Springboot 빌드
+      - name: Build with Gradle
+        run: ./gradlew build -x test
+        shell: bash
+        working-directory: ./backend
+      
+      - name: 빌드된 파일 이름 변경하기
+        run: mv ./backend/build/libs/*SNAPSHOT.jar ./project.jar
+      
+      - name: SCP로 EC2에 빌드된 파일 전송하기
+        uses: appleboy/scp-action@v0.1.7
+        with:
+          host: ${{ secrets.EC2_HOST }}
+          username: ${{ secrets.EC2_USERNAME }}
+          key: ${{ secrets.EC2_PRIVATE_KEY }}
+          source: project.jar
+          target: /home/ubuntu/instagram-server/tobe
+
+  deploy:
+    needs: build
+    name: CD
+    # runs-on을 ubuntu-latest로 지정해도 될지 모르겠음.(서버는 ubuntu 22.04)
+    runs-on: ubuntu-latest
+
+    steps:
+      # host: EC2 인스턴스 IP 주소
+      # key: .pem 파일(메모장으로 열어서 안에 있는 값 전체)
+      - name: executing remote ssh commands using password
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.EC2HOST }}
+          username: ubuntu
+          key: ${{ secrets.AWS_SSH_KEY }}
+          script: |
+            /home/ubuntu/deploy.sh
