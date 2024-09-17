@@ -1,5 +1,5 @@
 # workflow의 이름
-name: Deploy_docker
+name: Deploy
 
 # 해당 workflow가 언제 실행될 것인지에 대한 트리거를 지정
 on:
@@ -60,7 +60,7 @@ jobs:
         with:
           host: ${{ secrets.EC2_HOST }}
           username: ${{ secrets.EC2_USERNAME }}
-          key: ${{ secrets.EC2_PRIVATE_KEY }}
+          key: ${{ secrets.AWS_SSH_KEY }}
           source: project.jar
           target: /home/ubuntu/instagram-server/tobe
 
