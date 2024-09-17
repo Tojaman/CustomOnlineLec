@@ -61,7 +61,7 @@ jobs:
           host: ${{ secrets.EC2_HOST }}
           username: ${{ secrets.EC2_USERNAME }}
           key: ${{ secrets.AWS_SSH_KEY }}
-          source: project.jar
+          source: spring-base.jar
           target: /home/ubuntu/CustomOnlineLec/build/libs/
 
   deploy:
