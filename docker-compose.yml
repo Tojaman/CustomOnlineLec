@@ -7,10 +7,10 @@ services:
     ports:
       - 3306:3306
     environment:
-      MYSQL_ROOT_PASSWORD: 0000
+      MYSQL_ROOT_PASSWORD: 0
       MYSQL_DATABASE: customdb
       MYSQL_USER: user
-      MYSQL_PASSWORD: 0000
+      MYSQL_PASSWORD: 0
       TZ: Asia/Seoul
     volumes:
       # - mysql_data:/var/lib/mysql
@@ -28,7 +28,7 @@ services:
       - CELERY_RESULT_BACKEND=redis://redis:6379/0
       - DATABASE_HOST=my_mysql
       - DATABASE_USER=user
-      - DATABASE_PASSWORD=4886
+      - DATABASE_PASSWORD=0
       - DATABASE_NAME=customdb
     build:
       context: ./AI
