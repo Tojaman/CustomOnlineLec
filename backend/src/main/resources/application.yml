@@ -3,7 +3,7 @@
 spring:
   profiles:
     active: local
-    include: oauth
+    # include: oauth
 #    group:
 #      dev:
 #        - oauth

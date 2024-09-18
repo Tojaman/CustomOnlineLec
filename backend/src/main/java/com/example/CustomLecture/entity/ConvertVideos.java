@@ -18,15 +18,15 @@ public class ConvertVideos {
 //    @JoinColumn(name = "videoId")
 //    private Video video;
 
-    @Column(unique = true)
-    private String jimin;
+    // @Column(unique = true)
+    private String jimin ;
 
-    @Column(unique = true)
-    private String moon;
+    // @Column(unique = true)
+    private String jung;
 
-    @Column(unique = true)
-    private String winter;
+    // @Column(unique = true)
+    private String iu;
 
-    @Column(unique = true)
+    // @Column(unique = true)
     private String karina;
 }

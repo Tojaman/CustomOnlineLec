@@ -9,6 +9,9 @@ import { jwtDecode } from "jwt-decode";
 import Swal from "sweetalert2";
 import logo from "../assets/img/UUJJ.png";
 import Background from "../assets/img/Group.png";
+import config from '../config';
+
+const apiUrl = config.apiUrl;
 
 const LoginContainer = styled.div`
   display: flex;
@@ -112,7 +115,7 @@ const LoginPage = () => {
 
   const handleLogin = async () => {
     try {
-      const response = await axios.post("http://localhost:8080/login", {
+      const response = await axios.post(`${apiUrl}/login`, {
         username,
         password,
       });

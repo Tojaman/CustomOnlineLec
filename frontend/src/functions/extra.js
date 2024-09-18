@@ -4,21 +4,22 @@ export function displayPreviousSessionInfo() {
   const selectedVoice = sessionStorage.getItem("selectedVoice");
   const selectedVideoInfoString = sessionStorage.getItem("selectedVideoInfo");
   const selectedVideoInfo = JSON.parse(selectedVideoInfoString);
-
+  
   let selectedS3Path;
 
   switch (selectedVoice) {
+    
     case "karina":
       selectedS3Path = selectedVideoInfo.karina;
       break;
     case "jimin":
       selectedS3Path = selectedVideoInfo.jimin;
       break;
-    case "moon":
-      selectedS3Path = selectedVideoInfo.moon;
+    case "jung":
+      selectedS3Path = selectedVideoInfo.jung;
       break;
-    case "winter":
-      selectedS3Path = selectedVideoInfo.winter;
+    case "iu":
+      selectedS3Path = selectedVideoInfo.iu;
       break;
     default:
   }
@@ -55,6 +56,8 @@ export function displayPreviousSessionInfo() {
     });
 
     const profileS3Path = selectedVideoInfo.profileS3Path;
+
+    console.log(profileS3Path);
 
     if (profileS3Path !== null) {
       const profileImageParams = {

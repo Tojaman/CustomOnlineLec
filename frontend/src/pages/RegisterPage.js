@@ -2,10 +2,13 @@ import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import styled from "styled-components";
 import axios from "axios";
+import config from '../config';
 import Swal from "sweetalert2";
 
 import logo from "../assets/img/UUJJ.png";
 import Background from "../assets/img/Group.png";
+
+const apiUrl = config.apiUrl;
 
 const RegistContainer = styled.div`
   display: flex;
@@ -98,7 +101,7 @@ export default function RegisterPage() {
 
   const handleRegister = async () => {
     try {
-      const response = await axios.post("http://localhost:8080/join", {
+      const response = await axios.post(`${apiUrl}/join`, {
         username,
         password,
         nickname,

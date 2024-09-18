@@ -6,7 +6,10 @@ import { FaSyncAlt } from "react-icons/fa";
 import Navbar from "../components/header/Navbar";
 import Background from "../assets/img/Group.png";
 import axios from "axios";
+import config from '../config';
 import AWS from "aws-sdk";
+
+const apiUrl = config.apiUrl;
 
 const ListContainer = styled.div`
   display: flex;
@@ -133,7 +136,7 @@ const VideoList = () => {
     const s3 = new AWS.S3();
 
     axios
-      .get("http://localhost:8080/videos/list", {
+      .get(`${apiUrl}/videos/list`, {
         headers: {
           Authorization: `Bearer ${token}`,
         },

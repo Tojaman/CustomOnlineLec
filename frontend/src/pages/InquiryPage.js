@@ -5,6 +5,9 @@ import Navbar from "../components/header/Navbar";
 import styled from "styled-components";
 import axios from "axios";
 import Swal from "sweetalert2";
+import config from '../config';
+
+const apiUrl = config.apiUrl;
 
 const MainContainer = styled.div`
   display: flex;
@@ -129,7 +132,7 @@ const InquiryPage = () => {
     try {
       const token = sessionStorage.getItem("token");
       const response = await axios.post(
-        "http://localhost:8080/qna/upload",
+       `${apiUrl}/qna/upload`,
         { title, content },
         {
           headers: {

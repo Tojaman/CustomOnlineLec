@@ -41,20 +41,20 @@ public class Video {
 
     private String content;
 
-    @Column(nullable = false) // columnDefinition을 제거합니다.
     private LocalDateTime date;
 
     private String subject;
 
     //자막
+    @Column(columnDefinition = "LONGTEXT")
     private String subtitle;
 
-    @Column(unique = true)
+    // @Column(unique = true)
     private String originalS3Path;
 
 
-    @Column(unique = true)
-    private String subtitleS3Path;
+    // @Column(unique = true)
+    // private String subtitleS3Path;
 
     private String thumbnailS3Path;
     private String lectureNoteS3Path;
@@ -112,8 +112,8 @@ public class Video {
 		        videoData.getVideoHeight(),
 
                 s3Path.getJimin(),
-                s3Path.getMoon(),
-                s3Path.getWinter(),
+                s3Path.getJung(),
+                s3Path.getIu(),
                 s3Path.getKarina()
         );
     }

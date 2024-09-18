@@ -1,0 +1,306 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>강의영상</title>
+
+    <style>@-webkit-keyframes sk-pulseScaleOut {
+        0% {
+          -webkit-transform: scale(0);
+          transform: scale(0);
+        }
+
+        100% {
+          -webkit-transform: scale(1);
+          transform: scale(1);
+          opacity: 0;
+        }
+      }
+      @keyframes sk-pulseScaleOut {
+        0% {
+          -webkit-transform: scale(0);
+          transform: scale(0);
+        }
+
+        100% {
+          -webkit-transform: scale(1);
+          transform: scale(1);
+          opacity: 0;
+        }
+      }
+      .spinner-text {
+        float: left;
+      }
+      .sk-spinner-pulse {
+        width: 20px;
+        height: 20px;
+        margin: auto 10px;
+        float: left;
+        background-color: #333;
+        border-radius: 100%;
+        -webkit-animation: sk-pulseScaleOut 1s infinite ease-in-out;
+        animation: sk-pulseScaleOut 1s infinite ease-in-out;
+      }
+      #loading {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+      }
+
+      #progressBarFull {
+        height: 5px;
+        width: 100%;
+        background-color: #ccc;
+        cursor: pointer;
+      }
+      #progressBar {
+        height: 5px;
+        background-color: #4caf50;
+        width: 0;
+      }
+      #control {
+        display: flex;
+        padding: 2px;
+        justify-content: space-between;
+        background-color: #333;
+        color: #fff;
+      }
+      #subControl {
+        display: flex;
+        margin-right: 10px;
+      }
+      #playPauseButton {
+        font-size: 15px;
+      }
+      #time {
+        font-size: 15px;
+        margin-left: 10px;
+      }
+      #volumeSlider {
+        margin-top: 7.5px;
+        height: 5px;
+        width: 75px;
+      }
+
+      #resultVideo {
+        width: 100%;
+        margin-bottom: -4px;
+      }
+      #player {
+        width: 100%;
+      }
+      #videoPlayer {
+        display: flex;
+        flex-direction: column;
+      }
+
+      .container {
+        padding-left: 80px;
+        padding-right: 80px;
+      }
+
+      #videoInfo {
+        display: flex;
+        flex-direction: column;
+      }
+      #first {
+        display: flex;
+        justify-content: space-between;
+      }
+      #title {
+        font-size: 24px;
+        font-weight: bold;
+        margin-bottom: 10px;
+      }
+      #downloadButton {
+        height: 25px;
+      }
+      #profile {
+        height: 50px;
+        width: 50px;
+      }
+      #second {
+        display: flex;
+        align-items: flex-end;
+      }
+      #instructor,
+      #date {
+        margin-left: 10px;
+      }
+      #third {
+        display: flex;
+        width: 100%;
+        height: 150px;
+        background-color: #ccc;
+        border-radius: 15px;
+        margin-top: 8px;
+      }
+      #description {
+        padding: 10px;
+      }
+
+      #avatarSelection {
+        position: fixed;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        background-color: white;
+        padding: 20px;
+        border: 1px solid #ccc;
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+      }
+
+      #avatarSelection p {
+        margin-bottom: 10px;
+      }
+
+      #avatarSelection button {
+        margin-right: 10px;
+      }
+
+      #avatarSelection button:last-child {
+        margin-right: 0;
+      }
+
+      #toggleAvatarButton {
+        background-color: #5d5e60;
+        color: white;
+        border: none;
+        padding: 8px 16px;
+        cursor: pointer;
+        border-radius: 5px;
+        font-size: 14px;
+      }
+
+      #arrow {
+        position: relative;
+        top: 10px;
+        width: 10px;
+        height: 10px;
+        cursor: pointer;
+        border-top: 2px solid black;
+        border-left: 2px solid black;
+        transform: rotate(135deg);
+      }
+      #sub {
+        position: relative;
+        left: 20px;
+        bottom: 10px;
+      }
+
+      #goBackButton {
+        background-color: white;
+        border: none;
+        color: rgb(0, 0, 0);
+        padding: 3px 5px;
+        font-size: 16px;
+        cursor: pointer;
+      }
+
+      #subtitle {
+        width: 20px;
+        height: 18px;
+        border: 1px solid #fff;
+        text-align: center;
+        font-weight: bold;
+        font-size: 14px;
+        cursor: pointer;
+        margin-right: 5px;
+        margin-top: 1px;
+      }</style>
+  </head>
+
+  <body>
+    <div id="loading">
+      <span class="spinner-text" id="status"> Loading PoseNet model... </span>
+      <div class="sk-spinner sk-spinner-pulse"></div>
+    </div>
+
+    <div class="container">
+      <div id="content" hidden="">
+        <div>
+          <video id="originVideo" type="video/mp4" controls=""></video>
+        </div>
+
+        <div id="canvasCollection">
+          <canvas id="copyCanvas"></canvas>
+          <canvas id="camFlipCanvas"></canvas>
+          <canvas id="mergedCanvas"></canvas>
+        </div>
+      </div>
+
+      <div id="videoPlayer">
+        <div>
+          <button id="goBackButton">< 뒤로가기</button>
+        </div>
+        <div>
+          <video id="resultVideo"></video>
+        </div>
+        <div id="player">
+          <div id="progressBarFull">
+            <div id="progressBar"></div>
+          </div>
+          <div id="control">
+            <div id="subControl">
+              <div id="playPauseButton">▶</div>
+              <div id="time">0:00 / 0:00</div>
+            </div>
+            <div id="subControl">
+              <div id="subtitle">CC</div>
+              <div id="volume">🔊</div>
+              <input type="range" id="volumeSlider" min="0" max="1" step="0.01" value="1">
+            </div>
+          </div>
+        </div>
+
+        <hr>
+
+        <div id="videoInfo">
+          <div id="first">
+            <div id="title"></div>
+            <button id="downloadButton">PDF 다운로드</button>
+          </div>
+          <div id="second">
+            <img id="profile" src="/origin_profile.d0473003.jpg">
+            <div id="instructor"></div>
+            <div id="date"></div>
+          </div>
+          <div id="third">
+            <div id="description"></div>
+          </div>
+          <br>
+          <div>
+            <button id="toggleAvatarButton">아바타 선택</button>
+            <div id="avatarSelection" hidden="">
+              <p>아바타를 선택하세요:</p>
+              <button id="avatar1">기본 여성</button>
+              <button id="avatar2">기본 남성</button>
+              <button id="avatar3">윤석열</button>
+              <button id="avatar4">트럼프</button>
+              <button id="avatar5">키키</button>
+              <button id="avatar6">뽀로로</button>
+            </div>
+          </div>
+        </div>
+        <br>
+        <br>
+        <br>
+        <div class="toggle" id="toggleContent" style="display: none;">
+          <div class="leftInner">
+            <div id="arrow"></div>
+            <div id="sub">변환 모습</div>
+          </div>
+          <div id="inner" style="display: none">
+            <div>
+              <canvas id="camCanvas"></canvas>
+              <canvas class="illustrationCanvas"></canvas>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <script src="/camera.283d5d54.js"></script>
+    <script src="/progressBar.dd768398.js"></script>
+  </body>
+</html>

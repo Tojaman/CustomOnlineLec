@@ -7,6 +7,7 @@ import { FcOk } from "react-icons/fc";
 import Navbar from "../components/header/Navbar";
 import Background from "../assets/img/Group.png";
 import axios from "axios";
+import config from '../config';
 import AWS from "aws-sdk";
 import Swal from "sweetalert2";
 import { useToasts } from "react-toast-notifications";
@@ -21,12 +22,14 @@ import avatarImg5 from "../assets/avatarImg/키키.jpg";
 import avatarImg6 from "../assets/avatarImg/뽀로로.jpg";
 
 import voiceImg1 from "../assets/avatarImg/문재인.jpg";
-import voiceImg2 from "../assets/avatarImg/지민.jpg";
-import voiceImg3 from "../assets/avatarImg/윈터.jpg";
+import voiceImg2 from "../assets/avatarImg/일론머스크.jpg";
+import voiceImg3 from "../assets/avatarImg/아이유.jpg";
 import voiceImg4 from "../assets/avatarImg/카리나.jpg";
 
 import { registerables, CategoryScale, Chart } from "chart.js";
 Chart.register(CategoryScale, ...registerables);
+
+const apiUrl = config.apiUrl;
 
 const avatarImages = [avatarImg1, avatarImg2, avatarImg3, avatarImg4, avatarImg5, avatarImg6];
 const audioImages = [voiceImg1, voiceImg2, voiceImg3, voiceImg4];
@@ -366,7 +369,7 @@ const Manage = () => {
     const s3 = new AWS.S3();
 
     axios
-      .get("http://localhost:8080/admin/user/list", {
+      .get(`${apiUrl}/admin/user/list`, {
         headers: {
           Authorization: `Bearer ${token}`,
         },
@@ -423,7 +426,7 @@ const Manage = () => {
     const s3 = new AWS.S3();
 
     axios
-      .get("http://localhost:8080/videos/list", {
+      .get(`${apiUrl}/videos/list`, {
         headers: {
           Authorization: `Bearer ${token}`,
         },
@@ -505,7 +508,7 @@ const Manage = () => {
 
   const fetchQnaData = () => {
     axios
-      .get("http://localhost:8080/qna/list", {
+      .get(`${apiUrl}/qna/list`, {
         headers: {
           Authorization: `Bearer ${token}`,
         },
@@ -532,7 +535,7 @@ const Manage = () => {
     }).then((result) => {
       if (result.isConfirmed) {
         axios
-          .delete(`http://localhost:8080/mypage/delete/${username}`, {
+          .delete(`${apiUrl}/mypage/delete/${username}`, {
             headers: {
               Authorization: `Bearer ${token}`,
             },
@@ -560,7 +563,7 @@ const Manage = () => {
     }).then((result) => {
       if (result.isConfirmed) {
         axios
-          .delete(`http://localhost:8080/admin/${videoId}`, {
+          .delete(`${apiUrl}/admin/${videoId}`, {
             headers: {
               Authorization: `Bearer ${token}`,
             },
@@ -585,7 +588,7 @@ const Manage = () => {
       timer: 1500,
     }).then(() => {
       axios
-        .delete(`http://localhost:8080/qna/${qnaId}`, {
+        .delete(`${apiUrl}/qna/${qnaId}`, {
           headers: {
             Authorization: `Bearer ${token}`,
           },

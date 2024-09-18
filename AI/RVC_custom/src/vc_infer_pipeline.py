@@ -144,7 +144,9 @@ class VC(object):
         model="full",
     ):
         # Pick a batch size that doesn't cause memory errors on your gpu
-        batch_size = 512
+        # batch_size = 512
+        # batch_size = 128
+        batch_size = 64
         # Compute pitch using first gpu
         audio = torch.tensor(np.copy(x))[None].float()
         f0, pd = torchcrepe.predict(
