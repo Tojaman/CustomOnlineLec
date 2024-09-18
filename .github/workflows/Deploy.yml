@@ -5,6 +5,7 @@ name: Deploy
 on:
   # main branch에 대한 pr를 트리거로 지정
     pull_request:
+      types: [closed]
       branches: [ main ]
       # paths:
       #   - 'backend/**'
@@ -19,6 +20,7 @@ on:
 # workflow는 한개 이상의 job을 가지며, 각 job은 여러 step에 따라 단계를 나눌 수 있습니다.
 jobs:
   build:
+    if: github.event.pull_request.merged == true
     name: CI
     # 해당 workflow를 어떤 OS 환경에서 실행할 것인지 지정
     runs-on: ubuntu-latest
