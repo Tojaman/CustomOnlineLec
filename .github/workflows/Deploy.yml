@@ -6,10 +6,10 @@ on:
   # main branch에 대한 pr를 트리거로 지정
     pull_request:
       branches: [ main ]
-      paths:
-        - 'backend/**'
-        - 'AI/**'
-        - '.github/workflows/**'
+      # paths:
+      #   - 'backend/**'
+      #   - 'AI/**'
+      #   - '.github/workflows/**'
   # pull_request:
   #   branches: [ main ]
 
