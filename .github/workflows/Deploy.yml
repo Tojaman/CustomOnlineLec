@@ -3,13 +3,13 @@ name: Deploy
 
 # 해당 workflow가 언제 실행될 것인지에 대한 트리거를 지정
 on:
-  # main branch에 대한 push를 트리거로 지정
-  push:
-    branches: [ serverTest/#1 ]
-    paths:
-      - 'backend/**'
-      - 'AI/**'
-      - '.github/workflows/**'
+  # main branch에 대한 pr를 트리거로 지정
+    pull_request:
+      branches: [ main ]
+      paths:
+        - 'backend/**'
+        - 'AI/**'
+        - '.github/workflows/**'
   # pull_request:
   #   branches: [ main ]
 
