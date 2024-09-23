@@ -24,8 +24,11 @@
 ### 🍎 강의 목록 페이지
   <img width="1470" alt="search image" src="https://github.com/user-attachments/assets/b5b1a239-3aeb-4398-8c48-6998acd095f7">
 
+### 🍎 영상 재생 페이지
+  <img width="1470" alt="search image" src="https://github.com/user-attachments/assets/692de74c-6492-4074-96a4-bd3a47b5a129">
+
 ### 🍎 관리 페이지
-  <img width="1470" alt="search image" src="https://github.com/user-attachments/assets/dcca9f05-ae15-439c-8afa-df9457b68b31">
+  <img width="1470" alt="search image" src="https://github.com/user-attachments/assets/cb4163c9-ef48-4df6-95b1-e16ef86d6f53">
 
 
 ## 💻 System Architechture
