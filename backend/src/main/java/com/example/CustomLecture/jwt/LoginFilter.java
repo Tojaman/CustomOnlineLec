@@ -23,6 +23,8 @@ import java.util.Iterator;
 
 /**
  * 서블릿 필터 체인의 DelegatingFilter에 있는 요청을 가로채서 Security 필터 체인(LoginFilter, JWTFilter)에서 검증
+ * UsernamePasswordAuthenticationFilter를 상속받은 경우 URL이 /login 경로로 오는 POST 요청만 처리하도록 함
+ * 이는 JWT Filter 이후 LoginFilter가 실행되는데 로그인 요청을 제외한 다른 요청에는 Login Filter가 실행되면 안되기 떄문에 제한을 건 것
  */
 public class LoginFilter extends UsernamePasswordAuthenticationFilter {
     private final AuthenticationManager authenticationManager;
@@ -85,9 +87,10 @@ public class LoginFilter extends UsernamePasswordAuthenticationFilter {
 
         String role = auth.getAuthority();
 
-
         // JWT 토큰 생성
+        // 엑세스 토큰 만료 기간: 60*60*1000*10L
         String token = jwtUtil.createJwt(username, role,60*60*1000*10L);
+
         //header에 담아서 front에 전달
         response.addHeader("Authorization", "Bearer " + token);
     }
