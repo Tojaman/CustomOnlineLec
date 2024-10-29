@@ -105,6 +105,10 @@ public class SecurityConfig {
 
 
         // LoginFilter 앞에 JWTFilter 등록
+        /* 요청이 들어오면 JWT Filter를 거치고 LoginFilter를 거침
+         * 하지만 Login Filter는 /login으로 POST 요청이 들어오는 경우만 처리하게 되어 있어서 로그인 요청을 제외하면 JWT Filter만 거치게 됨
+        */
+        // 의문: 로그인 요청은 JWTFilter를 거칠 필요가 없다. 그런데 JWTFilter를 먼저 거치도록 되어 있어서 거칠 수밖에 없는데 이 경우 어떻게 할까?
         http
             .addFilterBefore(new JWTFilter(jwtUtil), LoginFilter.class);
 

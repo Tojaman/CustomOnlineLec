@@ -30,9 +30,16 @@ public class JWTFilter extends OncePerRequestFilter {
         String authorization= request.getHeader("Authorization");
 
         //Authorization 헤더 검증
+        /* - 검증 내용 -
+         * HTTP 헤더에 JWT 토큰이 존재하는지 여부
+         * JWT 토큰의 형식이 맞는지 여부
+         */
+        // JWT 토큰이 없거나 형식에 문제가 있는 경우도 있겠지만
+        // 로그인 요청일 경우도 이에 해당된다. 이 경우 LoginFilter로 넘어가게 되고 로그인 요청은 여기서 검증에 성공하게 된다.(다른 요청은 실패)
         if (authorization == null || !authorization.startsWith("Bearer ")) {
 
             System.out.println("token null");
+            // 다음 필터로 넘어가도록 함 -> LoginFilter로 넘어감
             filterChain.doFilter(request, response);
 
             //조건이 해당되면 메소드 종료 (필수)
@@ -71,8 +78,10 @@ public class JWTFilter extends OncePerRequestFilter {
         Authentication authToken = new UsernamePasswordAuthenticationToken(customUserDetails, null, customUserDetails.getAuthorities());
 
         //세션에 사용자 등록(임시 세션을 만들어서 임시 저장)
+        // 토큰을 검증한 후, 사용자를 스프링 시큐리티 컨텍스트에 등록하여 애플리케이션 내에서 인증된 사용자로 취급하도록 하는 역할
         SecurityContextHolder.getContext().setAuthentication(authToken);
 
+        // 
         filterChain.doFilter(request, response);
     }
 }
