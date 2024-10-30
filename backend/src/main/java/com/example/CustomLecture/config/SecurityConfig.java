@@ -99,6 +99,7 @@ public class SecurityConfig {
                     .requestMatchers("/login", "/", "/join", "/v3/**", "/swagger-ui/**").permitAll()
                     // admin 경로는 admin이라는 권한 가진 사용자만 접근
                     .requestMatchers("/admin/**").hasRole("ADMIN")
+                    .requestMatchers("/reissue").permitAll()
 
                     // 그 외 다른 요청은 로그인한 사용자만 접근가능
                     .anyRequest().authenticated());
