@@ -64,14 +64,16 @@ public class JWTFilter extends OncePerRequestFilter {
         //     return;
         // }
 
-        String accessToken = request.getHeader("access");
+//        String accessToken = request.getHeader("access");
+        String accessToken = request.getHeader("Authorization");
 
         if (accessToken == null) {
-
             filterChain.doFilter(request, response);
-        
+
             return;
         }
+
+        accessToken = accessToken.substring(7).trim();
         
         try {
             jwtUtil.isExpired(accessToken);
@@ -86,9 +88,9 @@ public class JWTFilter extends OncePerRequestFilter {
             return;
         }
 
-        String category = jwtUtil.getType(accessToken);
+        String type = jwtUtil.getType(accessToken);
 
-        if (!category.equals("access")) {
+        if (!type.equals("access")) {
 
             //response body
             PrintWriter writer = response.getWriter();
