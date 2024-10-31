@@ -54,7 +54,7 @@ public class JWTUtil {
                     .build()
                     .parseSignedClaims(token)
                     .getPayload()
-                    .get("category", String.class);
+                    .get("token_type", String.class);
     }
 
     public Boolean isExpired(String token) {
@@ -85,7 +85,7 @@ public class JWTUtil {
             redisTemplate.opsForValue().set(
                     username,
                     token,
-                    expiredMs, // redis에서 값 소멸 시간(TTL): RefreshToken의 만료 시간과 동일하게 설정)
+                    expiredMs, // redis에서 값 소멸 시간(TTL) RefreshToken의 만료 시간과 동일하게 설정)
                     TimeUnit.MILLISECONDS
             );
         }

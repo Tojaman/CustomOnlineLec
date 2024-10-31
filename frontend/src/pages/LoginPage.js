@@ -120,11 +120,13 @@ const LoginPage = () => {
         password,
       });
 
+      // JWT 엑세스 토큰을 세션 스토리지에 저장하는 코드
       const token = response.headers["authorization"].split(" ")[1];
       sessionStorage.setItem("token", token);
 
       const decodedToken = jwtDecode(token);
-      const { username: decodedUsername, role } = decodedToken;
+      // const { username: decodedUsername, role } = decodedToken;
+      const { sub: decodedUsername, role } = decodedToken;
 
       sessionStorage.setItem("username", decodedUsername);
       sessionStorage.setItem("role", role);
@@ -134,15 +136,33 @@ const LoginPage = () => {
       console.log("Role:", role);
 
       showToast();
+    // } catch (error) {
+    //   console.error("로그인 요청 실패 : ", error.response.status);
+    //   if (error.response.status === 401) {
+    //     showToastError("입력값이 올바르지 않습니다.");
+    //     showToastError("존재하지 않는 아이디 또는 비밀번호입니다.");
+    //   } else {
+    //     showToastError("로그인 중 오류가 발생했습니다.");
+    //   }
+    // }
     } catch (error) {
-      console.error("로그인 요청 실패 : ", error.response.status);
-      if (error.response.status === 401) {
-        showToastError("입력값이 올바르지 않습니다.");
-        showToastError("존재하지 않는 아이디 또는 비밀번호입니다.");
-      } else {
-        showToastError("로그인 중 오류가 발생했습니다.");
-      }
+    console.error("로그인 요청 실패 : ", error);
+
+    // error.response가 정의되어 있는지 확인
+    if (error.response) {
+        console.error("Status:", error.response.status);
+        if (error.response.status === 401) {
+            showToastError("입력값이 올바르지 않습니다.");
+            showToastError("존재하지 않는 아이디 또는 비밀번호입니다.");
+        } else {
+            showToastError("로그인 중 오류가 발생했습니다.");
+        }
+    } else {
+        // response가 없을 경우 네트워크 오류 등의 처리를 위해
+        showToastError("네트워크 오류가 발생했습니다. 다시 시도해주세요.");
     }
+}
+
   };
 
   const showToast = () => {
