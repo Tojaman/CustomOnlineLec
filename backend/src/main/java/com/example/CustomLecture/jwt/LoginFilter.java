@@ -104,11 +104,12 @@ public class LoginFilter extends UsernamePasswordAuthenticationFilter {
         GrantedAuthority auth = iterator.next();
         String role = auth.getAuthority();
 
-        String accesstoken = jwtUtil.createJwt("access", username, role, 60*10L);
+        String accesstoken = jwtUtil.createJwt("access", username, role, 60*10000*10L);
         String refreshtoken = jwtUtil.createJwt("refresh", username, role, 60*60*1000*10L);
-        
+
         //응답 설정
-        response.setHeader("access", accesstoken);
+        response.addHeader("Authorization", "Bearer " + accesstoken);
+//        response.setHeader("access", "Bearer " + accesstoken);
         response.addCookie(createCookie("refresh", refreshtoken));
         response.setStatus(HttpStatus.OK.value());
     }
