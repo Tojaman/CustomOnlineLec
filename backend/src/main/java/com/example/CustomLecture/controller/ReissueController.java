@@ -78,7 +78,8 @@ public class ReissueController {
         String newRefresh = jwtUtil.createJwt("refresh", username, role, 86400000L);
 
         //response
-        response.setHeader("access", newAccess);
+        // response.setHeader("access", newAccess);
+        response.addHeader("Authorization", "Bearer " + newAccess);
         response.addCookie(createCookie("refresh", newRefresh));
 
         return new ResponseEntity<>(HttpStatus.OK);

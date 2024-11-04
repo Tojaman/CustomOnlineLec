@@ -75,28 +75,6 @@ public class LoginFilter extends UsernamePasswordAuthenticationFilter {
     //로그인 성공시 실행하는 메소드 (여기서 JWT를 발급하면 됨)
     @Override
     protected void successfulAuthentication(HttpServletRequest request, HttpServletResponse response, FilterChain chain, Authentication authentication) {
-
-        // //UserDetailsS
-        // //User객체를 알아내기 위해 CustomUserDetails 클래스 만듦
-        // CustomUserDetails customUserDetails = (CustomUserDetails) authentication.getPrincipal();
-
-        // //getUsername()으로 username 뽑아내기
-        // String username = customUserDetails.getUsername();
-
-        // //user의 role 뽑아내기
-        // Collection<? extends GrantedAuthority> authorities = authentication.getAuthorities();
-        // Iterator<? extends GrantedAuthority> iterator = authorities.iterator();
-        // GrantedAuthority auth = iterator.next();
-
-        // String role = auth.getAuthority();
-
-        // // JWT 토큰 생성
-        // // 엑세스 토큰 만료 기간: 60*60*1000*10L
-        // String token = jwtUtil.createJwt(username, role,60*60*1000*10L);
-
-        // //header에 담아서 front에 전달
-        // response.addHeader("Authorization", "Bearer " + token);
-
         String username = authentication.getName();
 
         Collection<? extends GrantedAuthority> authorities = authentication.getAuthorities();
@@ -104,12 +82,11 @@ public class LoginFilter extends UsernamePasswordAuthenticationFilter {
         GrantedAuthority auth = iterator.next();
         String role = auth.getAuthority();
 
-        String accesstoken = jwtUtil.createJwt("access", username, role, 60*10000*10L);
+        String accesstoken = jwtUtil.createJwt("access", username, role, 6*1000L);
         String refreshtoken = jwtUtil.createJwt("refresh", username, role, 60*60*1000*10L);
 
         //응답 설정
         response.addHeader("Authorization", "Bearer " + accesstoken);
-//        response.setHeader("access", "Bearer " + accesstoken);
         response.addCookie(createCookie("refresh", refreshtoken));
         response.setStatus(HttpStatus.OK.value());
     }
@@ -131,8 +108,6 @@ public class LoginFilter extends UsernamePasswordAuthenticationFilter {
         // cookie.setHttpOnly(true); // JavaScropt가 쿠키 읽기를 허용할지 결정 -> true면 읽을 수 없음(document.cookie로 쿠키 정보를 얻을 수 없음)
         cookie.setSecure(true); // https 환경에서만 가능
         cookie.setAttribute("SameSite", "None");
-        
-    
         return cookie;
     }
 }

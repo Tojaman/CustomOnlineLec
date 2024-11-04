@@ -31,13 +31,20 @@ public class JWTFilter extends OncePerRequestFilter {
         // request에서 Authorization 헤더를 찾음
         String accessToken = request.getHeader("Authorization");
 
-         //Authorization 헤더 검증
-         /* - 검증 내용 -
-          * HTTP 헤더에 JWT 토큰이 존재하는지 여부
-          * JWT 토큰의 형식이 맞는지 여부
-          */
-         // JWT 토큰이 없거나 형식에 문제가 있는 경우도 있겠지만
-         // 로그인 요청일 경우도 이에 해당된다. 이 경우 LoginFilter로 넘어가게 되고 로그인 요청은 여기서 검증에 성공하게 된다.(다른 요청은 실패)
+        // 재발급 요청이라면 JWT 검증을 생략하고 다음 필터로 넘어가도록 설정
+        String requestURI = request.getRequestURI();
+        if (requestURI.equals("/reissue")) {
+            filterChain.doFilter(request, response);
+            return;
+        }
+
+        //Authorization 헤더 검증
+        /* - 검증 내용 -
+        * HTTP 헤더에 JWT 토큰이 존재하는지 여부
+        * JWT 토큰의 형식이 맞는지 여부
+        */
+        // JWT 토큰이 없거나 형식에 문제가 있는 경우도 있겠지만
+        // 로그인 요청일 경우도 이에 해당된다. 이 경우 LoginFilter로 넘어가게 되고 로그인 요청은 여기서 검증에 성공하게 된다.(다른 요청은 실패)
         if (accessToken == null || !accessToken.startsWith("Bearer ")) {
             System.out.println("token null");
 
