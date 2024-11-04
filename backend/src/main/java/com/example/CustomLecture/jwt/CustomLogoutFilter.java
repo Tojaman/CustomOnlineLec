@@ -99,7 +99,7 @@ public class CustomLogoutFilter extends GenericFilterBean {
 
         // 추후 AccessToken 블랙리스트로 추가하여 만료 시간이 남은 AccessToken으로 요청이 오는 보안 문제 해결 예정
 
-        // RefreshToken에 null 값을 만들고 Cookie로 만들어 응답
+        // RefreshToken에 null 값을 만들고 setMaxAge를 0인(쿠키 유효 기간) Cookie로 만들어 응답
         Cookie cookie = new Cookie("refresh", null);
         cookie.setMaxAge(0);
         cookie.setPath("/");
