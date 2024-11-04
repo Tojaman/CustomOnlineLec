@@ -128,7 +128,10 @@ public class LoginFilter extends UsernamePasswordAuthenticationFilter {
         cookie.setMaxAge(24*60*60);
         //cookie.setSecure(true);
         //cookie.setPath("/");
-        cookie.setHttpOnly(true);
+        // cookie.setHttpOnly(true); // JavaScropt가 쿠키 읽기를 허용할지 결정 -> true면 읽을 수 없음(document.cookie로 쿠키 정보를 얻을 수 없음)
+        cookie.setSecure(true); // https 환경에서만 가능
+        cookie.setAttribute("SameSite", "None");
+        
     
         return cookie;
     }
