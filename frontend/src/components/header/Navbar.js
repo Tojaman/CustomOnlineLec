@@ -126,12 +126,6 @@ const Navbar = () => {
     }
   };
 
-  // const handleLogout1 = async () => {
-  //   sessionStorage.clear();
-  //   navigate("/");
-  //   addToast("성공적으로 로그아웃되었습니다.", { appearance: "success", autoDismiss: true, autoDismissTimeout: 5000 });
-  // };
-
   const handleLogout = async () => {
     const token = sessionStorage.getItem("token");
   
@@ -166,6 +160,17 @@ const Navbar = () => {
         showToastError("네트워크 오류가 발생했습니다. 다시 시도해주세요.");
       }
     }
+  };
+  const showToast = () => {
+    Swal.fire({
+      icon: "success",
+      title: "로그아웃 성공",
+      toast: true,
+      showConfirmButton: false,
+      timer: 1000,
+    }).then(() => {
+      navigate("/");
+    });
   };
 
   const showToastError = (message) => {

@@ -118,7 +118,9 @@ const LoginPage = () => {
       const response = await axios.post(`${apiUrl}/login`, {
         username,
         password,
-      });
+      }, {
+    withCredentials: true, // 이걸 붙여야 서버로부터 쿠키를 수신
+});
 
       // JWT 엑세스 토큰을 세션 스토리지에 저장하는 코드
       const token = response.headers["authorization"].split(" ")[1];
@@ -146,10 +148,10 @@ const LoginPage = () => {
     //   }
     // }
     } catch (error) {
-    console.error("로그인 요청 실패 : ", error);
+    console.error("로그인 요청 실패 : ", error.response.status);
 
     // error.response가 정의되어 있는지 확인
-    if (error.response) {
+    if (error.response.status === 401) {
         console.error("Status:", error.response.status);
         if (error.response.status === 401) {
             showToastError("입력값이 올바르지 않습니다.");
