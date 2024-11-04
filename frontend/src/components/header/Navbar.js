@@ -5,6 +5,10 @@ import styled from "styled-components";
 import { TfiMenu } from "react-icons/tfi";
 import Swal from "sweetalert2";
 import { useToasts } from "react-toast-notifications";
+import axios from "axios";
+import config from '../../config';
+
+const apiUrl = config.apiUrl;
 
 const NavContainer = styled.div`
   width: 100%;
@@ -122,10 +126,57 @@ const Navbar = () => {
     }
   };
 
-  const handleLogout = () => {
-    sessionStorage.clear();
-    navigate("/");
-    addToast("성공적으로 로그아웃되었습니다.", { appearance: "success", autoDismiss: true, autoDismissTimeout: 5000 });
+  // const handleLogout1 = async () => {
+  //   sessionStorage.clear();
+  //   navigate("/");
+  //   addToast("성공적으로 로그아웃되었습니다.", { appearance: "success", autoDismiss: true, autoDismissTimeout: 5000 });
+  // };
+
+  const handleLogout = async () => {
+    const token = sessionStorage.getItem("token");
+  
+    try {
+      const response = await axios.post(
+        `${apiUrl}/logout`,{}, // 로그아웃 요청에 본문 데이터가 필요 없을 경우 빈 객체 전달
+        {
+          headers: {
+            Authorization: `Bearer ${token}`, // 필요한 경우 토큰 추가
+          },
+          withCredentials: true, // 리프레시 토큰을 쿠키에서 포함(null값인 쿠키를 응답받아서 기존의 리프레시 토큰 폐기)
+        }
+      );
+  
+      if (response.status === 200) {
+        // 로그아웃 성공 시 세션 스토리지에서 사용자 데이터 삭제
+        sessionStorage.clear();
+        navigate("/");
+        showToast("성공적으로 로그아웃되었습니다.");
+      }
+    } catch (error) {
+      console.error("로그아웃 요청 실패: ", error);
+  
+      if (error.response) {
+        console.error("Status:", error.response.status);
+        if (error.response.status === 401) {
+          showToastError("로그인 정보가 만료되었습니다.");
+        } else {
+          showToastError("로그아웃 중 오류가 발생했습니다.");
+        }
+      } else {
+        showToastError("네트워크 오류가 발생했습니다. 다시 시도해주세요.");
+      }
+    }
+  };
+
+  const showToastError = (message) => {
+    Swal.fire({
+      icon: "error",
+      title: "로그아웃 실패",
+      text: message,
+      toast: true,
+      showConfirmButton: false,
+      timer: 2000,
+    });
   };
 
   return (
