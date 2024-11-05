@@ -3,7 +3,7 @@ import Background from "../assets/img/Group.png";
 import { useNavigate } from "react-router-dom";
 import Navbar from "../components/header/Navbar";
 import styled from "styled-components";
-import axios from "axios";
+import axiosInstance from '../interceptors/axiosInstance';
 import Swal from "sweetalert2";
 import config from '../config';
 
@@ -131,14 +131,10 @@ const InquiryPage = () => {
 
     try {
       const token = sessionStorage.getItem("token");
-      const response = await axios.post(
-       `${apiUrl}/qna/upload`,
+      const response = await axiosInstance
+      .post(
+      `${apiUrl}/qna/upload`,
         { title, content },
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
       );
       console.log("문의가 성공적으로 제출되었습니다:", response.data);
       showToast("문의 제출 성공");

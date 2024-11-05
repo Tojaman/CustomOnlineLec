@@ -6,7 +6,7 @@ import { BsTrash } from "react-icons/bs";
 import { FcOk } from "react-icons/fc";
 import Navbar from "../components/header/Navbar";
 import Background from "../assets/img/Group.png";
-import axios from "axios";
+import axiosInstance from '../interceptors/axiosInstance';
 import config from '../config';
 import AWS from "aws-sdk";
 import Swal from "sweetalert2";
@@ -368,12 +368,8 @@ const Manage = () => {
 
     const s3 = new AWS.S3();
 
-    axios
-      .get(`${apiUrl}/admin/user/list`, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      })
+    axiosInstance
+      .get(`${apiUrl}/admin/user/list`, {})
       .then((response) => {
         const userData = response.data
           .map((user) => ({
@@ -425,12 +421,8 @@ const Manage = () => {
 
     const s3 = new AWS.S3();
 
-    axios
-      .get(`${apiUrl}/videos/list`, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      })
+    axiosInstance
+      .get(`${apiUrl}/videos/list`, {})
       .then((response) => {
         const videoData = response.data.map((video) => ({
           id: video.id || "",
@@ -507,12 +499,8 @@ const Manage = () => {
   };
 
   const fetchQnaData = () => {
-    axios
-      .get(`${apiUrl}/qna/list`, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      })
+    axiosInstance
+      .get(`${apiUrl}/qna/list`, {})
       .then((response) => {
         const qnaData = response.data.slice(0, 10); 
         console.log("Q&A 목록 요청 성공");
@@ -534,12 +522,8 @@ const Manage = () => {
       cancelButtonText: "아니요",
     }).then((result) => {
       if (result.isConfirmed) {
-        axios
-          .delete(`${apiUrl}/mypage/delete/${username}`, {
-            headers: {
-              Authorization: `Bearer ${token}`,
-            },
-          })
+        axiosInstance
+          .delete(`${apiUrl}/mypage/delete/${username}`, {})
           .then((response) => {
             console.log("회원 삭제 요청 성공");
             addToast("성공적으로 회원이 삭제되었습니다.", { appearance: "success", autoDismiss: true, autoDismissTimeout: 5000 });
@@ -562,12 +546,8 @@ const Manage = () => {
       cancelButtonText: "아니요",
     }).then((result) => {
       if (result.isConfirmed) {
-        axios
-          .delete(`${apiUrl}/admin/${videoId}`, {
-            headers: {
-              Authorization: `Bearer ${token}`,
-            },
-          })
+        axiosInstance
+          .delete(`${apiUrl}/admin/${videoId}`, {})
           .then((response) => {
             console.log("영상 삭제 성공");
             addToast("성공적으로 영상이 삭제되었습니다.", { appearance: "success", autoDismiss: true, autoDismissTimeout: 5000 });
@@ -587,12 +567,8 @@ const Manage = () => {
       showConfirmButton: false,
       timer: 1500,
     }).then(() => {
-      axios
-        .delete(`${apiUrl}/qna/${qnaId}`, {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        })
+      axiosInstance
+        .delete(`${apiUrl}/qna/${qnaId}`, {})
         .then((response) => {
           console.log("문의 삭제 성공");
           fetchQnaData();
