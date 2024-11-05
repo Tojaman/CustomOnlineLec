@@ -1,34 +1,27 @@
 package com.example.CustomLecture.controller;
 
+import com.example.CustomLecture.jwt.RedisUtil;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.ResponseBody;
-import org.springframework.data.redis.core.RedisTemplate;
-
 import com.example.CustomLecture.jwt.JWTUtil;
-
 import io.jsonwebtoken.ExpiredJwtException;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-
-import java.util.Objects;
-
 
 @Controller
 @ResponseBody
 public class ReissueController {
 
     private final JWTUtil jwtUtil;
-    private final RedisTemplate<String, String> redisTemplate;
+    private final RedisUtil redisUtil;
 
-    public ReissueController(JWTUtil jwtUtil, RedisTemplate<String, String> redisTemplate) {
+    public ReissueController(JWTUtil jwtUtil, RedisUtil redisUtil) {
         this.jwtUtil = jwtUtil;
-        this.redisTemplate = redisTemplate;
+        this.redisUtil = redisUtil;
     }
 
     // Access Token 재발급
@@ -65,11 +58,10 @@ public class ReissueController {
 
         // Redis에 RefreshToken이 저장되어 있는지 확인
         String username = jwtUtil.getUsername(refresh);
-        String refreshToken = redisTemplate.opsForValue().get(username);
+        String refreshToken = redisUtil.getValue(username);
         if (refreshToken == null || !refreshToken.equals(refresh))
             return new ResponseEntity<>("invalid refresh token", HttpStatus.BAD_REQUEST);
 
-//        String username = jwtUtil.getUsername(refresh);
         String role = jwtUtil.getRole(refresh);
 
         //make new JWT
@@ -78,7 +70,6 @@ public class ReissueController {
         String newRefresh = jwtUtil.createJwt("refresh", username, role, 86400000L);
 
         //response
-        // response.setHeader("access", newAccess);
         response.addHeader("Authorization", "Bearer " + newAccess);
         response.addCookie(createCookie("refresh", newRefresh));
 

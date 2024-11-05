@@ -2,32 +2,22 @@ package com.example.CustomLecture.jwt;
 
 import io.jsonwebtoken.Jwts;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Component;
-
 import javax.crypto.SecretKey;
 import javax.crypto.spec.SecretKeySpec;
 import java.nio.charset.StandardCharsets;
 import java.util.Date;
 import java.util.Objects;
-import java.util.concurrent.TimeUnit;
 
 @Component
 public class JWTUtil {
-    private final RedisTemplate<String, String> redisTemplate;
+    private final RedisUtil redisUtil;
     private SecretKey secretKey;
 
-    public JWTUtil(RedisTemplate<String, String> redisTemplate, @Value("${spring.jwt.secret}")String secret) {
-        this.redisTemplate = redisTemplate;
-
-
+    public JWTUtil(RedisUtil redisUtil, @Value("${spring.jwt.secret}")String secret) {
+        this.redisUtil = redisUtil;
         secretKey = new SecretKeySpec(secret.getBytes(StandardCharsets.UTF_8), Jwts.SIG.HS256.key().build().getAlgorithm());
     }
-
-    // public String getUsername(String token) {
-
-    //     return Jwts.parser().verifyWith(secretKey).build().parseSignedClaims(token).getPayload().get("username", String.class);
-    // }
 
     // 토큰에서 subject를 가져오는 메서드
     public String getUsername(String token) {
@@ -68,11 +58,23 @@ public class JWTUtil {
                     .before(new Date());
     }
 
+    // jwtUtil.java 파일
+    public Long getExpiration(String token) {
+        long ex = Jwts.parser()
+                    .verifyWith(secretKey)  // JWT 서명 키
+                    .build()
+                    .parseSignedClaims(token)
+                    .getPayload()
+                    .getExpiration()
+                    .getTime();
+        return ex - System.currentTimeMillis();
+    }
+
+
     public String createJwt(String type, String username, String role, Long expiredMs) {
 
         String token = Jwts.builder()
                 .subject(username) // 토큰의 주제. 즉, Key
-                // .claim("username", username)
                 .claim("role", role) // 토큰의 추가 정보 or 속성. 즉, Value
                 .claim("token_type", type)
                 .issuedAt(new Date(System.currentTimeMillis())) // 토클 발행 시간
@@ -82,12 +84,7 @@ public class JWTUtil {
 
         // refreshToken 생성 시 Redis에 저장
         if (Objects.equals(type, "refresh")) {
-            redisTemplate.opsForValue().set(
-                    username,
-                    token,
-                    expiredMs, // redis에서 값 소멸 시간(TTL) RefreshToken의 만료 시간과 동일하게 설정)
-                    TimeUnit.MILLISECONDS
-            );
+            redisUtil.setValue(username, token, expiredMs);
         }
 
         return token;
