@@ -82,7 +82,7 @@ public class LoginFilter extends UsernamePasswordAuthenticationFilter {
         GrantedAuthority auth = iterator.next();
         String role = auth.getAuthority();
 
-        String accesstoken = jwtUtil.createJwt("access", username, role, 6*1000L);
+        String accesstoken = jwtUtil.createJwt("access", username, role, 6*10000L);
         String refreshtoken = jwtUtil.createJwt("refresh", username, role, 60*60*1000*10L);
 
         //응답 설정

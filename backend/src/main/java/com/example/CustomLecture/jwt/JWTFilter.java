@@ -20,10 +20,12 @@ import java.io.PrintWriter;
 public class JWTFilter extends OncePerRequestFilter {
 
     private final JWTUtil jwtUtil;
+    private final RedisUtil redisUtil;
 
     // JWTUtil 주입
-    public JWTFilter(JWTUtil jwtUtil){
+    public JWTFilter(JWTUtil jwtUtil, RedisUtil redisUtil){
         this.jwtUtil = jwtUtil;
+        this.redisUtil = redisUtil;
     }
 
     @Override
@@ -79,6 +81,17 @@ public class JWTFilter extends OncePerRequestFilter {
             writer.print("invalid access token");
 
             //response status code
+            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+            return;
+        }
+
+        // blacklist 확인 -> 등록 되어 있다면 401 오류 반환
+        String isAccessToken = redisUtil.getValue(accessToken);
+        if (isAccessToken != null) {
+            //response body
+            PrintWriter writer = response.getWriter();
+            writer.print("access token in blacklist");
+
             response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
             return;
         }

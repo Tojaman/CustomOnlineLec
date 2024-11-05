@@ -1,23 +1,15 @@
 package com.example.CustomLecture.config;
 
-import com.example.CustomLecture.jwt.CustomLogoutFilter;
-import com.example.CustomLecture.jwt.JWTFilter;
-import com.example.CustomLecture.jwt.JWTUtil;
-import com.example.CustomLecture.jwt.LoginFilter;
+import com.example.CustomLecture.jwt.*;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
-import org.springframework.security.core.userdetails.User;
-import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-import org.springframework.security.provisioning.InMemoryUserDetailsManager;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.security.web.authentication.logout.LogoutFilter;
@@ -33,12 +25,12 @@ public class SecurityConfig {
     //AuthenticationManager가 인자로 받을 AuthenticationConfiguraion 객체 생성자 주입
     private final AuthenticationConfiguration authenticationConfiguration;
     private final JWTUtil jwtUtil;
-    private final RedisTemplate<String, String> redisTemplate;
+    private final RedisUtil redisUtil;
 
-    public SecurityConfig(AuthenticationConfiguration authenticationConfiguration, JWTUtil jwtUtil, RedisTemplate<String, String> redisTemplate) {
+    public SecurityConfig(AuthenticationConfiguration authenticationConfiguration, JWTUtil jwtUtil, RedisUtil redisUtil) {
         this.authenticationConfiguration = authenticationConfiguration;
         this.jwtUtil = jwtUtil;
-        this.redisTemplate = redisTemplate;
+        this.redisUtil = redisUtil;
     }
 
     //AuthenticationManager Bean 등록
@@ -116,14 +108,14 @@ public class SecurityConfig {
         */
         // 의문: 로그인 요청은 JWTFilter를 거칠 필요가 없다. 그런데 JWTFilter를 먼저 거치도록 되어 있어서 거칠 수밖에 없는데 이 경우 어떻게 할까?
         http
-            .addFilterBefore(new JWTFilter(jwtUtil), LoginFilter.class);
+            .addFilterBefore(new JWTFilter(jwtUtil, redisUtil), LoginFilter.class);
 
         //필터 추가 LoginFilter는 인자를 받음 (AuthenticationManager() 메소드에 authenticationConfiguration 객체를 넣어야 함) 따라서 등록 필요
         http
             .addFilterAt(new LoginFilter(authenticationManager(authenticationConfiguration), jwtUtil), UsernamePasswordAuthenticationFilter.class);
 
         http
-            .addFilterBefore(new CustomLogoutFilter(jwtUtil, redisTemplate), LogoutFilter.class);
+            .addFilterBefore(new CustomLogoutFilter(jwtUtil, redisUtil), LogoutFilter.class);
         // 세션 stateless 상태로 설정
         http
 
