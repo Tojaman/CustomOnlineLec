@@ -48,7 +48,7 @@ axiosInstance.interceptors.response.use(
                     }
                 );
                 // const { accessToken } = response.data;
-                const accessToken = response.headers['authorization']; // 헤더에서 직접 가져오기
+                const accessToken = response.headers['authorization'].split(" ")[1];; // 헤더에서 직접 가져오기
 
                 
                 // 새로운 Access token 저장
@@ -56,16 +56,14 @@ axiosInstance.interceptors.response.use(
                 
                 // 원래의 요청에 새로운 token을 추가하고 기존 요청을 다시 전송
                 // ↓Authorization 헤더에 "Bearer Bearer 토큰값" 형식으로 Bearer이 두 번 들어가는 문제 발생하여 수정
-                // originalRequest.headers.Authorization = `Bearer ${accessToken}`;
-                originalRequest.headers.Authorization = `${accessToken}`;
-                console.log(originalRequest.headers.Authorization);
+                originalRequest.headers.Authorization = `Bearer ${accessToken}`;
                 return axios(originalRequest);
             } catch (refreshError) {
                 console.log(refreshError);
-                // // refresh token이 만료된 경우
-                // sessionStorage.clear();
-                // // 로그인 페이지로 리다이렉트 등 필요한 처리 추가
-                // window.location.href = '/login';
+                // refresh token이 만료된 경우
+                sessionStorage.clear();
+                // 로그인 페이지로 리다이렉트 등 필요한 처리 추가
+                window.location.href = '/login';
             }
         }
     return Promise.reject(error);

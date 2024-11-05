@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { Link } from "react-router-dom";
 import styled from "styled-components";
-import axios from "axios";
+import axiosInstance from '../../interceptors/axiosInstance';
 import config from '../../config';
 import AWS from "aws-sdk";
 import Sidebar from "../../components/sidebar/Sidebar";
@@ -209,7 +209,7 @@ const VideoInfo = () => {
     }
 
     try {
-      const response = await axios.post(
+      const response = await axiosInstance.post(
         `${apiUrl}/videos/uploadInfo`,
         {
           id,
@@ -226,11 +226,6 @@ const VideoInfo = () => {
           videoHeight,
           subtitle,
         },
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
       );
 
       console.log("영상 정보 업로드 요청 성공");

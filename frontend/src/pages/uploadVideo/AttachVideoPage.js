@@ -1,6 +1,6 @@
 import React, { useState, useRef, useEffect } from "react";
 import { Link } from "react-router-dom";
-import axios from "axios";
+import axiosInstance from '../../interceptors/axiosInstance';
 import config from '../../config';
 import AWS from "aws-sdk";
 import Sidebar from "../../components/sidebar/Sidebar";
@@ -318,17 +318,12 @@ const Attach = () => {
     dispatch(videoData(videoInfo));
 
     try {
-      const response = await axios.post(
-       `${apiUrl}/videos/uploadVideo`,
+      const response = await axiosInstance.post(
+      `${apiUrl}/videos/uploadVideo`,
         {
           url,
           gender,
         },
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
       );
       sessionStorage.setItem("UploadVideoID", response.data.video_id);
       console.log("영상 링크 업로드 요청 성공");
