@@ -1,12 +1,7 @@
 package com.example.CustomLecture.jwt;
 
-import org.springframework.data.redis.core.RedisTemplate;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.filter.GenericFilterBean;
-
 import io.jsonwebtoken.ExpiredJwtException;
-
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.ServletRequest;
@@ -16,14 +11,16 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
 import java.io.IOException;
+import java.util.Date;
+import java.util.concurrent.TimeUnit;
 
 public class CustomLogoutFilter extends GenericFilterBean {
     private final JWTUtil jwtUtil;
-    private final RedisTemplate<String, String> redisTemplate;
+    private final RedisUtil redisUtil;
 
-    public CustomLogoutFilter(JWTUtil jwtUtil, RedisTemplate<String, String> redisTemplate) {
+    public CustomLogoutFilter(JWTUtil jwtUtil, RedisUtil redisUtil) {
         this.jwtUtil = jwtUtil;
-        this.redisTemplate = redisTemplate;
+        this.redisUtil = redisUtil;
     }
 
     @Override
@@ -88,16 +85,24 @@ public class CustomLogoutFilter extends GenericFilterBean {
 
         // Redis에 RefreshToken이 저장되어 있는지 확인
         String username = jwtUtil.getUsername(refresh);
-        String refreshToken = redisTemplate.opsForValue().get(username);
+        String refreshToken = redisUtil.getValue(username);
         if (refreshToken == null || !refreshToken.equals(refresh)) {
             response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
             return;
         }
 
         // Redis에서 RefreshToken 제거
-        redisTemplate.delete(username);
+        redisUtil.deleteValue(username);
 
-        // 추후 AccessToken 블랙리스트로 추가하여 만료 시간이 남은 AccessToken으로 요청이 오는 보안 문제 해결 예정
+        // AccessToken 블랙리스트로 추가
+        String accessToken = request.getHeader("Authorization");
+        accessToken = accessToken.substring(7).trim();
+
+        String acusername = jwtUtil.getUsername(accessToken);
+
+        long ttlMillis = jwtUtil.getExpiration(accessToken);
+
+        redisUtil.setValue(acusername, "logout", ttlMillis);
 
         // RefreshToken에 null 값을 만들고 setMaxAge를 0인(쿠키 유효 기간) Cookie로 만들어 응답
         Cookie cookie = new Cookie("refresh", null);
