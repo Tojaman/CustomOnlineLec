@@ -3,7 +3,7 @@ import { Link } from "react-router-dom";
 import styled from "styled-components";
 import Navbar from "../components/header/Navbar";
 import Background from "../assets/img/Group.png";
-import axios from "axios";
+import axiosInstance from '../interceptors/axiosInstance';
 import config from '../config';
 import AWS from "aws-sdk";
 
@@ -135,12 +135,8 @@ const UploadList = () => {
 
     const s3 = new AWS.S3();
 
-    axios
-      .get(`${apiUrl}/videos/list`, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      })
+    axiosInstance
+      .get(`${apiUrl}/videos/list`, {})
       .then((response) => {
         const videoData = response.data
           .map((video) => ({

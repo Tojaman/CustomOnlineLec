@@ -3,7 +3,7 @@ import { Link } from "react-router-dom";
 import styled from "styled-components";
 import { GoArrowRight } from "react-icons/go";
 import Slider from "react-slick";
-import axios from "axios";
+import axiosInstance from '../../interceptors/axiosInstance';
 import config from '../../config';
 import Navbar from "../../components/header/Navbar";
 import Background from "../../assets/img/Group.png";
@@ -160,17 +160,12 @@ const Select = () => {
     const selectedVideoId = sessionStorage.getItem("selectedVideoId");
     console.log(selectedVideoId);
     if (selectedVideoId) {
-      axios
+      axiosInstance
         .post(
           `${apiUrl}/videos/info`,
           {
             videoid: selectedVideoId,
           },
-          {
-            headers: {
-              Authorization: `Bearer ${token}`,
-            },
-          }
         )
         .then((response) => {
           console.log("영상 정보 요청 성공");

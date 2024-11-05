@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import styled from "styled-components";
-import axios from "axios";
 import config from '../config';
 import AWS from "aws-sdk";
 import { IoIosArrowForward } from "react-icons/io";
@@ -223,33 +222,6 @@ const MyPage = () => {
     setIsEditing(true);
   };
 
-  // const handleSaveClick = () => {
-  //   axios
-  //     .patch(
-  //       `${apiUrl}/mypage/update/${username}`,
-  //       {
-  //         newNickname: editedNickname,
-  //         currentPassword: currentPassword,
-  //         newPassword: newPassword,
-  //       },
-  //       {
-  //         headers: {
-  //           Authorization: `Bearer ${token}`,
-  //         },
-  //       }
-  //     )
-  //     .then((response) => {
-  //       console.log("회원 정보 수정 요청 성공");
-  //       setIsEditing(false);
-  //       addToast("회원 정보가 성공적으로 수정되었습니다.", { appearance: "success", autoDismiss: true, autoDismissTimeout: 5000 });
-  //     })
-  //     .catch((error) => {
-  //       console.error("회원 정보 수정 요청 실패 : ", error);
-  //       addToast("회원 정보 수정을 실패했습니다.", { appearance: "error", autoDismiss: true, autoDismissTimeout: 5000 });
-  //     });
-  //   sessionStorage.setItem("userNickname", editedNickname);
-  //   setNickname(editedNickname);
-  // };
   const handleSaveClick = () => {
     axiosInstance
       .patch(
@@ -313,15 +285,10 @@ const MyPage = () => {
   };
 
   const sendS3UrlToServer = (s3Url) => {
-    axios
+    axiosInstance
       .patch(
         `${apiUrl}/mypage/update/profile/${username}`,
         { ProfileS3Path: s3Url },
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
       )
       .then((response) => {
         console.log("프로필 사진 링크 업로드 요청 성공");
@@ -344,11 +311,10 @@ const MyPage = () => {
 
     async function fetchProfileInfo() {
       try {
-        const response = await axios.get(`${apiUrl}/mypage/${username}`, {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        });
+        const response = await axiosInstance
+        .get(
+          `${apiUrl}/mypage/${username}`, {}
+        );
         console.log("회원 정보 확인 요청 성공");
 
         setNickname(response.data.nickname);
@@ -387,11 +353,9 @@ const MyPage = () => {
 
     async function fetchVideos() {
       try {
-        const response = await axios.get(`${apiUrl}/videos/list`, {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        });
+        const response = await axiosInstance
+        .get(`${apiUrl}/videos/list`, {}
+        );
         console.log("영상 목록 요청 성공");
 
         const videoData = response.data
@@ -455,12 +419,9 @@ const MyPage = () => {
       cancelButtonText: "아니요",
     }).then((result) => {
       if (result.isConfirmed) {
-        axios
-          .delete(`${apiUrl}/mypage/delete/${username}`, {
-            headers: {
-              Authorization: `Bearer ${token}`,
-            },
-          })
+        axiosInstance
+          .delete(`${apiUrl}/mypage/delete/${username}`, {}
+          )
           .then((response) => {
             console.log("회원탈퇴 요청 성공");
             addToast("성공적으로 회원탈퇴되었습니다.", { appearance: "success", autoDismiss: true, autoDismissTimeout: 5000 });
