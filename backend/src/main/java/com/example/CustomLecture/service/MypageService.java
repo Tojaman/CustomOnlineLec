@@ -49,55 +49,10 @@ public class MypageService {
             throw new EntityNotFoundException("User with ID " + username + " not found");
         }
     }
-
-
   
     public UserEntity getUserByUsername(String username) {
         return userRepository.findByUsername(username).orElse(null);
     }
-
-
-    public String getUserNicknameByUsername(String username) {
-        return userRepository.findByUsername(username)
-                .map(UserEntity::getNickname)
-                .orElse(null);
-    }
-
-    public String getUserPasswordByUsername(String username) {
-        return userRepository.findByUsername(username)
-                .map(UserEntity::getPassword)
-                .orElse(null);
-    }
-
-    public String getUserProfileByUsername(String username) {
-        return userRepository.findByUsername(username)
-                .map(UserEntity::getProfileS3Path)
-                .orElse(null);
-    }
-
-    /**
-    //회원 정보 업데이트
-    public void updateUserDetail(Long userId, Map<String, String> updateInfo) {
-        Optional<UserEntity> optionalUser = userRepository.findById(userId);
-
-        if (optionalUser.isPresent()) {
-            UserEntity user = optionalUser.get();
-
-            if (updateInfo.containsKey("newNickname")) {
-                user.setNickname(updateInfo.get("newNickname"));
-            }
-
-            if (updateInfo.containsKey("newPassword")) {
-                String newPassword = updateInfo.get("newPassword");
-                user.setPassword(bCryptPasswordEncoder.encode(newPassword));
-            }
-
-            userRepository.save(user);
-        } else {
-            throw new EntityNotFoundException("User with ID " + userId + " not found");
-        }
-    }
-*/
 
     //탈퇴하는 회원 비디오 삭제
     public void deleteVideosByUser(UserEntity user) {
@@ -149,5 +104,11 @@ public class MypageService {
         } else {
             throw new EntityNotFoundException("User with ID " + username + " not found");
         }
+    }
+
+    public String getUserPasswordByUsername(String username) {
+        return userRepository.findByUsername(username)
+                .map(UserEntity::getPassword)
+                .orElse(null);
     }
 }
