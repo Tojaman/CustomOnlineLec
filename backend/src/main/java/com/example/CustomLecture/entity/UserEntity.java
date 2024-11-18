@@ -1,6 +1,7 @@
 package com.example.CustomLecture.entity;
 
 import com.example.CustomLecture.dto.ProfileDTO;
+import com.example.CustomLecture.dto.Response.UserInfoResponseDTO;
 import com.example.CustomLecture.dto.Response.VideoInfoResponseDTO;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Email;
@@ -44,6 +45,14 @@ public class UserEntity {
 
     public UserEntity() {
 
+    }
+
+    public UserInfoResponseDTO toUserInfoResponseDTO() {
+        return new UserInfoResponseDTO(
+                this.nickname,
+                this.password,
+                this.profileS3Path
+        );
     }
 
 
