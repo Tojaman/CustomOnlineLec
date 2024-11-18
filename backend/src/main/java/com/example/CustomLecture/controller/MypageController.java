@@ -1,6 +1,7 @@
 package com.example.CustomLecture.controller;
 
 
+import com.example.CustomLecture.dto.Response.UserInfoResponseDTO;
 import com.example.CustomLecture.entity.UserEntity;
 import com.example.CustomLecture.service.MypageService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -17,6 +18,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.NoSuchElementException;
 
 @Tag(name="마이페이지 API", description = "마이페이지 API 입니다.")
 @RestController
@@ -34,18 +36,15 @@ public class MypageController {
             @ApiResponse(responseCode = "200", description = "OK"),
             @ApiResponse(responseCode = "500", description = "Server Error")
     })
-    public ResponseEntity<Map<String, String>> getUserInfoByNickname(@PathVariable String username) {
-        UserEntity user = mypageService.getUserByUsername(username);
-
-        if (user != null) {
-            Map<String, String> userInfo = new HashMap<>();
-            userInfo.put("nickname", user.getNickname());
-            userInfo.put("password", user.getPassword());
-            userInfo.put("profile", user.getProfileS3Path());
-
-            return new ResponseEntity<>(userInfo, HttpStatus.OK);
-        } else {
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+    public ResponseEntity<Object> getUserInfoByNickname(@PathVariable String username) {
+        try {
+            return ResponseEntity.status(HttpStatus.OK).body(mypageService.getUserByUsername(username));
+        } catch (NoSuchElementException e) {
+            // 유효성 검사 실패 등 예외 발생 시 클라이언트에게 BadRequest 반환
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
+        } catch (Exception e) {
+            // 그 외 예상치 못한 예외 발생 시 클라이언트에게 InternalServerError 반환
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("서버 오류가 발생했습니다: " + e.getMessage());
         }
     }
 
@@ -97,23 +96,21 @@ public class MypageController {
     })
     public ResponseEntity<String> deleteUser(@PathVariable String username) {
         try {
-            UserEntity user = mypageService.getUserByUsername(username);
-            if (user != null) {
-                // 해당 유저의 모든 비디오 삭제
-                mypageService.deleteVideosByUser(user);
+            UserInfoResponseDTO userInfoResponseDTO = mypageService.getUserByUsername(username);
 
-                // 유저 탈퇴
-                mypageService.deleteUserByUsername(username);
+            // 해당 유저의 모든 비디오 삭제
+            mypageService.deleteVideosByUser(userInfoResponseDTO);
 
-                return new ResponseEntity<>("User and associated videos deleted successfully", HttpStatus.OK);
-            } else {
-                return new ResponseEntity<>("User not found", HttpStatus.NOT_FOUND);
-            }
-        } catch (EmptyResultDataAccessException e) {
-            return new ResponseEntity<>("User not found", HttpStatus.NOT_FOUND);
+            // 유저 탈퇴
+            mypageService.deleteUserByUsername(username);
+            return ResponseEntity.status(HttpStatus.OK).body("User and associated videos deleted successfully");
+        } catch (NoSuchElementException e) {
+            // 유효성 검사 실패 등 예외 발생 시 클라이언트에게 BadRequest 반환
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
+        } catch (Exception e) {
+            // 그 외 예상치 못한 예외 발생 시 클라이언트에게 InternalServerError 반환
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("서버 오류가 발생했습니다: " + e.getMessage());
         }
     }
-
-
 }
 
