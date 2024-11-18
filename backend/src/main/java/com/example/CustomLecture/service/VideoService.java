@@ -1,6 +1,7 @@
 package com.example.CustomLecture.service;
 import com.example.CustomLecture.dto.Request.VideoSaveRequestDTO;
 import com.example.CustomLecture.dto.Response.VideoInfoResponseDTO;
+import com.example.CustomLecture.dto.Response.VideoListResponseDTO;
 import com.example.CustomLecture.entity.UserEntity;
 import com.example.CustomLecture.entity.Video;
 import com.example.CustomLecture.entity.VideoData;
@@ -124,55 +125,18 @@ public class VideoService {
 
     }
 
-    //모든 영상 id 불러오기
-    public List<Long> getAllVideoIds() {
-        List<Video> videoIds = videoRepository.findAll();
-        return videoIds.stream()
-                .map(Video::getId)
-                .collect(Collectors.toList());
-    }
-
-    //모든 영상 제목 불러오기
-    public List<String> getAllVideoTitles() {
-        List<Video> videoTitles = videoRepository.findAll();
-        return videoTitles.stream()
-                .map(Video::getTitle)
-                .collect(Collectors.toList());
-    }
-
-    //모든 영상 썸네일 불러오기
-    public List<String> getAllVideoThumbnails() {
+    // 모든 영상 정보 불러오기
+    public List<VideoListResponseDTO> getAllVideoDetails() {
         List<Video> videos = videoRepository.findAll();
-        return videos.stream()
-                .map(Video::getThumbnailS3Path)
-                .collect(Collectors.toList());
-    }
+        if (videos.isEmpty()) {
+            throw new IllegalArgumentException("영상 목록이 비어있습니다.");
+        }
 
-    //모든 영상 닉네임 불러오기
-    public List<String> getAllNicknames() {
-        List<Video> videos = videoRepository.findAll();
-        return videos.stream()
-                .map(video -> {
-                    Optional<UserEntity> userOptional = userRepository.findById(video.getMember().getId());
-                    return userOptional.map(UserEntity::getNickname).orElse(null);
-                })
-                .collect(Collectors.toList());
-    }
-
-    // 모든 영상 주제 불러오기
-    public List<String> getAllSubject() {
-        List<Video> subjects = videoRepository.findAll();
-        return subjects.stream()
-                .map(Video::getSubject)
-                .collect(Collectors.toList());
-    }
-
-    //모든 영상 날짜 불러오기
-    public List<LocalDateTime> getAllDate(){
-        List<Video> date = videoRepository.findAll();
-        return date.stream()
-                .map(Video::getDate)
-                .collect(Collectors.toList());
+        List<VideoListResponseDTO> videoList = new ArrayList<>();
+        for (Video video : videos) {
+            videoList.add(video.toVideoListResponseDTO());
+        }
+        return videoList;
     }
 
 

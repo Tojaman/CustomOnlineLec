@@ -3,6 +3,7 @@ package com.example.CustomLecture.controller;
 import com.example.CustomLecture.dto.Request.VideoConvertRequestDTO;
 import com.example.CustomLecture.dto.Request.VideoInfoRequestDTO;
 import com.example.CustomLecture.dto.Request.VideoSaveRequestDTO;
+import com.example.CustomLecture.dto.Response.VideoListResponseDTO;
 import com.example.CustomLecture.entity.UserEntity;
 import com.example.CustomLecture.service.VideoService;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -100,29 +101,18 @@ public class VideoController {
             @ApiResponse(responseCode = "200", description = "OK"),
             @ApiResponse(responseCode = "500", description = "Server Error")
     })
-    public ResponseEntity<List<Map<String, Object>>> getAllVideoDetails() {
-        List<Map<String, Object>> result = new ArrayList<>();
+    // List<VideoListResponseDTO> 뿐만 아니라 오류 메시지도 전송할 수 있도록 반환 타입을 Object로 변경
+    public ResponseEntity<Object> getAllVideoDetails() {
 
-        List<Long> videoIds = videoService.getAllVideoIds();
-        List<String> videoTitles = videoService.getAllVideoTitles();
-        List<String> videoThumbnails = videoService.getAllVideoThumbnails();
-        List<String> nicknames = videoService.getAllNicknames();
-        List<String> subjects = videoService.getAllSubject();
-        List<LocalDateTime> dates = videoService.getAllDate();
-
-        IntStream.range(0, Math.min(Math.min(Math.min(Math.min(videoIds.size(), videoTitles.size()), videoThumbnails.size()), nicknames.size()), Math.min(subjects.size(), dates.size())))
-                .forEach(i -> {
-                    Map<String, Object> map = new HashMap<>();
-                    map.put("id", videoIds.get(i));
-                    map.put("title", videoTitles.get(i));
-                    map.put("thumbnail", videoThumbnails.get(i));
-                    map.put("nickname", nicknames.get(i));
-                    map.put("subject", subjects.get(i));
-                    map.put("date", dates.get(i));
-                    result.add(map);
-                });
-
-        return new ResponseEntity<>(result, HttpStatus.OK);
+        try {
+            return ResponseEntity.status(HttpStatus.OK).body(videoService.getAllVideoDetails());
+        } catch (IllegalArgumentException e) {
+            // 유효성 검사 실패 등 예외 발생 시 클라이언트에게 BadRequest 반환
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("요청이 잘못되었습니다: " + e.getMessage());
+        } catch (Exception e) {
+            // 그 외 예상치 못한 예외 발생 시 클라이언트에게 InternalServerError 반환
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("서버 오류가 발생했습니다: " + e.getMessage());
+        }
     }
 
     @PostMapping("/info")

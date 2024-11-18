@@ -2,13 +2,13 @@ package com.example.CustomLecture.entity;
 
 import com.example.CustomLecture.dto.Request.VideoSaveRequestDTO;
 import com.example.CustomLecture.dto.Response.VideoInfoResponseDTO;
+import com.example.CustomLecture.dto.Response.VideoListResponseDTO;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import java.sql.Timestamp;
 import java.time.format.DateTimeFormatter;
 import java.time.LocalDateTime;
 
@@ -115,6 +115,17 @@ public class Video {
                 s3Path.getJung(),
                 s3Path.getIu(),
                 s3Path.getKarina()
+        );
+    }
+
+    public VideoListResponseDTO toVideoListResponseDTO() {
+        return new VideoListResponseDTO(
+                this.getId(),
+                this.getTitle(),
+                this.getThumbnailS3Path(),
+                this.getMember().getNickname(),
+                this.getSubject(),
+                this.getDate()
         );
     }
 
