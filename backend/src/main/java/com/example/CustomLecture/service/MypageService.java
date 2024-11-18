@@ -1,6 +1,7 @@
 package com.example.CustomLecture.service;
 
 import com.example.CustomLecture.dto.JoinDTO;
+import com.example.CustomLecture.dto.Response.UserInfoResponseDTO;
 import com.example.CustomLecture.entity.UserEntity;
 import com.example.CustomLecture.entity.Video;
 import com.example.CustomLecture.repository.UserRepository;
@@ -14,6 +15,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
 import java.util.Map;
+import java.util.NoSuchElementException;
 import java.util.Optional;
 
 @Service
@@ -50,15 +52,26 @@ public class MypageService {
         }
     }
   
-    public UserEntity getUserByUsername(String username) {
-        return userRepository.findByUsername(username).orElse(null);
+    public UserInfoResponseDTO getUserByUsername(String username) {
+        Optional<UserEntity> user = userRepository.findByUsername(username);
+
+        if (user.isEmpty()) {
+            throw new NoSuchElementException("존재하지 않는 이메일입니다.");
+        }
+
+        return user.get().toUserInfoResponseDTO();
     }
 
     //탈퇴하는 회원 비디오 삭제
-    public void deleteVideosByUser(UserEntity user) {
-        List<Video> videos = videoRepository.findByMember(user);
-        for (Video video : videos) {
-            videoRepository.delete(video);
+    public void deleteVideosByUser(UserInfoResponseDTO userInfoResponseDTO) {
+        Optional<UserEntity> user = userRepository.findByUsername(userInfoResponseDTO.getNickname());
+
+        if (user.isPresent()) {
+            List<Video> videos = videoRepository.findByMember(user.get());
+            if (!videos.isEmpty())
+                for (Video video : videos) {
+                    videoRepository.delete(video);
+                }
         }
     }
 
